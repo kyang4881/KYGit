@@ -44,7 +44,6 @@ plot(k.values, wss_values,
      xlab="Number of clusters K",
      ylab="Total within-clusters sum of squares")
 
-set.seed(123)
 
 fviz_nbclust(df, kmeans, method = "wss")
 
@@ -67,7 +66,6 @@ plot(k.values, avg_sil_values,
 
 fviz_nbclust(df, kmeans, method = "silhouette")
 
-set.seed(123)
 gap_stat <- clusGap(df, FUN = kmeans, nstart = 25,
                     K.max = 10, B = 50)
 #Print results
