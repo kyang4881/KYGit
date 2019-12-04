@@ -1,0 +1,175 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{titling}
+\usepackage{amsmath}
+
+
+\begin{document}
+	%%create title page
+	\begin{titlepage}
+		\vspace*{\stretch{1.0}}
+			\begin{center}
+		      		\Large\textbf{Neural Networks Documentation}\\
+		      		\large{Kyang4881}\\
+				\large{November 3 2019}\\
+		   	\end{center}
+	   	\vspace*{\stretch{2.0}}
+	\end{titlepage}
+
+	%%create main page
+	\title{\vspace{-8em} Derivative of Softmax Function}
+		\date{\vspace{-5ex}}
+		\maketitle
+
+	\[
+		Softmax(a)_i = {\frac{e^{a_i}} {\sum_{k=1}^{N} e^{a_k}}}
+	\]
+
+	\[
+		{\frac{\partial p_i}{\partial a_j}} = {\frac{\partial {\frac{e^{a_i}} {\sum_{k=1}^{N} e^{a_k}}}} {\partial a_j}}
+	\]  
+	
+
+
+	\[
+		{\frac{\partial {\sum_{k=1}^{N} e^{a_k}}} {\partial {e^{a_j}}}} = 
+			\begin{cases}
+				e^{a_j},		&\text{if $k = $j;}\\
+				0,			&\text{otherwise.}\\
+			\end{cases}		     
+	\]
+	
+	\text{ if $i = $j:}
+	
+
+	%\begin{multline}
+	\begin{align}
+		{\frac{\partial p_i}{\partial a_j}} 
+		 		    &= {\frac{\partial {\frac{e^{a_i}}{\sum_{k=1}^{N} e^{a_k}}}}{\partial {a_j}}} \\
+				    &= {\frac{({\frac{\partial {e^{a_i}}}{\partial a_j}})({\sum_{k=1}^{N} e^{a_k}}) - ({\frac{\partial{\sum_{k=1}^{N} e^{a_k}}}{\partial {a_j}}})(e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= {\frac{(e^{a_j})({\sum_{k=1}^{N} e^{a_k}}) - (e^{a_j})(e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= {\frac{({e^{a_j}})({\sum_{k=1}^{N} e^{a_k}} - e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= ({\frac{e^{a_j}}{\sum_{k=1}^{N} e^{a_k}}})({\frac{{\sum_{k=1}^{N} e^{a_k}} - e^{a_i}} {\sum_{k=1}^{N} e^{a_k}}})\\
+				    &= p_j(1-{\frac{e^{a_i}}{\sum_{k=1}^{N} e^{a_k}}})\\
+				    &= p_j(1-p_i)
+	\end{align}
+	%\end{multline}
+
+	\text{ if $i \neq $j:}
+	
+
+	%\begin{multline}
+	\begin{align}
+		{\frac{\partial p_i}{\partial a_j}} 
+		 		    &= {\frac{\partial {\frac{e^{a_i}}{\sum_{k=1}^{N} e^{a_k}}}}{\partial {a_j}}} \\
+				    &= {\frac{({\frac{\partial {e^{a_i}}}{\partial a_j}})({\sum_{k=1}^{N} e^{a_k}}) - ({\frac{\partial{\sum_{k=1}^{N} e^{a_k}}}{\partial {a_j}}})(e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= {\frac{(0)({\sum_{k=1}^{N} e^{a_k}}) - (e^{a_j})(e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= {\frac{-({e^{a_j}} e^{a_i})} {({\sum_{k=1}^{N} e^{a_k}})^2}} \\
+				    &= -({\frac{e^{a_j}}{\sum_{k=1}^{N} e^{a_k}}})({\frac{e^{a_i}} {\sum_{k=1}^{N} e^{a_k}}})\\
+				    &= -p_jp_i\\
+	\end{align}
+	%\end{multline}
+
+	\[
+		{\frac{\partial {p_i}} {\partial a_j}} = %%empty row will cause an error (Missing $ inserted)		
+			\begin{cases}
+				p_j(1-p_i),		&\text{if $i = $j;}\\
+				-p_jp_i,		&\text{if $i \neq $j.}\\
+			\end{cases}		     
+	\]
+
+
+	%%create main page
+	\title{\vspace{-8em} Cross Entropy Loss and Derivative}
+		\date{\vspace{-5ex}}
+		\maketitle
+	
+	\[ 
+		L = H(y_i, {\hat y_i}) = -{\sum_{i} y_i log({\hat y_i})} 
+	\]
+
+	%\begin{multline}
+	\begin{align}
+		\frac{\partial {L}}{\partial a_j} 
+		&= - \frac{\partial {\sum_{i} y_i log({\hat y_i})}} {\partial a_j}\\
+		&= - \frac{\sum_{i} y_i {\partial log({\hat y_i})}} {\partial a_j}\\
+		&= - \frac{\sum_{i} y_i {\partial log({\hat y_i})}} {\partial {\hat y_i}} \frac{\partial {\hat y_i}}{\partial {a_j}}\\
+		&= - \frac{\sum_{i} y_i} {{\hat y_i}} \frac{\partial {\hat y_i}}{\partial {a_j}}\\
+		&= - \frac{\sum_{i} y_i} {{\hat y_i}} 			
+			\begin{cases}
+				\hat y_j(1- \hat y_i),		&\text{if $i = $j;}\\
+				-\hat y_j \hat y_i,		&\text{if $i \neq $j.}\\
+			\end{cases}	\\
+		&= -y_j*(1- \hat y_j) + \sum_{i \neq j} y_i\hat y_j \\
+		&= -y_j + y_j\hat y_j + \sum_{i \neq j} y_i\hat y_j\\
+		&= -y_j + (y_j\hat y_j + \sum_{i \neq j} y_i\hat y_j)\\
+		&= -y_j + \sum_i {y_i \hat y_j} \\
+		&= \hat y_j - y_j
+	\end{align}
+	%\end{multline}	
+
+	\[
+		Cost = L = H(y_i, {\hat y_i}) = -{\sum_{i} y_i log({\hat y_i})}
+	\]
+	
+	%\text {Let wh = hidden weights, xh = hidden outputs, yh = mapped hidden outputs, bh = hidden bias}
+	%\text {and wo = output weights, xo = final outputs, yo = mapped final outputs, bo = output bias}
+	
+	%\begin{multline}
+	\begin{align}
+		\frac{\partial {L}}{\partial w_{o}}
+		&= - \frac{\partial {\sum y log(y_{o})}} {\partial w_{o}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (x_{o}))}} {\partial w_{o}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot y_{h} + b_{o}))}} {\partial w_{o}} \\
+		&= - \frac{\partial L}{\partial y_{o}}\frac {\partial y_{o}}{\partial x_{o}}\frac{\partial x_{o}}{\partial w_{o}}\\
+		&= - \frac{\partial L}{\partial x_{o}} \frac{\partial x_{o}}{\partial w_{o}}\\
+		&= - (y_{o} - y)(y_{h})\\
+		&= (y - y_{o})(y_{h})
+	\end{align}
+	%\end{multline}	
+
+	%\begin{multline}
+	\begin{align}
+		\frac{\partial {L}}{\partial b_{o}}
+		&= - \frac{\partial {\sum y log(y_{o})}} {\partial b_{o}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (x_{o}))}} {\partial b_{o}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot y_{h} + b_{o}))}} {\partial b_{o}} \\
+		&= - \frac{\partial L}{\partial y_{o}}\frac {\partial y_{o}}{\partial x_{o}}\frac{\partial x_{o}}{\partial b_{o}}\\
+		&= - \frac{\partial L}{\partial x_{o}} \frac{\partial x_{o}}{\partial b_{o}}\\
+		&= (y_{o} - y)(1)\\
+		&= (y_{o} - y)
+	\end{align}
+	%\end{multline}	
+
+	%\begin{multline}
+	\begin{align}
+		\frac{\partial {L}}{\partial w_{h}}
+		&= - \frac{\partial {\sum y log(y_{o})}} {\partial w_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (x_{o}))}} {\partial w_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot y_{h} + b_{o}))}} {\partial w_{h}} \\\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot (\theta_{h} (x_{h}) ) + b_{o}))}} {\partial w_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot (\theta_{h} (w_{h}\cdot x_{inputs} + b_{h}) ) + b_{o}))}} {\partial w_{h}} \\
+		&= - (\frac{\partial L}{\partial y_{o}}\frac {\partial y_{o}}{\partial x_{o}})\frac{\partial x_{o}}{\partial y_{h}} \frac{\partial y_{h}}{\partial x_{h}}\frac{\partial x_{h}}{\partial w_{h}}\\
+		&= - \frac{\partial L}{\partial x_{o}} \frac{\partial x_{o}}{\partial y_{h}}\frac{\partial y_{h}}{\partial x_{h}}\frac{\partial x_{h}}{\partial w_{h}}\\
+		&= (y_{o} - y)(w_{o})(  \theta^\prime_{h} (x_{h}))(x_{inputs})\\
+	\end{align}
+	%\end{multline}	
+
+	%\begin{multline}
+	\begin{align}
+		\frac{\partial {L}}{\partial b_{h}}
+		&= - \frac{\partial {\sum y log(y_{o})}} {\partial b_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (x_{o}))}} {\partial b_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot y_{h} + b_{o}))}} {\partial b_{h}} \\\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot (\theta_{h} (x_{h}) ) + b_{o}))}} {\partial b_{h}} \\
+		&= - \frac{\partial {\sum y log(\theta_{o} (w_{o}\cdot (\theta_{h} (w_{h}\cdot x_{inputs} + b_{h}) ) + b_{o}))}} {\partial b_{h}} \\
+		&= - (\frac{\partial L}{\partial y_{o}}\frac {\partial y_{o}}{\partial x_{o}})\frac{\partial x_{o}}{\partial y_{h}} \frac{\partial y_{h}}{\partial x_{h}}\frac{\partial x_{h}}{\partial b_{h}}\\
+		&= - \frac{\partial L}{\partial x_{o}} \frac{\partial x_{o}}{\partial y_{h}}\frac{\partial y_{h}}{\partial x_{h}}\frac{\partial x_{h}}{\partial b_{h}}\\
+		&= (y_{o} - y)(w_{o})(  \theta^\prime_{h} (x_{h}))(1)\\
+		&= (y_{o} - y)(w_{o})(  \theta^\prime_{h} (x_{h}))
+	\end{align}
+	%\end{multline}	
+		
+	
+\end{document}
+
