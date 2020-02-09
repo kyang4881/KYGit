@@ -106,7 +106,7 @@ predictions = list()
 for i in range(np.shape(data_rand_validation)[0]):
     predictions.append(int(knn.predict([data_rand_validation_features[i]])))
 data_rand_validation_predicted = np.hstack((data_rand_validation_features, np.array([predictions]).T))
-sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0] # Validation_accuracy = 67%
+sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0] 
 
 # Iterate through multiple n values
 accuracy = []
@@ -122,7 +122,7 @@ for k in range(3, 21):
 
     data_rand_validation_predicted = np.hstack((data_rand_validation_features, np.array([predictions]).T))
 
-    accuracy.append(sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels)/np.shape(data_rand_validation_labels)[0]) # k=3 => 73%
+    accuracy.append(sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels)/np.shape(data_rand_validation_labels)[0])  
     k_num.append(k)
 
 
@@ -133,6 +133,6 @@ predictions = list()
 for i in range(np.shape(data_rand_test)[0]):
     predictions.append(int(knn.predict([data_rand_test_features[i]])))
 data_rand_test_predicted = np.hstack((data_rand_test_features, np.array([predictions]).T))
-sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0] # test_accuracy = 77%
+sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0] 
 
 
