@@ -102,18 +102,17 @@ knn = KNeighborsClassifier()
 knn.fit(data_rand_train_features, data_rand_train_labels)
 
 # Check accuracy of default n on validation set
-validation_accuracy = []
 predictions = list()
 for i in range(np.shape(data_rand_validation)[0]):
     predictions.append(int(knn.predict([data_rand_validation_features[i]])))
 data_rand_validation_predicted = np.hstack((data_rand_validation_features, np.array([predictions]).T))
-validation_accuracy.append(sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0]) # Validation_accuracy = 67%
+sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0] # Validation_accuracy = 67%
 
 # Iterate through multiple n values
 accuracy = []
 k_num = []
 
-for k in range(3, 25):
+for k in range(3, 21):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(data_rand_train_features, data_rand_train_labels)
 
@@ -129,10 +128,11 @@ for k in range(3, 25):
 
 # Check accuracy of default n on testing set
 knn = KNeighborsClassifier(n_neighbors=3)
-knn.fit(data_rand_test_features, data_rand_test_labels)
-test_accuracy = []
+knn.fit(data_rand_train_features, data_rand_train_labels)
 predictions = list()
 for i in range(np.shape(data_rand_test)[0]):
     predictions.append(int(knn.predict([data_rand_test_features[i]])))
 data_rand_test_predicted = np.hstack((data_rand_test_features, np.array([predictions]).T))
-test_accuracy.append(sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0]) # test_accuracy = 77%
+sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0] # test_accuracy = 77%
+
+
