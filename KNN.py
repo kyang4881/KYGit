@@ -106,7 +106,7 @@ predictions = list()
 for i in range(np.shape(data_rand_validation)[0]):
     predictions.append(int(knn.predict([data_rand_validation_features[i]])))
 data_rand_validation_predicted = np.hstack((data_rand_validation_features, np.array([predictions]).T))
-sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0] 
+sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.shape(data_rand_validation_labels)[0] # Validation_accuracy 
 
 # Iterate through multiple n values
 accuracy = []
@@ -122,7 +122,7 @@ for k in range(3, 21):
 
     data_rand_validation_predicted = np.hstack((data_rand_validation_features, np.array([predictions]).T))
 
-    accuracy.append(sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels)/np.shape(data_rand_validation_labels)[0])  
+    accuracy.append(sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels)/np.shape(data_rand_validation_labels)[0]) 
     k_num.append(k)
 
 
@@ -133,6 +133,17 @@ predictions = list()
 for i in range(np.shape(data_rand_test)[0]):
     predictions.append(int(knn.predict([data_rand_test_features[i]])))
 data_rand_test_predicted = np.hstack((data_rand_test_features, np.array([predictions]).T))
-sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0] 
+sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_rand_test_labels)[0] # test_accuracy
 
 
+# Using grid search to determine optimal k value
+# Separate data into features and labels for both training and testing sets
+data_rand_features = np.array([i[:-1] for i in data_rand])
+data_rand_labels = np.array([i[-1] for i in data_rand])
+
+param_grid = dict(n_neighbors=list(range(3, 20)))  # Iterate for k = [3,20)
+grid = GridSearchCV(knn, param_grid, cv=10, scoring='accuracy')   # 10 folds for each iteration
+grid.fit(data_rand_features, data_rand_labels)
+grid.cv_results_ 
+
+# optimal k = 4
