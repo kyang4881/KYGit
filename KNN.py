@@ -148,3 +148,77 @@ grid.fit(data_rand_features, data_rand_labels)
 grid.cv_results_ 
 
 # optimal k = 4
+
+
+
+############################################################################################################
+
+class knn_model:
+
+    def __init__(self, k, train_percentage, validation_percentage, test_percentage, data_set, cv, grid_lower_k, grid_upper_k, scoring):
+        self.k = k
+        self.train_percentage = train_percentage
+        self.validation_percentage = validation_percentage
+        self.test_percentage = test_percentage
+        self.data_set = data_set
+        self.cv = cv
+        self.train_data_filter()
+        self.validation_data_filter()
+        self.test_data_filter()
+        self.data_features = np.array([i[:-1] for i in self.data_set])
+        self.data_labels = np.array([i[-1] for i in self.data_set])
+        self.grid_lower_k = grid_lower_k
+        self.grid_upper_k = grid_upper_k
+        self.scoring = scoring
+
+    def train_data_filter(self):
+        self.df_train = self.data_set[0:round(self.train_percentage * np.shape(self.data_set)[0]), ]
+        self.train_features = np.array([i[:-1] for i in self.df_train])
+        self.train_labels = np.array([i[-1] for i in self.df_train])
+        return self.train_features, self.train_labels
+
+    def validation_data_filter(self):
+        self.df_validation = self.data_set[round(self.train_percentage * np.shape(self.data_set)[0]): round(
+            (self.train_percentage + self.validation_percentage) * np.shape(self.data_set)[0])]
+        self.validation_features = np.array([i[:-1] for i in self.df_validation])
+        self.validation_labels = np.array([i[-1] for i in self.df_validation])
+        return self.validation_features, self.validation_labels
+
+    def test_data_filter(self):
+        self.df_test = self.data_set[round((self.train_percentage + self.validation_percentage) * np.shape(self.data_set)[0]):]
+        self.test_features = np.array([i[:-1] for i in self.df_test])
+        self.test_labels = np.array([i[-1] for i in self.df_test])
+        return self.test_features, self.test_labels
+
+    def train(self):
+        self.knn = KNeighborsClassifier(n_neighbors=self.k)
+        self.fit = self.knn.fit(self.train_features, self.train_labels)
+        return self.knn, self.fit
+
+    def grid_search(self):
+        self.knn = KNeighborsClassifier(n_neighbors=self.k)
+        self.fit = self.knn.fit(self.train_features, self.train_labels)
+        self.param_grid = dict(n_neighbors=list(range(self.grid_lower_k, self.grid_upper_k)))
+        self.grid = GridSearchCV(self.knn, self.param_grid, cv=self.cv, scoring=self.scoring)
+        self.grid.fit(self.data_features, self.data_labels)
+        return self.grid
+
+    def run(self, input_feature_vector, input_label_vector):
+        predictions = list()
+        for i in range(np.shape(input_feature_vector)[0]):
+            predictions.append(int(self.knn.predict([input_feature_vector[i]])))
+        data_label_predicted = np.hstack((input_feature_vector, np.array([predictions]).T))
+        accuracy = sum(data_label_predicted[:, -1] == input_label_vector) / np.shape(input_label_vector)[0]
+        return accuracy, data_label_predicted
+
+
+run_knn = knn_model(k=5, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, 
+                    data_set=data_rand, cv=5, grid_lower_k=3, grid_upper_k=5, scoring='accuracy')
+
+
+
+
+
+
+
+
