@@ -10,6 +10,7 @@ import os
 import csv
 from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV
 
 
 # Check current working directory
