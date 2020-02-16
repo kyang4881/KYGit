@@ -212,8 +212,7 @@ class knn_model:
         return accuracy, data_label_predicted
 
 
-run_knn = knn_model(k=5, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, 
-                    data_set=data_rand, cv=5, grid_lower_k=3, grid_upper_k=5, scoring='accuracy')
+run_knn = knn_model(k=5, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, data_set=data_rand, cv=5, grid_lower_k=3, grid_upper_k=5, scoring='accuracy')
 
 
 
