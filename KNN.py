@@ -214,6 +214,19 @@ class knn_model:
 
 run_knn = knn_model(k=5, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, data_set=data_rand, cv=5, grid_lower_k=3, grid_upper_k=5, scoring='accuracy')
 
+run_knn.train()
+validation_df_true_label = run_knn.validation_data_filter()[1]
+validation_results = run_knn.run(run_knn.validation_data_filter()[0], validation_df_true_label)
+validation_accuracy = validation_results[0]
+validation_predictions = validation_results[1]
+
+grid_results = run_knn.grid_search()
+grid_results.cv_results_
+
+test_df_true_label = run_knn.test_data_filter()[1]
+test_results = run_knn.run(run_knn.test_data_filter()[0], test_df_true_label)
+test_accuracy = test_results[0]
+test_predictions = test_results[1]
 
 
 
