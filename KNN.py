@@ -1,17 +1,16 @@
 import distutils
 import matplotlib.pyplot as plt
-from sklearn import datasets
-from sklearn.utils import shuffle
 import random as rd
 import pandas as pd
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
 import os
 import csv
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.neighbors import NearestNeighbors
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
-
+from sklearn import datasets
+from sklearn.utils import shuffle
 
 # Check current working directory
 os.getcwd()
@@ -142,13 +141,10 @@ sum(data_rand_test_predicted[:, -1] == data_rand_test_labels) /np.shape(data_ran
 data_rand_features = np.array([i[:-1] for i in data_rand])
 data_rand_labels = np.array([i[-1] for i in data_rand])
 
-param_grid = dict(n_neighbors=list(range(3, 20)))  # Iterate for k = [3,20)
+param_grid = dict(n_neighbors=list(range(3, 10)))  # Iterate for k = [3,10)
 grid = GridSearchCV(knn, param_grid, cv=10, scoring='accuracy')   # 10 folds for each iteration
 grid.fit(data_rand_features, data_rand_labels)
-grid.cv_results_ 
-
-# optimal k = 4
-
+grid.cv_results_  # optimal k = 4
 
 
 ############################################################################################################
@@ -227,10 +223,4 @@ test_df_true_label = run_knn.test_data_filter()[1]
 test_results = run_knn.run(run_knn.test_data_filter()[0], test_df_true_label)
 test_accuracy = test_results[0]
 test_predictions = test_results[1]
-
-
-
-
-
-
 
