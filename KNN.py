@@ -84,6 +84,8 @@ data = np.hstack((df_features_vectorized_array, np.array([df_label_array]).T))
 np.random.seed(123)
 data_rand = shuffle(data)
 
+###########################################################################################################################
+
 # Split data into training and testing sets
 data_rand_train = data_rand[0:round(0.7*np.shape(data_rand)[0]), ] # (2286, 5800)
 data_rand_validation = data_rand[round(0.7*np.shape(data_rand)[0]): round(0.85*np.shape(data_rand)[0])] # (490, 5800)
@@ -146,8 +148,7 @@ grid = GridSearchCV(knn, param_grid, cv=10, scoring='accuracy')   # 10 folds for
 grid.fit(data_rand_features, data_rand_labels)
 grid.cv_results_  # optimal k = 4
 
-
-############################################################################################################
+###########################################################################################################################
 
 class knn_model:
 
