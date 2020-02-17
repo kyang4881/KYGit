@@ -209,7 +209,7 @@ class knn_model:
         return accuracy, data_label_predicted
 
 
-run_knn = knn_model(k=5, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, data_set=data_rand, cv=10, 
+run_knn = knn_model(k=4, train_percentage=0.7, validation_percentage=0.15, test_percentage=0.15, data_set=data_rand, cv=10, 
                     grid_lower_k=3, grid_upper_k=10, scoring='accuracy')
 
 run_knn.train()
@@ -219,7 +219,7 @@ validation_accuracy = validation_results[0]
 validation_predictions = validation_results[1]
 
 grid_results = run_knn.grid_search()
-grid_results.cv_results_
+grid_results.cv_results_   # optimal k = 4
 
 test_df_true_label = run_knn.test_data_filter()[1]
 test_results = run_knn.run(run_knn.test_data_filter()[0], test_df_true_label)
