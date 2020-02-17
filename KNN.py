@@ -114,7 +114,7 @@ sum(data_rand_validation_predicted[:, -1] == data_rand_validation_labels) /np.sh
 accuracy = []
 k_num = []
 
-for k in range(3, 21):
+for k in range(3, 10):
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(data_rand_train_features, data_rand_train_labels)
 
