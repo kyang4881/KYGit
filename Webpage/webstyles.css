@@ -1,0 +1,348 @@
+/* IMPORTANT: If CSS styles are applied but udpates made aren't showing => clear browser cache */
+
+/*index.php styles*/
+table, th, td {
+  border: 1px solid black;    /*solid line border */
+  border-collapse: collapse;  /*single border line table*/
+  padding: 5px; /*spacing between text and border*/
+  text-align: center;
+  border-spacing: 1px; /*spacing between cells*/
+}
+
+#intro{
+  color: yellow;
+  font-weight: bold;
+}
+
+/*index.php styles*/
+#login1 a {
+  position:relative;
+  left: 0px;
+  top: -60px;
+  /*background-color: #02A098;*/
+  color: white;
+  padding: 3px;
+  font-weight: bold;
+  border-width: thin;
+  border-color: white;
+  display:inline-block;
+  font-size: 25px;
+  border: 3px solid white;
+  text-decoration: none;
+  border-radius: 10px; /*rounded corners*/
+}
+
+/*index.php styles*/
+#login1 a:hover{
+  background-color: #0080FF;
+}
+
+/*login.php styles*/
+.loginform1 {
+  position:absolute;
+  text-align: center; /*align login box to center of border*/
+  /*border: 1px solid black;*/
+  border-style: solid;
+  border-width: 5px
+  display: inline-block; /*resizes border to fit with text */
+  color: black;
+  padding: 50px;
+  /*box-sizing: content-box;*/
+  width: 150px;
+  left: 41%;
+  top: 25%;
+  zoom:120%;
+  background-color: white;
+  z-index: 2;
+  border-radius: 10px; /*rounded corners*/
+}
+
+/*login.php styles*/
+#login_reset, #login_signup, #login_logout {
+  position: relative;
+  padding: 4px;
+  display: flex;  /*make ul items line up one after another*/
+  justify-content: center;  /*make ul items line up one after another*/
+}
+
+/*login.php styles */
+.login_homepage a {
+  text-decoration: none; /*removes underline*/
+  border: 1px solid black;
+  display: inline-block;
+  padding: 4px;
+  font-size: 20px;
+  color: black;
+  z-index: 2;
+  background-color: white;
+}
+
+/*login.php styles */
+.login_homepage a:hover {
+  background-color: #cacbcf;
+}
+
+/*login.php styles */
+.login_body {
+  background-color: #e6fffd;
+  z-index: 1;
+}
+
+/*not used*/
+#loginform{
+  /*position:relative;
+  left: 1450px;
+  top: -75px;
+  --background-color: #02A098;
+  color: white;
+  padding: 5px;
+  font-weight: bold;
+  border-width: thin;
+  border-color: white;
+  display:inline-block;*/
+
+  position:relative;
+  left: 1700px;
+  top: -140px;
+  /*background-color: #02A098;*/
+  color: white;
+  padding: 5px;
+  font-weight: bold;
+  border-width: thin;
+  border-color: white;
+  display:inline-block;
+}
+
+/*not used*/
+#logintext{
+  opacity: 0;
+}
+
+/*index.php styles*/
+#t1 {
+  position: relative;
+  top 500px;
+  left 500px;
+  border: 5px solid #73AD21;
+  background-color: #f1f1f1; /*using id to style tables*/
+
+}
+/*index.php styles*/
+#t2 {
+  background-color: #f1f1f1; /*using id to style tables */
+}
+/*index.php styles*/
+#t1 tr:nth-child(odd){
+  background-color: #fff; /*background colour of odd rows of table t1*/
+}
+/*index.php styles*/
+#t1 tr:nth-child(even){
+  background-color: #eee; /*background colour of even rows of table t1*/
+}
+
+/*index.php styles*/
+.topnav input[type=text]{
+  /*position: relative;
+  left:5px;
+  top:5px;
+  width:500px;
+  float: left;
+  padding: 6px;
+  margin-top: 10px;
+  margin-right: 200px;
+  border: none;
+  font-size: 17px;*/
+
+  /*width: 700px;
+  height: 30px;
+  position: relative;
+  z-index: 2;
+  left: 30%;
+  top: 10px;
+  border:none;
+  border-radius: 10px;
+  font-size: 25px;
+  outline: none; --outline around search bar border
+  cursor: auto;
+  text-align: left;
+  padding: 5px;*/
+
+  width: 700px;
+  height: 30px;
+  position: relative;
+  z-index: 1;
+  left: 600px;
+  top: 10px;
+  border:none;
+  border-radius: 10px; /*rounded corners*/
+  font-size: 25px;
+  outline: none; /*outline around search bar border*/
+  cursor: auto;
+  text-align: left;
+  padding: 5px;
+  overflow-y: hidden;
+}
+
+/*index.php styles*/
+#topnav_mag input{
+  position: relative;
+  resize: both;
+  height: auto;
+  width: auto;
+  max-height: 25px;
+  max-width: 25px;
+  left: 1280px;
+  top: -20px;
+  /*left: -2px;
+  top: 8px;
+  left: 66.5%;
+  top: 15px;*/
+  z-index: 1; /* along with relative position, bring image to front */
+  outline: none;
+  overflow-y: hidden;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-bottom: 0px;
+  padding: 0px;
+  background: none;
+}
+
+/*index.php styles*/
+/* main page navigation bar*/
+.nav1_ul {
+  position:absolute;
+  left:0px;
+  top:80px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
+  font-weight: bold;
+  /*overflow: hidden;*/
+  /*background-color: #02A098;*/
+  /*border: 10px solid white;
+  border-style: solid;*/
+}
+/*index.php styles*/
+.nav1_ul li{
+  float: left;
+}
+/*index.php styles*/
+.nav1_ul a {
+  /*display: block;*/
+  display: inline-block;
+  color: white;
+  text-align: center;
+  padding: 5px 10px;  /*vertical and horizontal padding of the nav bar*/
+  text-decoration: none;
+  font-size: 20px;
+}
+/*index.php styles*/
+.nav1_ul a:hover {
+  background-color: #0080FF;
+}
+/*index.php styles*/
+.topnav {
+  overflow: hidden;
+  background-color:;
+}
+
+/*index.php styles*/
+li.dropdown1 {
+  display: inline-block;
+}
+
+.index_acc_dropdown{
+  display: none;
+  position: absolute;
+  background-color: #009999;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.index_acc_dropdown a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  color: white;
+}
+
+.index_acc_dropdown a:hover {background-color: #0080FF;}
+
+.dropdown1:hover .index_acc_dropdown {
+  display: block;
+}
+
+
+/*index.php styles
+Need to make sure background colour can be zoomed with other elements*/
+.indexhome html, .indexhome body {
+  background: linear-gradient(180deg, #02A098 25%, #FFFFFF 60%);
+  background-repeat: no-repeat; /*prevents background from repeating stripes*/
+  /*background-size:100%;*/
+  height: 220px;
+  /*background-position: center;
+  background-size:100%;
+  width:100%;
+  height:100%;
+  background-size: cover;*/
+}
+
+/*index.php styles*/
+.indexbg {
+  /*background-color: #02A098;*/
+  /*background-size: 1920px 200px;*/
+  /*height: 5%;*/
+  /*background: linear-gradient(180deg, #02A098 2%, #FFFFFF 12%);
+  background-position: center;*/
+}
+/*index.php styles*/
+.bg2 {
+  background-size: 1920px 1080px;
+  width: 1920px;
+  height: 1080px;
+  border: 0x solid;
+  color: black;
+  opacity: 0.9;
+}
+
+/*signup.php styles*/
+#signup_exit a {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  padding: 5px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+/*signup.php styles*/
+#signup_submit input {
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  padding: 5px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+#submit div, #submit input, #submit a{
+  text-decoration: none; /*removes underline*/
+  border: 1px solid black;
+  display: inline-block;
+  padding: 4px;
+  font-size: 20px;
+  color: black;
+  z-index: 2;
+  background-color: white;
+  text-decoration: none;
+}
+
+#submit div:hover, #submit input:hover, #submit a:hover{
+  background-color: #cacbcf;
+}
