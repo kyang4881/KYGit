@@ -156,57 +156,5 @@ session_start();
     <?php //require('scripts/db_tables.php') ?>
 
 
-    <!-- demo -->
-    <p id="demo">This sentence will be changed on click.</p>
-    <button type="button" onclick="chg_sentence()">Click to Change Sentence </button>
-
-    <script>
-    function chg_sentence() {
-      if (document.getElementById("demo").innerHTML == "This sentence will be changed on click.") {
-        document.getElementById("demo").innerHTML = "This is a new sentence.";
-      }
-      else {
-        document.getElementById("demo").innerHTML = "This sentence will be changed on click.";
-      }
-    }
-    </script>
-
-    <input type="text" id="cityFiler" onkeyup="cityFilter()" placeholder="Search for city">
-
-    <h2>My Phonebook</h2>
-
-    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
-
-    <ul id="myUL">
-      <li><a href="#">Adele</a></li>
-      <li><a href="#">Agnes</a></li>
-
-      <li><a href="#">Billy</a></li>
-      <li><a href="#">Bob</a></li>
-
-      <li><a href="#">Calvin</a></li>
-      <li><a href="#">Christina</a></li>
-      <li><a href="#">Cindy</a></li>
-    </ul>
-
-    <script>
-    function myFunction() {
-        var input, filter, ul, li, a, i, txtValue;
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
-        ul = document.getElementById("myUL");
-        li = ul.getElementsByTagName("li");
-        for (i = 0; i < li.length; i++) {
-            a = li[i].getElementsByTagName("a")[0];
-            txtValue = a.textContent || a.innerText;
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                li[i].style.display = "";
-            } else {
-                li[i].style.display = "none";
-            }
-          }
-        }
-    </script>
-
   </body>
 </html>
