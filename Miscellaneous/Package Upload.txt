@@ -1,0 +1,15 @@
+pip install wheel
+pip install twine
+
+# Upload package to python test server https://test.pypi.org/manage/project/kypackage/releases/
+python setup.py sdist bdist_wheel   
+twine upload --repository testpypi dist/*  
+
+# Install package
+pip install -i https://test.pypi.org/simple/ kypackage==3.0.0
+
+from kypackage import first_script as fs
+from kypackage import second_script as ss
+
+fs.first_function()
+ss.second_function()
