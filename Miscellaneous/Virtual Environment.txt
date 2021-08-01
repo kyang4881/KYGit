@@ -1,0 +1,25 @@
+Create Virtual Environment and New Kernel
+
+In Jupyter Notebook Terminal
+1) cd to >>path  ('Downloads\Python Package Tut')
+2) >>python -m venv ___ ; ___ = input a name for the virtual environment folder
+3) cd to >>___\Scripts
+4) >>activate
+5) >>pip install ipykernel
+6) >>ipython kernel install --user --name=___; ___= input a name for the kernel
+7) >>jupyter notebook
+8) new kernel will be shown in a python envir
+
+Install Different Python Kernel
+In Jupyter Notebook Terminal
+1) cd >>'Downloads\Python Package Tut\ky_virtual_env'
+2) >>conda create -n py27 python=2.7
+3) >>conda activate py27
+4) >>conda install ipykernel
+5) juypter notebook
+
+Show all Kernels:
+>>jupyter kernelspec list
+
+Remove Kernels:
+>>jupyter kernelspec uninstall unwanted-kernel __; __=name of kernel
