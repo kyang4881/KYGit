@@ -1,0 +1,11 @@
+include README.md
+include LICENSE.txt
+inlcude README.txt
+include README
+include MANIFEST.in
+include README.rst
+include AUTHORS
+include Changelog
+include FAQ
+include INSTALL
+include setup.cfg
