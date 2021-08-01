@@ -18,7 +18,7 @@ setup(
     description="example package",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/kyang4881/KyangGitHub/Package Setup",
+    url="https://github.com/kyang4881/KyangGitHub/tree/master/Package%20Setup",
     classifiers=[
         "Programming Language :: Python :: 3",
     ],
