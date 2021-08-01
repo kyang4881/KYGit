@@ -1,0 +1,8 @@
+Installation
+============
+
+You can install ``kypackage``:
+
+To install using ``pip``,::
+
+    $ pip install kypackage
