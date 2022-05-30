@@ -63,7 +63,7 @@ def extract_status(max_iter=10, time_delay_sec=2):
                     #send_simple_message_validate()
             
             except:
-                wrapper_function()
+                wrapper_function(max_iter_given, time_delay_sec_given)
                 time.sleep(time_delay_sec)
             
         else:
