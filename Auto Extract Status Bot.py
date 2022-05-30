@@ -28,10 +28,17 @@ def clicker():
     #click submit
     driver.find_elements_by_xpath("//input[@name='boption']")[0].click()
     
-def beep():
+def play_music():
     """Play music"""
-    
     display(Audio('Chillstep Ferven - Falling.mp3', autoplay=True))
+
+def repeat_music(n_iter):
+    n = 0
+    while n < n_iter:
+        
+        music()
+        time.sleep(218)
+        n+=1
 
 def extract_status(max_iter=10, time_delay_sec=2):
     """Extract application status"""
@@ -61,7 +68,7 @@ def extract_status(max_iter=10, time_delay_sec=2):
             
         else:
             print("Updates Available!")
-            beep();
+            repeat_music(n_iter=20);
             #send_simple_message_available()
             break
         
