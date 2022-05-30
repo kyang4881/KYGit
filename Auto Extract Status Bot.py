@@ -76,3 +76,8 @@ def wrapper_function(max_iter_given, time_delay_sec_given):
     initialize(app_num_input, pp_num_input, dob_num_input)
     clicker()
     extract_status(max_iter = max_iter_given, time_delay_sec=time_delay_sec_given)
+
+    
+    
+#driver = webdriver.Chrome(ChromeDriverManager().install())
+#wrapper_function(max_iter_given=20000, time_delay_sec_given=300)
