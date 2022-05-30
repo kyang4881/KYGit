@@ -25,6 +25,8 @@ def clicker():
     #click checkbox
     driver.find_elements_by_xpath("//input[@name='chkpdpa']")[0].click()
     
+    time.sleep(1)
+    
     #click submit
     driver.find_elements_by_xpath("//input[@name='boption']")[0].click()
     
