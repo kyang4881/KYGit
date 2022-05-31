@@ -50,7 +50,7 @@ class extract_bot:
         n = 0
         while n < self.music_iter:
 
-            music()
+            play_music()
             time.sleep(218)
             n+=1
 
@@ -81,7 +81,7 @@ class extract_bot:
 
             else:
                 print("Updates Available.")
-                repeat_music(self.music_iter);
+                repeat_music();
                 #send_simple_message_available()
                 break
 
