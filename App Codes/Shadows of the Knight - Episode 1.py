@@ -63,3 +63,5 @@ while True:
     # the location of the next window Batman should jump to.
     print(str(x0) + " " + str(y0))
 
+
+    https://www.codingame.com/ide/puzzle/shadows-of-the-knight-episode-1
