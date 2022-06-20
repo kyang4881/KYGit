@@ -43,3 +43,5 @@ while True:
 
     # A single line providing the move to be made: N NE E SE S SW W or NW
     print(direction)
+
+ https://www.codingame.com/ide/puzzle/power-of-thor-episode-1
