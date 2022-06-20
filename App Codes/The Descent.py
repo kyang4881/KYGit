@@ -30,3 +30,5 @@ while True:
 
 # given 8 mountains each turn
 # shoot the highest mountain by returning the index by the end of the turn
+
+https://www.codingame.com/ide/puzzle/the-descent
