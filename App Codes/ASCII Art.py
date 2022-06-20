@@ -61,3 +61,5 @@ for i in range(h):
 -non alpha => '?'
 
 '''
+
+https://www.codingame.com/ide/puzzle/ascii-art
