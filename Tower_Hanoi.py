@@ -1,3 +1,15 @@
+import sys
+
+# This algorithm has a time complexity of O(n). The if statements have a time complexity of O(1) 
+# and the for loops, which depend on either the n value or other initialized values of fixed 
+# length have time complexities of n and 1, respectively. The recursion part, executed with the 
+# following line of code: "call_tower(n-1, state, status, initial_pos, key)", have a time complexity 
+# of O(n) because it is dependent on the value n and thus executes and grows linearly. With each 
+# passing iteration, n is reduced by 1, thus only n iterations are executed. Summing up all time 
+# complexity terms in the function will result in aO(n) + bO(1), such that a and b are constants. 
+# Since aO(n) is the dominant term, bO(1) can be dropped. The constant term a can be dropped, 
+# therefore the time complexity of the algorithm is just O(n).
+
 def tower_hanoi(n, state):
     global new_pos
     global state_pos
@@ -14,22 +26,25 @@ def tower_hanoi(n, state):
         new_pos = initial_pos
         state_pos = state_index
         call_tower(n, state, status, initial_pos, key)
-    res = map_peg(status, initial_pos, initial_p)
+    res = map_peg(status, initial_pos, initial_p)  
     return res
-
+    
 def disk_moved():
+    """Check if the disk has moved"""
     return new_pos != state_pos
 
 def valid_move(n):
+    """Verify whether a move is valid"""
     is_valid = False
     if n % 2 == 0 and ((new_pos - 1) % 3 == state_pos):
         is_valid = True
-    elif n % 2 != 0 and ((new_pos + 1) % 3 == state_pos):
+    elif n % 2 != 0 and ((new_pos + 1) % 3 == state_pos): 
         is_valid = True
     return is_valid
 
 def map_peg(status, initial_pos, initial_p):
-    peg_map = {0: 'A', 1: 'B', 2: 'C'}
+    """Map intermediate results to get the final outcome"""
+    peg_map = {0: 'A', 1: 'B', 2: 'C'} 
     map_res = None
     if status['static_impossible'] + status['disk_moved_impossible'] == 2:
         peg = 'impossible'
@@ -41,18 +56,22 @@ def map_peg(status, initial_pos, initial_p):
         else:
             peg = peg_map[initial_p['static']]
             total_count = status['static']
-
+            
         return peg + " " + str(total_count)
 
 def update_position(state_pos):
+    """Update the position of the current state"""
     global new_pos
     new_pos = list(set([0,1,2]) - set([new_pos, state_pos]))[0]
 
 def call_tower(n, state, status, initial_pos, key):
-    global new_pos
+    """Apply logic to determine if a disk has moved and is a valid move. 
+       Apply recursion to obtain the original position and step count.
+    """
     global state_pos
+    global new_pos
     state_pos = [state.index(i) for i in state if n in i][0]
-
+    
     if n == 1:
         if disk_moved() and valid_move(n):
             status[key] += 1
@@ -69,3 +88,9 @@ def call_tower(n, state, status, initial_pos, key):
             call_tower(n-1, state, status, initial_pos, key)
         else:
             status[key + '_impossible'] += 1
+            
+num_case = int(sys.stdin.readline())
+for _ in range(num_case):
+    state_temp = [[int(t) for t in s.split()] for s in sys.stdin.readline().split(',')]
+    n = len(state_temp[0]) + len(state_temp[1]) + len(state_temp[2])
+    print(tower_hanoi(n, state_temp))
