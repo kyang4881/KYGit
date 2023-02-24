@@ -1,0 +1,32 @@
+\documentclass[10pt, a4paper]{article}
+\usepackage{amsmath}
+\usepackage[margin=0.85in]{geometry}
+
+
+\begin{document}
+
+\begin{flushleft}
+		A1 Q3 b)\linebreak\linebreak
+		$T(n) = 2T(n-2)  + n $\linebreak
+		$ T(n) = 2^{2}T(n-4) + 2(n-2) + n $ \linebreak
+		$ T(n) = 2^{3}T(n-6) + 2^{2}(n-4) + 2(n-2) + n $ \linebreak 
+		...\linebreak 
+		$T(n) = 2^{k-1}T(n - 2(k-1)) + 2^{k-2}(n - 2(k-2)) + … + 2^{2}(n-4) + 2(n-2) + n$ \linebreak
+		$T(n) = 2^{k}T(n-2k) + 2^{k-1}(n-2(k-1)) + 2^{k-2}(n-2(k-2)) + … + 2^{2}(n-4) + 2(n-2) + n$ \linebreak
+		$\text{Let n } = 2k => k = \frac{n} {2}$ \linebreak
+		$=> 2^{\frac{n}{2}}T(0) + 2^{\frac{n}{2}-1}(n-2({\frac{n}{2}}-1)) + 2^{\frac{n}{2}-2}(n-2({\frac{n}{2}}-2)) + … + 2^{2}(n-4) + 2(n-2) + n$ \linebreak
+		$=> 2^{\frac{n}{2}-1}(2) + 2^{\frac{n}{2}-2}(4) + … + 2^{2}(n-4) + 2(n-2) + n$ \linebreak
+		$=>  {\sum_{k=0}^{\frac{n}{2} -1}2^{k}}{(n-2k)}  $ \linebreak
+		$=>  {n\sum_{k=0}^{\frac{n}{2} -1}2^{k}} - {2\sum_{k=0}^{\frac{n}{2} -1}2^{k}}{(k)}  $ \linebreak
+
+		Using the Geometric and Geometric-Arithmetic Series: ${\sum_{j=0}^{p}}{{ar^{j-1}}} \text{ and } {\sum_{j=0}^{p}}{br^{j}{(a+dj)}}  $ \linebreak
+
+		$=>  {n(2^{\frac{n}{2}} - 1)} - {2(n2^{\frac{n}{2} -1}} - 2(2^{\frac{n}{2}} -1))  $ \linebreak
+		$=>  {O(2^{\frac{n}{2}})} $ 
+
+
+
+\end{flushleft} 
+
+\end{document}
+
