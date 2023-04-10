@@ -1,15 +1,5 @@
 import sys
 
-# This algorithm has a time complexity of O(n). The if statements have a time complexity of O(1) 
-# and the for loops, which depend on either the n value or other initialized values of fixed 
-# length have time complexities of n and 1, respectively. The recursion part, executed with the 
-# following line of code: "call_tower(n-1, state, status, initial_pos, key)", have a time complexity 
-# of O(n) because it is dependent on the value n and thus executes and grows linearly. With each 
-# passing iteration, n is reduced by 1, thus only n iterations are executed. Summing up all time 
-# complexity terms in the function will result in aO(n) + bO(1), such that a and b are constants. 
-# Since aO(n) is the dominant term, bO(1) can be dropped. The constant term a can be dropped, 
-# therefore the time complexity of the algorithm is just O(n).
-
 def tower_hanoi(n, state):
     global new_pos
     global state_pos
