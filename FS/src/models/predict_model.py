@@ -1,0 +1,132 @@
+import xgboost as xgb
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, precision_score, recall_score, f1_score
+from feature_selection_timeseries.src.models.train_model import generateModel
+from feature_selection_timeseries.src.models.utils import rebalance_data
+from feature_selection_timeseries.src.visualization.visualize import plotScore
+
+
+
+class computeScore:
+    """ ...
+    Args:
+        data_dict (dict):
+        keep_cols (list):
+        pred_type (str):
+        seed (int):
+    """
+    def __init__(self, data_dict, keep_cols, pred_type, seed):
+        self.data_dict = data_dict
+        self.keep_cols = keep_cols 
+        self.data_dict_new = {}
+        self.pred_type = pred_type.lower()
+        self.seed = seed
+
+    def filter_data(self):
+        """..."""
+        # Extract features and labels
+        features = [k for k in self.data_dict.keys() if "X_" in k]
+        labels = [k for k in self.data_dict.keys() if "y_" in k]
+        # Filter features
+        for f, l in zip(features, labels):
+            if self.data_dict[f] is None:
+                self.data_dict_new[f] = []
+                self.data_dict_new[l] = []
+            else:
+                self.data_dict_new[f] = self.data_dict[f][self.keep_cols]
+                self.data_dict_new[l] = self.data_dict[l]
+
+    def pred_score(self):
+        """ ...
+        Returns: 
+        """
+        # Apply feature filter
+        self.filter_data()
+        y_val_true = self.data_dict_new['y_val']
+        # Generate trained XGBoost model
+        self.trained_model = generateModel(data_dict=self.data_dict_new, pred_type=self.pred_type, seed=self.seed).get_model()
+        # Generate predictions
+        y_pred = self.trained_model.predict(self.data_dict_new['X_val'])
+        # Compute and save scoring metrics
+        if self.pred_type == "classification":
+            y_pred = [1 if p >= 0.5 else 0 for p in y_pred]
+            score = accuracy_score(y_val_true, y_pred)
+            tn, fp, fn, tp = confusion_matrix(y_val_true, y_pred).ravel()
+            cm = confusion_matrix(y_val_true, y_pred)
+            cm_val = {
+                "true_positive": tp,
+                "false_positive": fp,
+                "true_negative": tn,
+                "false_negative": fn,
+                "total_positive": np.sum(self.data_dict_new['y_val'] == 1),
+                "total_negative": np.sum(self.data_dict_new['y_val'] == 0),
+                "precision": precision_score(y_val_true, y_pred),
+                "recall": recall_score(y_val_true, y_pred),
+                "f1_score": f1_score(y_val_true, y_pred)
+                }
+            return score, str(cm_val)
+        else:
+            score = mean_squared_error(y_val_true, y_pred)
+            return score
+
+def run_scoring_pipeline(feature_impt, input_data_dict, pred_type, rebalance, rebalance_type, seed):
+    """ ...
+    Args:
+        feature_impt (list):
+        input_data_dict (dict):
+        pred_type (str):
+        rebalance (bool):
+        rebalance_type (str):
+        seed (int):
+    Returns:      
+    """
+    # Rebalance the dataset
+    if rebalance:
+        input_data_dict_rebalanced = rebalance_data(data=input_data_dict, rebalance_type=rebalance_type, seed=seed)
+   
+    all_scores = []
+    all_features = []
+    all_cm_val = []
+    # For each top n features, compute and save the scoring metrics
+    for i in range(1, len(feature_impt)+1):        
+        compute_score_1 = computeScore(
+            data_dict=input_data_dict_rebalanced if rebalance else input_data_dict,
+            keep_cols=feature_impt[:i] if i < len(feature_impt) else list(input_data_dict["X_train"].keys()),
+            pred_type=pred_type,
+            seed=seed
+          )
+        score, cm_val = compute_score_1.pred_score()
+        all_scores.append(score)
+        all_features.append(feature_impt[:i])
+        all_cm_val.append(cm_val)
+
+    all_scores_reverse = []
+    all_features_reverse = []
+    all_cm_val_reverse = []
+    # For each top n features in reversed order, compute and save the scoring metrics
+    for i in range(1, len(feature_impt)+1):
+        compute_score_1 = computeScore(
+            data_dict=input_data_dict_rebalanced if rebalance else input_data_dict,
+            keep_cols=feature_impt[::-1][:i] if i < len(feature_impt) else list(input_data_dict["X_train"].keys()),
+            pred_type=pred_type,
+            seed=seed
+        )
+        score, cm_val = compute_score_1.pred_score()
+        all_scores_reverse.append(score)
+        all_features_reverse.append(feature_impt[::-1][:i])
+        all_cm_val_reverse.append(cm_val)
+
+    # Plot the scores
+    plotter = plotScore(data=all_scores, feature_impt=feature_impt, pred_type=pred_type)
+    plt.close()
+    display(plotter.score_plot())
+    print("Rank Reversed:\n")
+    plt.close()
+    # Plot the scores for the reversed feature order
+    plotter_reversed = plotScore(data=all_scores_reverse, feature_impt=feature_impt[::-1], pred_type=pred_type)
+    display(plotter_reversed.score_plot())
+
+    return all_scores, all_scores_reverse, all_features, all_features_reverse, all_cm_val, all_cm_val_reverse
+
+
