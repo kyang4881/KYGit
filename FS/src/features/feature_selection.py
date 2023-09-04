@@ -20,14 +20,13 @@ import os
 import torch
 import math
 
-
 class sageValues:
-    """ ...
+    """ A class for methods related to the Sage feature selection method
     Args:
-        data_dict (dict): 
-        pred_type (str):
-        model (obj):
-        seed (int):
+        data_dict (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        model (obj): a trained XGBoost model
+        seed (int): a random state
     """
     def __init__(self, data_dict, pred_type, model, seed):
         self.data_dict = data_dict
@@ -38,8 +37,10 @@ class sageValues:
         self.seed = seed
 
     def compute_sage_val(self):
-        """ ...
+        """ A method for computing feature importance using the Sage method
         Returns:
+            sage_features (list): ranked features
+            values (list): ranked feature importances
         """
         # Calculate sage values
         imputer = sage.MarginalImputer(self.model, self.data_dict["X_train"][:512].values)
@@ -60,14 +61,17 @@ class sageValues:
         plt.show()
 
 def sage_importance(model, data, pred_type, seed, target_colname):
-    """ ...
+    """ A method that calls the sage class to extract the features, feature scores, and total runtime
     Args:
-        model (obj): 
-        data (dict):
-        pred_type (str):
-        seed (int):
-        target_colname (str):
+        model (obj): a trained XGBoost model
+        data (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
     Returns:
+        sage_features (list): ranked features
+        sage_feature_scores (list): ranked feature importances
+        total_time (float): total runtime for the Sage feature selection process
     """ 
     start_time = time.time()
     # Generate the Sage Values
@@ -86,14 +90,17 @@ def sage_importance(model, data, pred_type, seed, target_colname):
     return sage_features, sage_feature_scores, total_time
 
 def permutation_test(model, data, pred_type, seed, target_colname):
-    """ ...
+    """ A method that extracts the features, feature scores, and total runtime
     Args:
-        model (obj): 
-        data (dict):
-        pred_type (str):
-        seed (int):
-        target_colname (str):
-    Returns:
+        model (obj): a trained XGBoost model
+        data (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
+    Returns: 
+        feature_names_sorted (list): ranked features
+        premu_test.importances_mean[sorted_idx] (list): ranked feature importances
+        total_time_permu (float): total runtime for the Sage feature selection process
     """      
     start_time = time.time()
     premu_test = permutation_importance(model, data["X_val"], data["y_val"],  random_state = seed)
@@ -111,14 +118,17 @@ def permutation_test(model, data, pred_type, seed, target_colname):
     return feature_names_sorted, premu_test.importances_mean[sorted_idx], total_time_permu
 
 def xgb_importance(model, data, pred_type, seed, target_colname):
-    """ ...
+    """ A method that extracts the features, feature scores, and total runtime
     Args:
-        model (obj): 
-        data (dict):
-        pred_type (str):
-        seed (int):
-        target_colname (str):
+        model (obj): a trained XGBoost model
+        data (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
     Returns:
+        top_features (list): ranked features
+        top_scores (list): ranked feature importances
+        total_time (float): total runtime for the Sage feature selection process
     """     
     # make predictions for val data
     y_pred = model.predict(data['X_val'])
@@ -140,14 +150,17 @@ def xgb_importance(model, data, pred_type, seed, target_colname):
     return top_features, top_scores, total_time
 
 def shap_importance(model, data, pred_type, seed, target_colname):
-    """ ...
+    """ A method that extracts the features, feature scores, and total runtime
     Args:
-        model (obj): 
-        data (dict):
-        pred_type (str):
-        seed (int):
-        target_colname (str):
+        model (obj): a trained XGBoost model
+        data (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
     Returns:
+        sorted_features (list): ranked features
+        feature_score_shap (list): ranked feature importances
+        total_time (float): total runtime for the Sage feature selection process
     """        
     start_time = time.time()
     explainer = shap.Explainer(model)
@@ -169,13 +182,17 @@ def shap_importance(model, data, pred_type, seed, target_colname):
 
 
 def cae_importance(data, pred_type, seed, target_colname):
-    """ ...
+    """ A method that extracts the features, feature scores, and total runtime
     Args:
-        data (dict):
-        pred_type (str):
-        seed (int):
-        target_colname (str):
+        model (obj): a trained XGBoost model
+        data (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
     Returns:
+        sorted_features (list): ranked features
+        feature_scores (list): ranked feature importances
+        total_time (float): total runtime for the Sage feature selection process
     """     
     X_train = data['X_train'].values
     y_train = data['y_train'].values
