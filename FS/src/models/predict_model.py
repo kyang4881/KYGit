@@ -6,15 +6,16 @@ from feature_selection_timeseries.src.models.train_model import generateModel
 from feature_selection_timeseries.src.models.utils import rebalance_data
 from feature_selection_timeseries.src.visualization.visualize import plotScore
 
-
-
 class computeScore:
-    """ ...
+    """ A class that contains two methods, filter_data is a method for trimming the features 
+        of the dataset based on feature selection methods and pred_score is a method for
+        generating the scoring metrics based on the predictions using subsets of features.
+        
     Args:
-        data_dict (dict):
-        keep_cols (list):
-        pred_type (str):
-        seed (int):
+        data_dict (dict): a dictionary containing dataframes of the train and validation data
+        keep_cols (list): a list of columns to filter for
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
     """
     def __init__(self, data_dict, keep_cols, pred_type, seed):
         self.data_dict = data_dict
@@ -24,7 +25,7 @@ class computeScore:
         self.seed = seed
 
     def filter_data(self):
-        """..."""
+        """A method for filtering dataframes based on a selected list of features"""
         # Extract features and labels
         features = [k for k in self.data_dict.keys() if "X_" in k]
         labels = [k for k in self.data_dict.keys() if "y_" in k]
@@ -38,8 +39,10 @@ class computeScore:
                 self.data_dict_new[l] = self.data_dict[l]
 
     def pred_score(self):
-        """ ...
+        """ A method for generating prediction metrics on the validation data
         Returns: 
+            score (float): model prediction accuracy
+            cm_val (str): other scoring metrics 
         """
         # Apply feature filter
         self.filter_data()
@@ -71,15 +74,21 @@ class computeScore:
             return score
 
 def run_scoring_pipeline(feature_impt, input_data_dict, pred_type, rebalance, rebalance_type, seed):
-    """ ...
+    """ A method for generating model prediction scoring metrics
     Args:
-        feature_impt (list):
-        input_data_dict (dict):
-        pred_type (str):
-        rebalance (bool):
-        rebalance_type (str):
-        seed (int):
-    Returns:      
+        feature_impt (list): list of top features to use for model prediction
+        input_data_dict (dict): a dictionary containing train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        rebalance (bool): a boolean indicating whether to rebalance the dataset
+        rebalance_type (str): a string indicating what type of rebalancing to perform
+        seed (int): a random state
+    Returns:    
+        all_scores (list): a list of prediction accuracies for each feature subset
+        all_scores_reverse (list): a list of prediction accuracies for each feature subset with top features subsets in reversed order
+        all_features (list): a list of top features subsets
+        all_features_reverse (list): a list of top features subsets in reversed order
+        all_cm_val (list): a list of other scoring metrics
+        all_cm_val_reverse (list): a list of other scoring metrics for top features subsets in reversed order
     """
     # Rebalance the dataset
     if rebalance:
