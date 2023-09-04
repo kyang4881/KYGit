@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 
-
 class plotScore:
     """define"""
     def __init__(self, data, feature_impt, pred_type):
