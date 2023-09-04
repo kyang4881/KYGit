@@ -1,12 +1,11 @@
 import xgboost as xgb
 
-
 class generateModel:
-    """ ...
+    """ A class with a method for generating a trained model
     Args:
-        data_dict (dict):
-        pred_type (str):
-        seed (int):
+        data_dict (dict): a dictionary containing dataframes of the train and validation data
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        seed (int): a random state
     """
     def __init__(self, data_dict, pred_type, seed):
         self.data_dict = data_dict
@@ -14,8 +13,9 @@ class generateModel:
         self.seed = seed
 
     def get_model(self):
-        """ ...
-        Returns:
+        """ Train an XGBoost model and return it
+        Returns: 
+            model (obj): A trained XGBoost model
         """
         if self.pred_type.lower() == 'classification':
             model = xgb.XGBClassifier(
@@ -23,8 +23,8 @@ class generateModel:
                 objective='binary:logistic',
                 nthread=4,
                 random_state=self.seed,
-                eval_metric='error'#,
-                #num_round=50  # Equivalent to num_round in xgb.train
+                eval_metric='error',
+                n_estimators=100  
             )
         else:
             model = xgb.XGBRegressor(
@@ -32,8 +32,8 @@ class generateModel:
                 objective='reg:squarederror',
                 nthread=4,
                 random_state=self.seed,
-                eval_metric='error'#,
-                #n_estimators=50  # Equivalent to num_round in xgb.train
+                eval_metric='error',
+                n_estimators=100  
             )
 
         # Set up data for xgboost model
@@ -41,7 +41,8 @@ class generateModel:
         y_train = self.data_dict["y_train"]
 
         # Train model using xgb.fit
-        model.fit(X_train, y_train, eval_set=[(X_train, y_train)], verbose=False)
+        #model.fit(X_train, y_train, eval_set=[(X_train, y_train)], verbose=False)
+        model.fit(X_train, y_train, verbose=False)
 
         return model
 
