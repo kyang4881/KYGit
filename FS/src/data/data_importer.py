@@ -3,15 +3,15 @@ import sage
 from scipy.io import arff
 import numpy as np
 
-
-def importer(file_path, dataset, sample=False, sample_size=100):
-    """...
+def importer(file_path, dataset, seed, sample=False, sample_size=100):
+    """ A method for importing datasets from multiple sources
     Args:
-        file_path (str):
-        dataset (dict):
-        sample (bool):
-        sample_size (int):
+        file_path (str): the path of the dataset
+        dataset (dict): the name of the dataset to import
+        sample (bool): whether to take a sample from the dataset
+        sample_size (int): the size of the sample to take
     Returns:   
+        df (dataframe): a dataframe containing data
     """
     if dataset.lower() == "credit":
         df_path = file_path + '/credit.data'
@@ -125,7 +125,45 @@ def importer(file_path, dataset, sample=False, sample_size=100):
         df['target'] = df['target'].map({"L": 0, "H": 1})
         df = df.iloc[:, 3:]
         
+    if dataset.lower() == "eye":
+        file_path = file_path + '/EEG Eye State.arff'
+        data = arff.loadarff(file_path)
+        df = pd.DataFrame(data[0])
+        df.rename(columns={"eyeDetection": 'target'}, inplace=True)
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({b'0': 0, b'1': 1})
+        #df = df.iloc[:5000, :]
+        
+    if dataset.lower() == "strawberry":
+        file_path = file_path + '/Strawberry_TRAIN.arff'
+        data = arff.loadarff(file_path)
+        df = pd.DataFrame(data[0])
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({b'1': 0, b'2': 1})
+        
+    if dataset.lower() == "strawberry_test":
+        file_path = file_path + '/Strawberry_TEST.arff'
+        data = arff.loadarff(file_path)
+        df = pd.DataFrame(data[0])
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({b'1': 0, b'2': 1})
+        
+    if dataset.lower() == "ford":
+        file_path = file_path + "/FordA_TRAIN.arff"
+        data = arff.loadarff(file_path)
+        df = pd.DataFrame(data[0])
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({b'-1': 0, b'1': 1})
+        
+    if dataset.lower() == "ford_test":
+        file_path = file_path + "/FordA_TEST.arff"
+        data = arff.loadarff(file_path)
+        df = pd.DataFrame(data[0])
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({b'-1': 0, b'1': 1})
+        
     if sample:
+        np.random.seed(seed)
         df = df.sample(n=sample_size)
         
     print(np.shape(df))
