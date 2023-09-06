@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-05-2023
+# Description: This script provides the method(s) for generating the trained XGBoost model
+
 import xgboost as xgb
 
 class generateModel:
