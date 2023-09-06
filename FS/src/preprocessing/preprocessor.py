@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-06-2023
+# Description: This script provides the method(s) for data preprocessing 
+
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.model_selection import TimeSeriesSplit
@@ -17,6 +21,8 @@ class Preprocess:
         self.cat_cols = cat_cols
         self.num_cols = num_cols
         self.num_cv_splits = num_cv_splits
+        self.scaler = StandardScaler()
+        self.encoder = OneHotEncoder()
 
     def encode_norm(self, X_train, X_val):
         """ A method for data transformation
@@ -27,21 +33,17 @@ class Preprocess:
              X_train_data_transformed (dataframe): a dataframe containing transformed train data
              X_val_data_transformed (dataframe): a dataframe containing transformed validation data
         """
-        # Normalize and Encode data
-        scaler = StandardScaler()
-        encoder = OneHotEncoder()
-
         # Normalize numerical variables
-        X_train_scaled = scaler.fit_transform(X_train[self.num_cols])
-        X_val_scaled = scaler.transform(X_val[self.num_cols])
+        X_train_scaled = self.scaler.fit_transform(X_train[self.num_cols])
+        X_val_scaled = self.scaler.transform(X_val[self.num_cols])
         
         # Encode categorical variables
-        X_train_encoded = encoder.fit_transform(X_train[self.cat_cols])
-        X_val_encoded = encoder.transform(X_val[self.cat_cols])
+        X_train_encoded = self.encoder.fit_transform(X_train[self.cat_cols])
+        X_val_encoded = self.encoder.transform(X_val[self.cat_cols])
 
         # Extract feature names
-        num_feature_names = [str(f) for f in scaler.get_feature_names_out().tolist()]
-        cat_feature_names = [str(f) for f in encoder.get_feature_names_out().tolist()]
+        num_feature_names = [str(f) for f in self.scaler.get_feature_names_out().tolist()]
+        cat_feature_names = [str(f) for f in self.encoder.get_feature_names_out().tolist()]
 
         # Combine normalized and encoded features
         X_train_data_transformed = pd.concat([
@@ -78,5 +80,5 @@ class Preprocess:
             df_compiled['y_train'].append(y_train)
             df_compiled['y_val'].append(y_val)
         
-        return df_compiled
+        return df_compiled, self.scaler, self.encoder
 
