@@ -1,11 +1,12 @@
 # Author: JYang
-# Last Modified: Sept-05-2023
-# Description: This script provides the add-on method(s), such as tracking tables for model benchmark, data rebalancing, etc.
+# Last Modified: Sept-06-2023
+# Description: This script provides the helper method(s), such as tracking tables for model benchmark, data rebalancing, etc.
 
 import pandas as pd
 import numpy as np
 import datetime
 from collections import Counter
+import copy
 from imblearn.over_sampling import RandomOverSampler, SMOTE, SMOTEN, SMOTENC, BorderlineSMOTE, ADASYN
 
 def check_column_types(df):
@@ -156,3 +157,26 @@ def rebalance_data(data, rebalance_type, seed):
     print(f"y_train classes after resampling: {dict(Counter(data['y_train']))}")
     return data
 
+def map_data(input_data, map_cols, prev_col_name, mapped_col_names):
+    """Map the input data based on a mapping dictionary
+    Args:
+        input_data (dataframe): The input dataset
+        map_cols (list): A list of columns to be mapped
+        prev_col_name (list): A list of the names of the columns to be mapped
+        mapped_col_names (list): A list of the mapped columns' new names
+    Returns:
+        A new dataset with newly mapped columns
+    """
+    # Generate a dictionary containing the above mappings, the previous and new column names
+    mapping_dict = {}
+    for m, m_col_name, p_col_name in zip(map_cols, mapped_col_names, prev_col_name):
+        mapping_dict[m_col_name] = (p_col_name, m)
+    # Map new columns
+    df_copy = copy.deepcopy(input_data)
+    df_target = df_copy.iloc[:, -1]
+    df_copy = df_copy.iloc[:, :-1]
+    for k,v in mapping_dict.items():
+        df_copy[k] = df_copy[v[0]].map(v[1])
+    # Drop previous columns    
+    df_copy = df_copy.drop(columns=[v[0] for v in mapping_dict.values()])       
+    return pd.concat([df_copy, df_target], axis=1)
