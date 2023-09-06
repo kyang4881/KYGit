@@ -1,9 +1,12 @@
+# Author: JYang
+# Last Modified: Sept-05-2023
+# Description: This script provides the add-on method(s), such as tracking tables for model benchmark, data rebalancing, etc.
+
 import pandas as pd
 import numpy as np
 import datetime
 from collections import Counter
-from imblearn.over_sampling import RandomOverSampler
-from imblearn.over_sampling import SMOTE, SMOTEN, SMOTENC, BorderlineSMOTE
+from imblearn.over_sampling import RandomOverSampler, SMOTE, SMOTEN, SMOTENC, BorderlineSMOTE, ADASYN
 
 def check_column_types(df):
     """ A method that checks whether the dataframe columns are numerical or categorical
@@ -140,6 +143,10 @@ def rebalance_data(data, rebalance_type, seed):
 
     if rebalance_type.lower() == "borderlinesmote":
         sampler = BorderlineSMOTE(random_state=seed)        
+        X_resampled, y_resampled = sampler.fit_resample(X_data_df, y_data_df)
+        
+    if rebalance_type.lower() == "adasyn":
+        sampler = ADASYN(random_state=seed)        
         X_resampled, y_resampled = sampler.fit_resample(X_data_df, y_data_df)
 
     data['X_train'] = X_resampled
