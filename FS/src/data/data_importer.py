@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-05-2023
+# Description: This script provides the method(s) for importing datasets
+
 import pandas as pd
 import sage
 from scipy.io import arff
@@ -161,6 +165,22 @@ def importer(file_path, dataset, seed, sample=False, sample_size=100):
         df = pd.DataFrame(data[0])
         df.columns = df.columns.astype(str)
         df['target'] = df['target'].map({b'-1': 0, b'1': 1})
+        
+    if dataset.lower() == "sp500":
+        path = file_path + '/sp500_v3.xlsx'
+        df = pd.read_excel(path, sheet_name='train')
+        #df.rename(columns={36: 'target'}, inplace=True)
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({"sell": 1, "buy": 0})
+        df = df.iloc[:, 1:]
+     
+    if dataset.lower() == "sp500_test":
+        path = file_path + '/sp500_v3.xlsx'
+        df = pd.read_excel(path, sheet_name='test')
+        #df.rename(columns={36: 'target'}, inplace=True)
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({"sell": 1, "buy": 0})
+        df = df.iloc[:, 1:]
         
     if sample:
         np.random.seed(seed)
