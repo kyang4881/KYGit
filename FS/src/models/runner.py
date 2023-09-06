@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-06-2023
+# Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
+
 import numpy as np
 import pandas as pd
 from collections import Counter
@@ -7,23 +11,23 @@ from feature_selection_timeseries.src.features.feature_selection import sage_imp
 from feature_selection_timeseries.src.preprocessing.preprocessor import Preprocess
 from feature_selection_timeseries.src.models.predict_model import generateModel
 
-
 def get_metrics_df(seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, rebalance=False, rebalance_type=None, append_to_full_df=False):
-    """ ...
+    """ A methold for generating the model results
     Args:
-        seed (int):
-        target_colname (str):
-        data (dict):
-        data_original (dict):
-        full_df (dataframe):
-        method_name (str):
-        dataset_name (str):
-        pred_type (str):
-        cv_iteration (int):
-        rebalance (bool):
-        rebalance_type (str):
-        append_to_full_df (str):
-    Returns:      
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
+        data (dict): a dictionary containing train (rebalanced, if applicable) and validation data
+        data_original (dict): a dictionary containing train and validation data
+        full_df (dataframe): a dataframe containing currently tracked model results
+        method_name (str): name of the feature selection model
+        dataset_name (str): name of the dataset
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        cv_iteration (int): an integer indicating the cross validation iteration
+        rebalance (bool): a boolean indicating whether to rebalance the dataset
+        rebalance_type (str): a string indicating what type of rebalancing to perform
+        append_to_full_df (bool): a boolean indicating whether to append model results to the existing tracked results
+    Returns:    
+        full_df (dataframe): a dataframe containing all currently tracked model results
     """   
     model = generateModel(
         data_dict = data,
@@ -85,7 +89,7 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
             "y_train (class/count)": y_train_dict,
             "y_val (class/count)": y_val_dict,
             "X_total (instance/features)": (X_train_shape[0] + X_val_shape[0], X_train_shape[1]),
-            "y_total (class/count)": {0: y_train_dict[0] + y_val_dict[0], 1: y_train_dict[1] + y_val_dict[1]}
+            "y_total (class/count)": {0: y_train_dict[0] + y_val_dict[0], 1: y_train_dict[1] + y_val_dict[1]}            # If KeyError => data has a missing class; not enough data 
         }),
         is_max_acc = [num_index == all_scores.index(max(all_scores)) for num_index in range(len(all_scores))],
         cv_iteration = cv_iteration
@@ -106,20 +110,21 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
 
 
 def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_type, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False):
-    """ ...
+    """ A method that runs through the entire pipeline by wrapping the required methods
     Args:
-        seed (int):
-        target_colname (str):
-        data (dict):
-        full_df (dataframe):
-        method_name (str):
-        dataset_name (str):
-        pred_type (str):
-        num_cv_splits (int):
-        rebalance (bool):
-        rebalance_type (str):
-        append_to_full_df (str):
+        seed (int): a random state
+        target_colname (str): a string indicating the name of the target variable column
+        data (dict): a dictionary containing train and validation data
+        full_df (dataframe): a dataframe containing all currently tracked model results
+        method_name (str): name of the feature selection model
+        dataset_name (str): name of the dataset
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        num_cv_splits (int): an integer indicating the number of cross validation fold
+        rebalance (bool): a boolean indicating whether to rebalance the dataset
+        rebalance_type (str): a string indicating what type of rebalancing to perform
+        append_to_full_df (bool): a boolean indicating whether to append model results to the existing tracked results
     Returns:      
+        full_df (dataframe): a dataframe containing all currently tracked model results
     """   
     # Extract categorical and numerical features
     categorical_cols, numerical_cols = check_column_types(data.iloc[:,:-1])
@@ -135,7 +140,7 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         num_cv_splits = num_cv_splits
     )
     # Dictionary containing all cross validation splits
-    compiled_data = processor1.split_data()
+    compiled_data, scaler_saved, encoder_saved = processor1.split_data()
     # The number of cv splits
     cv_iteration = len(compiled_data['X_train'])
     
@@ -167,4 +172,4 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
             rebalance_type=rebalance_type, 
             append_to_full_df=append_to_full_df
         )
-    return full_df
+    return full_df, scaler_saved, encoder_saved
