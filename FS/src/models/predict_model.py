@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-05-2023
+# Description: This script provides the method(s) for computing evaluation metrics
+
 import xgboost as xgb
 import numpy as np
 import matplotlib.pyplot as plt
@@ -64,7 +68,7 @@ class computeScore:
                 "false_negative": fn,
                 "total_positive": np.sum(self.data_dict_new['y_val'] == 1),
                 "total_negative": np.sum(self.data_dict_new['y_val'] == 0),
-                "precision": precision_score(y_val_true, y_pred),
+                "precision": precision_score(y_val_true, y_pred, zero_division=0),
                 "recall": recall_score(y_val_true, y_pred),
                 "f1_score": f1_score(y_val_true, y_pred)
                 }
