@@ -1,3 +1,7 @@
+# Author: JYang
+# Last Modified: Sept-06-2023
+# Description: This script provides the method(s) for evaluating model performance on the test data
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -11,7 +15,7 @@ class computeTestScore:
         selected_features (list): a lsit of features to use
         data (dataframe): the test data
     """
-    def __init__(self, selected_features, train_data, test_data, pred_type, seed, printout=False):
+    def __init__(self, selected_features, train_data, test_data, pred_type, seed, scaler_saved, encoder_saved, printout=False):
         self.selected_features = selected_features
         self.X_train_data = train_data.iloc[:, :-1]
         self.X_test_data = test_data.iloc[:, :-1]
@@ -19,6 +23,8 @@ class computeTestScore:
         self.y_test_data = test_data.iloc[:, -1]
         self.pred_type = pred_type
         self.seed = seed     
+        self.scaler = scaler_saved
+        self.encoder = encoder_saved
         self.printout = printout
         self.cat_cols, self.num_cols = check_column_types(self.X_train_data)       
         
@@ -37,21 +43,17 @@ class computeTestScore:
             print("X_test")
             display(X_test.head())        
         
-        # Normalize and Encode data
-        scaler = StandardScaler()
-        encoder = OneHotEncoder()
-        
         # Normalize numerical variables
-        X_train_scaled = scaler.fit_transform(X_train[self.num_cols])
-        X_test_scaled = scaler.fit_transform(X_test[self.num_cols])
+        X_train_scaled = self.scaler.transform(X_train[self.num_cols])
+        X_test_scaled = self.scaler.transform(X_test[self.num_cols])
 
         # Encode categorical variables
-        X_train_encoded = encoder.fit_transform(X_train[self.cat_cols])
-        X_test_encoded = encoder.fit_transform(X_test[self.cat_cols])
+        X_train_encoded = self.encoder.transform(X_train[self.cat_cols])
+        X_test_encoded = self.encoder.transform(X_test[self.cat_cols])
 
         # Extract feature names
-        num_feature_names = [str(f) for f in scaler.get_feature_names_out().tolist()]
-        cat_feature_names = [str(f) for f in encoder.get_feature_names_out().tolist()]
+        num_feature_names = [str(f) for f in self.scaler.get_feature_names_out().tolist()]
+        cat_feature_names = [str(f) for f in self.encoder.get_feature_names_out().tolist()]
 
         # Combine normalized and encoded features
         X_train_transformed = pd.concat([
