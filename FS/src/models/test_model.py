@@ -74,8 +74,16 @@ class computeTestScore:
             X_train_filtered (dataframe): train data with filtered features only
             X_test_filtered (dataframe): test data with filtered features only
         """
-        X_train_filtered = X_train_transformed[self.selected_features] 
+        X_train_filtered = X_train_transformed[self.selected_features]
         X_test_filtered = X_test_transformed[self.selected_features] 
+        
+        if self.printout:
+            print("Selected Features:\n", self.selected_features, "\n")
+            print("X_train_transformed columns:\n", list(X_train_transformed.columns), "\n")
+            print("X_test_transformed columns:\n", list(X_test_transformed.columns), "\n")
+            print("Selected features not in X_train_transformed columns:\n", [item for item in self.selected_features if item not in list(X_train_transformed.columns)], "\n")
+            print("Selected features not in X_test_transformed columns:\n", [item for item in self.selected_features if item not in list(X_test_transformed.columns)], "\n")
+
         return X_train_filtered, X_test_filtered
         
     def pred(self):
