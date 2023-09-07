@@ -81,4 +81,3 @@ class Preprocess:
             df_compiled['y_val'].append(y_val)
         
         return df_compiled, self.scaler, self.encoder
-
