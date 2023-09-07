@@ -147,7 +147,7 @@ def rebalance_data(data, rebalance_type, seed):
         X_resampled, y_resampled = sampler.fit_resample(X_data_df, y_data_df)
         
     if rebalance_type.lower() == "adasyn":
-        sampler = ADASYN(random_state=seed)        
+        sampler = ADASYN(random_state=seed)         
         X_resampled, y_resampled = sampler.fit_resample(X_data_df, y_data_df)
 
     data['X_train'] = X_resampled
