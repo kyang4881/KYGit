@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-05-2023
+# Last Modified: Sept-07-2023
 # Description: This script provides the method(s) for importing datasets
 
 import pandas as pd
@@ -121,6 +121,12 @@ def importer(file_path, dataset, seed, sample=False, sample_size=100):
         df['target'] = df['target'].map({"K04": 0, "J04": 1})
         df = df.iloc[:, 1:]
         
+    if dataset.lower() == "census_income":
+        df_path = file_path + '/census_income.csv'
+        df = pd.read_csv(df_path, delimiter=',')
+        df.columns = df.columns.astype(str)
+        df['target'] = df['target'].map({"<=50K": 0, ">50K": 1})
+        
     if dataset.lower() == "ai4i":
         ai4i = file_path + '/ai4i.csv'
         df = pd.read_csv(ai4i, delimiter=',')
@@ -166,21 +172,22 @@ def importer(file_path, dataset, seed, sample=False, sample_size=100):
         df.columns = df.columns.astype(str)
         df['target'] = df['target'].map({b'-1': 0, b'1': 1})
         
-    if dataset.lower() == "sp500":
-        path = file_path + '/sp500_v3.xlsx'
-        df = pd.read_excel(path, sheet_name='train')
+    if dataset.lower() == "sp500_train_v7":
+        path = file_path + '/sp500_jamie_v7.xlsx'
+        df = pd.read_excel(path, sheet_name='Train')
         #df.rename(columns={36: 'target'}, inplace=True)
         df.columns = df.columns.astype(str)
-        df['target'] = df['target'].map({"sell": 1, "buy": 0})
-        df = df.iloc[:, 1:]
+        df['target'] = df['target'].map({"Down": 0, "Up": 1})
+        #df = df.iloc[:, 1:]
      
-    if dataset.lower() == "sp500_test":
-        path = file_path + '/sp500_v3.xlsx'
-        df = pd.read_excel(path, sheet_name='test')
+    if dataset.lower() == "sp500_test_v7":
+        path = file_path + '/sp500_jamie_v7.xlsx'
+        df = pd.read_excel(path, sheet_name='Test')
         #df.rename(columns={36: 'target'}, inplace=True)
         df.columns = df.columns.astype(str)
-        df['target'] = df['target'].map({"sell": 1, "buy": 0})
-        df = df.iloc[:, 1:]
+        df['target'] = df['target'].map({"Down": 0, "Up": 1})
+        #df = df.iloc[:, 1:]
+
         
     if sample:
         np.random.seed(seed)
