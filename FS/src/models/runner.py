@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-06-2023
+# Last Modified: Sept-08-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -7,9 +7,9 @@ import pandas as pd
 from collections import Counter
 from feature_selection_timeseries.src.models.predict_model import run_scoring_pipeline
 from feature_selection_timeseries.src.models.utils import create_df, add_to_dataframe, check_column_types
-from feature_selection_timeseries.src.features.feature_selection import sage_importance, permutation_test, xgb_importance, shap_importance, cae_importance
 from feature_selection_timeseries.src.preprocessing.preprocessor import Preprocess
-from feature_selection_timeseries.src.models.predict_model import generateModel
+from feature_selection_timeseries.src.models.train_model import generateModel
+from feature_selection_timeseries.src.features.feature_selection import featureValues
 
 def get_metrics_df(seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, rebalance=False, rebalance_type=None, append_to_full_df=False):
     """ A methold for generating the model results
@@ -35,22 +35,27 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
         seed = seed
     ).get_model()
         
+    feature_values = featureValues(data_dict=data, pred_type=pred_type, model=model, seed=seed, target_colname=target_colname)
+        
     # Generate ranked features and other input variables
     if method_name.lower() == "sage":
-        sorted_features, feature_scores, total_time = sage_importance(model=model, data=data, pred_type=pred_type, seed=seed, target_colname=target_colname)
+        sorted_features, feature_scores, total_time = feature_values.sage_importance()
 
     if method_name.lower() == "permutation":
-        sorted_features, feature_scores, total_time = permutation_test(model=model, data = data, pred_type = pred_type, seed=seed, target_colname=target_colname)
+        sorted_features, feature_scores, total_time = feature_values.permutation_test()
 
     if method_name.lower() == "xgboost":
-        sorted_features_xgb, feature_scores, total_time = xgb_importance(model=model, data=data, pred_type=pred_type, seed=seed, target_colname=target_colname)
+        sorted_features_xgb, feature_scores, total_time = feature_values.xgb_importance()
         sorted_features = list(sorted_features_xgb) + [f for f in list(data['X_train'].columns) if f not in sorted_features_xgb]
 
     if method_name.lower() == "shap":
-        sorted_features, feature_scores, total_time = shap_importance(model=model, data = data, pred_type = pred_type, seed=seed, target_colname=target_colname)
+        sorted_features, feature_scores, total_time = feature_values.shap_importance()
 
     if method_name.lower() == "cae":
-        sorted_features, feature_scores, total_time = cae_importance(data = data, pred_type = pred_type, seed=seed, target_colname=target_colname)
+        sorted_features, feature_scores, total_time = feature_values.cae_importance()
+    
+    if method_name.lower() == "boruta":
+        sorted_features, feature_scores, total_time = feature_values.boruta_importance()
 
     # Generate the scoring metrics
     all_scores, all_scores_reverse, all_features, all_features_reverse, cm_val, cm_val_reversed  = run_scoring_pipeline(
@@ -101,7 +106,7 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     if append_to_full_df:
         full_df = pd.concat([add_to_dataframe(
             df = results_df,
-            import_name = "feature_selection/data/external/empty.xlsx",
+            import_name = "feature_selection_timeseries/data/external/empty.xlsx",
             export = False,
             export_name = None
         ), full_df])
