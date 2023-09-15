@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-08-2023
+# Last Modified: Sept-14-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -56,6 +56,9 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     
     if method_name.lower() == "boruta":
         sorted_features, feature_scores, total_time = feature_values.boruta_importance()
+    
+    if method_name.lower() == "dynamic":
+        sorted_features, feature_scores, total_time = feature_values.dynamic_selection_importance()
 
     # Generate the scoring metrics
     all_scores, all_scores_reverse, all_features, all_features_reverse, cm_val, cm_val_reversed  = run_scoring_pipeline(
