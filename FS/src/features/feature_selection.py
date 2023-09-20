@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-14-2023
+# Last Modified: Sept-19-2023
 # Description: This script provides the feature selection method(s) for computing importances
 
 import numpy as np
@@ -18,6 +18,10 @@ from keras.utils import to_categorical
 from keras.layers import Dense, Dropout, LeakyReLU
 from sklearn.metrics import accuracy_score 
 from sklearn.inspection import permutation_importance
+from sklearn.linear_model import Lasso
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 import time
 import matplotlib.pyplot as plt
 import shap
@@ -30,6 +34,8 @@ from torch.utils.data import Dataset, DataLoader, Subset, TensorDataset
 from torchmetrics import Accuracy, AUROC
 from feature_selection_timeseries.author_feature_selection.dynamic_selection_main import dynamic_selection as ds
 from feature_selection_timeseries.author_feature_selection.dynamic_selection_main.dynamic_selection import MaskingPretrainer, GreedyDynamicSelection
+from feature_selection_timeseries.author_feature_selection.stg_master.python.stg.stg import STG
+
 
 class featureValues:
     """ A class containing feature selection methods
@@ -51,10 +57,72 @@ class featureValues:
         self.feature_names = self.X_data_train.columns.to_list()
         self.seed = seed
         
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)  
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    
+    def stg_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Paper: https://arxiv.org/abs/1810.04247
+            Source: https://github.com/runopti/stg/tree/master
+            Compiled_by: JYang
+        Returns: 
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """  
+        start_time = time.time()
+        
+        #args_cuda = torch.cuda.is_available()
+        #device = torch.device("cuda" if args_cuda else "cpu") 
+        model = STG(
+            task_type = 'classification',
+            input_dim = self.X_data_train.shape[1], 
+            output_dim = 2, 
+            hidden_dims = [60, self.X_data_train.shape[1]], 
+            activation = 'tanh',
+            optimizer = 'SGD', 
+            learning_rate = 0.1, 
+            batch_size = self.X_data_train.shape[0], 
+            feature_selection = True, 
+            sigma = 0.5, 
+            lam = 0.5, 
+            random_state = 1, 
+            device = "cpu"
+        ) 
+        model.fit(
+            X=self.X_data_train.values, 
+            y=self.y_data_train.values, 
+            nr_epochs=6000, 
+            valid_X=self.X_data_val.values, 
+            valid_y=self.y_data_val.values, 
+            print_interval=1000
+        )
+        
+        feature_impt = model.get_gates(mode='raw')
+        feature_rank_index = np.argsort(-feature_impt)
+        feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
+        feature_scores = feature_impt[feature_rank_index]
+
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nRuntime: {total_time:.2f} seconds")
+        
+        #print("self.feature_names", self.feature_names)
+        #print("feature_impt: ", feature_impt)
+        #print("feature_rank_index: ", feature_rank_index)
+        #print("feature_names_sorted: ", feature_names_sorted)
+        #print("feature_scores: ", feature_scores)
+        
+        return feature_names_sorted, feature_scores, total_time
+        
     def dynamic_selection_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/2301.00557
             Source: https://github.com/iancovert/dynamic-selection/tree/main
+            Compiled_by: JYang
         Returns: 
             feature_names_sorted (list): ranked features
             feature_scores (list): ranked feature importances
@@ -141,7 +209,7 @@ class featureValues:
         feature_rank_index = np.argsort(np.mean(feature_rank, axis = 0))
         #feature_score_unordered = np.sort(np.mean(feature_rank, axis = 0)).tolist()
         
-        feature_names_sorted = np.array(self.feature_names)[feature_rank_index]
+        feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
         feature_scores = np.arange(len(self.feature_names), 0, -1)
         
         end_time = time.time()
@@ -159,6 +227,7 @@ class featureValues:
     def boruta_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Source: https://github.com/scikit-learn-contrib/boruta_py
+            Compiled_by: JYang
         Returns: 
             feature_names_sorted (list): ranked features
             feature_scores (list): ranked feature importances
@@ -210,6 +279,7 @@ class featureValues:
         """ A method that calls the sage class to extract the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/2004.00668
             Source: https://github.com/iancovert/sage
+            Compiled_by: JYang
         Returns:
             sage_features (list): ranked features
             sage_feature_scores (list): ranked feature importances
@@ -228,6 +298,7 @@ class featureValues:
     def permutation_test(self):
         """ A method that extracts the features, feature scores, and total runtime
             Source: https://scikit-learn.org/stable/modules/permutation_importance.html
+            Compiled_by: JYang
         Returns: 
             feature_names_sorted (list): ranked features
             feature_scores (list): ranked feature importances
@@ -249,6 +320,7 @@ class featureValues:
     def xgb_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Source: https://xgboost.readthedocs.io/en/stable/R-package/discoverYourData.html
+            Compiled_by: JYang
         Returns:
             top_features (list): ranked features
             top_scores (list): ranked feature importances
@@ -276,6 +348,7 @@ class featureValues:
     def shap_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Source: https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html
+            Compiled_by: JYang
         Returns:
             sorted_features (list): ranked features
             feature_score_shap (list): ranked feature importances
@@ -305,6 +378,7 @@ class featureValues:
         """ A method that extracts the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/1901.09346
             Source: https://github.com/mfbalin/Concrete-Autoencoders
+            Compiled_by: JYang
         Returns:
             sorted_features (list): ranked features
             feature_scores (list): ranked feature importances
@@ -334,6 +408,110 @@ class featureValues:
         feature_scores = feature_importances[argsort]
 
         return sorted_features, feature_scores, total_time
+    
+
+    def lasso_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Source: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html
+            Compiled_by: JChang
+        Returns:
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """
+        start_time = time.time()
+        # Calcuate lasso feature importance
+        # Create an instance of the Lasso model with the desired alpha value
+        lasso = Lasso(alpha=0.00001)
+        lasso.fit(self.X_data_train.values, self.y_data_train.values)
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nRuntime: {total_time:.2f} seconds")
+        # Order features by lasso rank
+        feature_imp = pd.DataFrame({'Value': np.abs(lasso.coef_), 'Feature': self.feature_names})
+        top_features =feature_imp.sort_values(by="Value",ascending=False)
+        # Feature names and scores to be returned
+        feature_names_sorted=top_features['Feature'].tolist()
+        feature_scores=top_features['Value'].tolist()
+
+        return feature_names_sorted, feature_scores, total_time
+
+    def cart_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Source: https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
+            Compiled_by: JChang
+        Returns:
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """
+        start_time = time.time()
+        # Calcuate lasso feature importance
+        # Create an instance of the Lasso model with the desired alpha value
+        cart_model = DecisionTreeClassifier(random_state=123).fit(self.X_data_train.values, self.y_data_train.values)
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nRuntime: {total_time:.2f} seconds")
+        # Order features by CART rank
+        feature_imp = pd.DataFrame({'Value': cart_model.feature_importances_, 'Feature': self.feature_names})
+        top_features =feature_imp.sort_values(by="Value",ascending=False)
+        # Feature names and scores to be returned
+        feature_names_sorted=top_features['Feature'].tolist()
+        feature_scores=top_features['Value'].tolist()
+
+        return feature_names_sorted, feature_scores, total_time
+
+    def svm_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Source: https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
+            Compiled_by: JChang
+        Returns:
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """
+        start_time = time.time()
+        # Calcuate lasso feature importance
+        # Create an instance of the Lasso model with the desired alpha value
+        clf = SVC(kernel='linear', gamma=0.1, C=1)
+        clf.fit(self.X_data_train.values, self.y_data_train.values)
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nRuntime: {total_time:.2f} seconds")
+        # Order features by SVM rank
+        feature_imp = pd.DataFrame({'Value': np.abs(clf.coef_[0]), 'Feature': self.feature_names})
+        top_features =feature_imp.sort_values(by="Value",ascending=False)
+        # Feature names and scores to be returned
+        feature_names_sorted=top_features['Feature'].tolist()
+        feature_scores=top_features['Value'].tolist()
+
+        return feature_names_sorted, feature_scores, total_time
+
+    def randomforest_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Source: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
+            Compiled_by: JChang
+        Returns:
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """
+        start_time = time.time()
+        # Calcuate lasso feature importance
+        # Create an instance of the Lasso model with the desired alpha value
+        rf_model = RandomForestClassifier(n_estimators = 100,random_state=123)
+        rf_model.fit(self.X_data_train.values, self.y_data_train.values)
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nRuntime: {total_time:.2f} seconds")
+        # Order features by SVM rank
+        feature_imp = pd.DataFrame({'Value': rf_model.feature_importances_, 'Feature': self.feature_names})
+        top_features =feature_imp.sort_values(by="Value",ascending=False)
+        # Feature names and scores to be returned
+        feature_names_sorted=top_features['Feature'].tolist()
+        feature_scores=top_features['Value'].tolist()
+
+        return feature_names_sorted, feature_scores, total_time
 
 # NOTE:
 # https://github.com/mfbalin/Concrete-Autoencoders/blob/master/concrete_autoencoder/concrete_autoencoder/__init__.py
