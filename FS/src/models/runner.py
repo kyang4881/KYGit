@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-14-2023
+# Last Modified: Sept-19-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -38,9 +38,6 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     feature_values = featureValues(data_dict=data, pred_type=pred_type, model=model, seed=seed, target_colname=target_colname)
         
     # Generate ranked features and other input variables
-    if method_name.lower() == "sage":
-        sorted_features, feature_scores, total_time = feature_values.sage_importance()
-
     if method_name.lower() == "permutation":
         sorted_features, feature_scores, total_time = feature_values.permutation_test()
 
@@ -51,15 +48,33 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     if method_name.lower() == "shap":
         sorted_features, feature_scores, total_time = feature_values.shap_importance()
 
+    if method_name.lower() == "boruta":
+        sorted_features, feature_scores, total_time = feature_values.boruta_importance()
+        
+    if method_name.lower() == "sage":
+        sorted_features, feature_scores, total_time = feature_values.sage_importance()
+        
     if method_name.lower() == "cae":
         sorted_features, feature_scores, total_time = feature_values.cae_importance()
     
-    if method_name.lower() == "boruta":
-        sorted_features, feature_scores, total_time = feature_values.boruta_importance()
-    
     if method_name.lower() == "dynamic":
         sorted_features, feature_scores, total_time = feature_values.dynamic_selection_importance()
-
+        
+    if method_name.lower() == "stg":
+        sorted_features, feature_scores, total_time = feature_values.stg_importance()
+    
+    if method_name.lower() == "lasso":
+        sorted_features, feature_scores, total_time = feature_values.lasso_importance()
+    
+    if method_name.lower() == "cart":
+        sorted_features, feature_scores, total_time = feature_values.cart_importance()
+        
+    if method_name.lower() == "svm":
+        sorted_features, feature_scores, total_time = feature_values.svm_importance()
+        
+    if method_name.lower() == "rf":
+        sorted_features, feature_scores, total_time = feature_values.randomforest_importance()
+        
     # Generate the scoring metrics
     all_scores, all_scores_reverse, all_features, all_features_reverse, cm_val, cm_val_reversed  = run_scoring_pipeline(
         feature_impt = sorted_features,
