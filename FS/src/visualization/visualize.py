@@ -1,8 +1,10 @@
 # Author: JYang
-# Last Modified: Sept-05-2023
+# Last Modified: Sept-27-2023
 # Description: This script provides the method(s) for generating visualizations
 
 import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+from collections import Counter, OrderedDict
 
 class plotScore:
     """ A class for generating visualizations
@@ -78,3 +80,46 @@ class plotCurve:
         self.label.append(label)
         self.data.append(data)
         self.plot_line()
+
+        
+def word_cloud_freq(file_path, top_n=10):
+    """Generate a wordcloud and histogram using feature frequencies
+    Args:
+        file_path (str): a string indicating the path where the outputs file is stored
+        top_n (int): an integer that determines the top number of features to display in the histogram
+    """
+    # Import data
+    outputs_df = pd.read_excel(file_path, sheet_name="data")
+    # Filter for optimal feature subsets only
+    feature_df = pd.DataFrame(outputs_df.loc[outputs_df['is_max_acc'] == True]['feature']).reset_index(drop=True)
+    # Append features to a list
+    feature_list = []
+    for i in range(len(feature_df)):
+        for s in ast.literal_eval(feature_df['feature'][i]):
+            feature_list.append(s)
+    # Get feature counts
+    feature_cnt = Counter(feature_list)
+    # Order feature counts
+    sorted_word_counts = OrderedDict(feature_cnt.most_common())
+    
+    # Generate wordcloud object
+    wordcloud = WordCloud(width=800, height=400, background_color='white').generate_from_frequencies(sorted_word_counts)
+    # Plot wordcloud
+    plt.figure(figsize=(10, 8))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis('off')
+    plt.show()
+    
+    # Sort word counts
+    sorted_word_counts_list = list(sorted_word_counts)
+    # Filter for top n features
+    words, frequencies = zip(*list(sorted_word_counts.items())[:top_n])
+    
+    # Create a histogram
+    plt.bar(words, frequencies)
+    plt.title(f'Top {top_n} Word Frequency Histogram')
+    plt.xlabel('Words')
+    plt.ylabel('Frequency')
+    plt.xticks(rotation=90)  # Rotate x-labels for better readability
+    plt.tight_layout()
+    plt.show()
