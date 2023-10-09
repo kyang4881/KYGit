@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-06-2023
+# Last Modified: Oct-09-2023
 # Description: This script provides the method(s) for evaluating model performance on the test data
 
 import numpy as np
@@ -120,7 +120,7 @@ class computeTestScore:
         
         if self.pred_type == "classification":
             y_pred = [1 if p >= 0.5 else 0 for p in y_pred]
-            score = accuracy_score(y_true, y_pred)
+            score = f1_score(y_true, y_pred) #accuracy_score(y_true, y_pred)
             tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
             cm = confusion_matrix(y_true, y_pred)
             metrics = {
@@ -136,3 +136,7 @@ class computeTestScore:
                 "accuracy": score
             }
         return metrics
+
+    
+    
+    
