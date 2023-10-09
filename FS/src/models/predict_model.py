@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-05-2023
+# Last Modified: Oct-09-2023
 # Description: This script provides the method(s) for computing evaluation metrics
 
 import xgboost as xgb
@@ -58,7 +58,7 @@ class computeScore:
         # Compute and save scoring metrics
         if self.pred_type == "classification":
             y_pred = [1 if p >= 0.5 else 0 for p in y_pred]
-            score = accuracy_score(y_val_true, y_pred)
+            score = f1_score(y_val_true, y_pred) #accuracy_score(y_val_true, y_pred)      # Changed Oct 09
             tn, fp, fn, tp = confusion_matrix(y_val_true, y_pred).ravel()
             cm = confusion_matrix(y_val_true, y_pred)
             cm_val = {
@@ -70,7 +70,8 @@ class computeScore:
                 "total_negative": np.sum(self.data_dict_new['y_val'] == 0),
                 "precision": precision_score(y_val_true, y_pred, zero_division=0),
                 "recall": recall_score(y_val_true, y_pred),
-                "f1_score": f1_score(y_val_true, y_pred)
+                "f1_score": f1_score(y_val_true, y_pred),
+                "accuracy": accuracy_score(y_val_true, y_pred)
                 }
             return score, str(cm_val)
         else:
