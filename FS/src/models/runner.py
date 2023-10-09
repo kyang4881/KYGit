@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-19-2023
+# Last Modified: Oct-03-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -132,7 +132,7 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     return full_df
 
 
-def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_type, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False):
+def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_type, num_cv_splits=5, rebalance=False, rebalance_type=None, append_to_full_df=False, train_examples=1, test_examples=1):
     """ A method that runs through the entire pipeline by wrapping the required methods
     Args:
         seed (int): a random state
@@ -146,6 +146,9 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         rebalance (bool): a boolean indicating whether to rebalance the dataset
         rebalance_type (str): a string indicating what type of rebalancing to perform
         append_to_full_df (bool): a boolean indicating whether to append model results to the existing tracked results
+        n_splits (int): number of cross-validation splits
+        train_examples (int): number of train examples in each cv split
+        test_examples (int): number of test examples in each cv split
     Returns:      
         full_df (dataframe): a dataframe containing all currently tracked model results
     """   
@@ -160,7 +163,9 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         target = target_colname,
         cat_cols = categorical_cols,
         num_cols = numerical_cols, 
-        num_cv_splits = num_cv_splits
+        num_cv_splits = num_cv_splits,
+        train_examples = train_examples,
+        test_examples = test_examples
     )
     # Dictionary containing all cross validation splits
     compiled_data, scaler_saved, encoder_saved = processor1.split_data()
