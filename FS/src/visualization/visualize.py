@@ -1,10 +1,11 @@
 # Author: JYang
-# Last Modified: Sept-27-2023
+# Last Modified: Oct-09-2023
 # Description: This script provides the method(s) for generating visualizations
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter, OrderedDict
+import pandas as pd
 
 class plotScore:
     """ A class for generating visualizations
@@ -22,7 +23,7 @@ class plotScore:
         """ A method that display a plot with accuracy against the number of features """
         plt.plot(range(1, len(self.data) + 1), self.data)
         plt.xlabel("Number of Features")
-        score_type = "Accuracy" if self.pred_type == "classification" else "MSE"
+        score_type = "F1" if self.pred_type == "classification" else "MSE"
         plt.ylabel(f"{score_type} Score")
         plt.title(f"{score_type} Score over Number of Features")
 
@@ -60,7 +61,7 @@ class plotCurve:
             plt.plot(range(1, len(data) + 1), data, label=f"Line {i+1}")
 
         plt.xlabel("Number of Features")
-        score_type = "Accuracy" if self.pred_type == "classification" else "MSE"
+        score_type = "F1" if self.pred_type == "classification" else "MSE"
         plt.ylabel(f"{score_type} Score")
         plt.title(f"{score_type} Score over Number of Features [{self.ds_title}]")
         n = 5
