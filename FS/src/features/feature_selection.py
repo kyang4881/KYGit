@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-19-2023
+# Last Modified: Oct-09-2023
 # Description: This script provides the feature selection method(s) for computing importances
 
 import numpy as np
@@ -331,7 +331,7 @@ class featureValues:
         # round predictions
         predictions = [round(value) for value in y_pred]
         # evaluate predictions
-        accuracy = accuracy_score(predictions, self.y_data_val)
+        #accuracy = accuracy_score(predictions, self.y_data_val)
         start_time = time.time()
         # Calculate feature importance scores
         feature_importances = self.model.get_booster().get_score(importance_type='weight')
