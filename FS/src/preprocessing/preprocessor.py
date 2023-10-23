@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-03-2023
+# Last Modified: Oct-17-2023
 # Description: This script provides the method(s) for data preprocessing 
 
 import pandas as pd
@@ -66,7 +66,7 @@ class Preprocess:
 
         return X_train_data_transformed, X_val_data_transformed
 
-    def split_data_backup(self):
+    def split_data_backup_inactive(self):
         """ A method for splitting the original data into train/validation sets
         Returns:
             df_compiled (dict): a dictionary containing the train and validation data
@@ -99,6 +99,8 @@ class Preprocess:
         tscv = TimeSeriesSplit(max_train_size=None, n_splits=self.num_cv_splits)            
         # Dictionary containing all cv splits
         df_compiled = {'X_train': [], 'X_val': [], 'y_train': [], 'y_val': []}
+        # Dictionary containing indices of train and test sets
+        train_test_index = {'train_index':[], 'test_index':[]}
         # For each cv split, normalize and encode the data
         for train_index, test_index in self.split_model.split(self.data, fixed_length=True, train_examples=self.train_examples, test_examples=self.test_examples):
             #print("TRAIN:", len(train_index), "TEST:", len(test_index))
@@ -111,9 +113,13 @@ class Preprocess:
             df_compiled['X_train'].append(X_train_data_transformed)
             df_compiled['X_val'].append(X_val_data_transformed)
             df_compiled['y_train'].append(y_train)
-            df_compiled['y_val'].append(y_val)
+            df_compiled['y_val'].append(y_val) 
+            train_test_index['train_index'].append(train_index)
+            train_test_index['test_index'].append(test_index)
         
-        return df_compiled, self.scaler, self.encoder    
+        return df_compiled, self.scaler, self.encoder, train_test_index
+    
+    
     
 class TimeSeriesSplitImproved(TimeSeriesSplit):
     """ A class that contains a method for applying cross-validation split"""
@@ -154,3 +160,5 @@ class TimeSeriesSplitImproved(TimeSeriesSplit):
                     print(f"(Split #{i+1}) Warning: Indices not included due to incompleteness: train ([{train_return[0]}, {train_return[-1]}]), test ([{test_return[0]}, {test_return[-1]}])")
             
             train_start = train_end
+            
+            
