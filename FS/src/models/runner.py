@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-03-2023
+# Last Modified: Oct-17-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -11,7 +11,8 @@ from feature_selection_timeseries.src.preprocessing.preprocessor import Preproce
 from feature_selection_timeseries.src.models.train_model import generateModel
 from feature_selection_timeseries.src.features.feature_selection import featureValues
 
-def get_metrics_df(seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, rebalance=False, rebalance_type=None, append_to_full_df=False):
+def get_metrics_df(seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, train_examples,
+                   test_examples, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False):
     """ A methold for generating the model results
     Args:
         seed (int): a random state
@@ -107,6 +108,9 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
         rebalance = rebalance,
         rebalance_type = rebalance_type,
         data_shape = str({
+            "cv_train_size": train_examples,
+            "cv_test_size": test_examples,
+            "num_cv_split": num_cv_splits,
             "X_train (instance/feature)": X_train_shape,
             "X_val (instance/feature)": X_val_shape,
             "y_train (class/count)": y_train_dict,
@@ -119,16 +123,19 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     )
 
     display(results_df.head())
-
+    
     # Append scoring metrics for feature subsets into a dataframe
-    if append_to_full_df:
-        full_df = pd.concat([add_to_dataframe(
-            df = results_df,
-            import_name = "feature_selection_timeseries/data/external/empty.xlsx",
-            export = False,
-            export_name = None
-        ), full_df])
+    #if append_to_full_df:
+    #    full_df = pd.concat([add_to_dataframe(
+    #        df = results_df,
+    #        import_name = "feature_selection_timeseries/data/external/empty.xlsx",
+    #        export = False,
+    #        export_name = None
+    #    ), full_df])
 
+    if append_to_full_df:
+        full_df = pd.concat([results_df, full_df])
+        
     return full_df
 
 
@@ -168,7 +175,7 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         test_examples = test_examples
     )
     # Dictionary containing all cross validation splits
-    compiled_data, scaler_saved, encoder_saved = processor1.split_data()
+    compiled_data, scaler_saved, encoder_saved, train_test_index = processor1.split_data()
     # The number of cv splits
     cv_iteration = len(compiled_data['X_train'])
     
@@ -184,6 +191,7 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         print('X_val', np.shape(selected_cv_dict['X_val']))
         print('y_train', np.shape(selected_cv_dict['y_train']))
         print('y_val', np.shape(selected_cv_dict['y_val']), "\n")
+        print(f"Running Cross-Validation Split: train_index=[{train_test_index['train_index'][i][0]}, {train_test_index['train_index'][i][-1]}], test_index=[{train_test_index['test_index'][i][0]}, {train_test_index['test_index'][i][-1]}]\n")
 
         # Compute metrics
         full_df = get_metrics_df(
@@ -196,6 +204,9 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
             dataset_name=dataset_name, 
             pred_type=pred_type, 
             cv_iteration=i,
+            train_examples=train_examples,
+            test_examples=test_examples,
+            num_cv_splits=num_cv_splits,
             rebalance=rebalance, 
             rebalance_type=rebalance_type, 
             append_to_full_df=append_to_full_df
