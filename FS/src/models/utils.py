@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Sept-06-2023
+# Last Modified: Oct-17-2023
 # Description: This script provides the helper method(s), such as tracking tables for model benchmark, data rebalancing, etc.
 
 import pandas as pd
@@ -66,10 +66,10 @@ def create_df(all_features, all_scores, all_features_rev, all_scores_rev, datase
         "feature_score": list(feature_score) + [0]*(df_len - len(feature_score)),
         "cm_val": cm_val,
         "cm_val_reversed": cm_val_reversed,
-        "rebalance": [rebalance]*df_len,
+        "rebalance": [str(rebalance)]*df_len,
         "rebalance_type": [rebalance_type]*df_len,
         "data_shape": [data_shape]*df_len,
-        "is_max_acc": is_max_acc,
+        "is_max_acc": [str(x) for x in is_max_acc],
         "cv_iteration": [cv_iteration]*df_len
     })
     return results_df
@@ -180,3 +180,32 @@ def map_data(input_data, map_cols, prev_col_name, mapped_col_names):
     # Drop previous columns    
     df_copy = df_copy.drop(columns=[v[0] for v in mapping_dict.values()])       
     return pd.concat([df_copy, df_target], axis=1)
+
+def tune_cv_split(data, min_test_val_size=50, val_test_prop_constraint=0.2, num_split_constraint=3):
+    """Create various combinations of cv splits
+    Args:
+        data (data_frame): A dataframe containing the train, validation, and test data
+        min_test_val_size (int): An integer specifying the minimum number of instances in the validation and test set
+        val_test_prop_constraint (float): A float indicating the proportional size of the val/test set relative to the train set
+        num_split_constraint (int): An integer specifying the minimum number of train/val splits required
+    Returns:
+        A list containing lists of train and test size, and number of splits
+    """
+    # number of instances in the dataset
+    sample_size = data.shape[0]
+    # generate the possible val/test set size
+    n_iter = int((sample_size - 2*min_test_val_size)*val_test_prop_constraint / min_test_val_size)
+    test_val_size_list = []
+    for n in range(1, n_iter):
+        test_val_size = min_test_val_size*n
+        test_val_size_list.append(test_val_size)
+    # generate the final combinations for train/val/test size
+    train_test_list = []
+    for train_val_size in test_val_size_list:
+        num_split = int(np.floor((sample_size - 2*train_val_size) / (train_val_size / val_test_prop_constraint)))
+        if num_split < num_split_constraint: 
+            break  
+        train_size = int(train_val_size / val_test_prop_constraint)
+        train_test_list.append([train_size, train_val_size, num_split])
+    print(train_test_list)
+    return train_test_list
