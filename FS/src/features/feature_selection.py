@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-09-2023
+# Last Modified: Oct-26-2023
 # Description: This script provides the feature selection method(s) for computing importances
 
 import numpy as np
@@ -56,6 +56,7 @@ class featureValues:
         self.sage_val = None
         self.feature_names = self.X_data_train.columns.to_list()
         self.seed = seed
+        self.model_init = xgb.XGBClassifier(seed=self.seed)
         
         np.random.seed(seed)
         torch.manual_seed(seed)
@@ -75,8 +76,8 @@ class featureValues:
         """  
         start_time = time.time()
         
-        #args_cuda = torch.cuda.is_available()
-        #device = torch.device("cuda" if args_cuda else "cpu") 
+        args_cuda = torch.cuda.is_available()
+        device = torch.device("cuda" if args_cuda else "cpu") 
         model = STG(
             task_type = 'classification',
             input_dim = self.X_data_train.shape[1], 
@@ -90,7 +91,7 @@ class featureValues:
             sigma = 0.5, 
             lam = 0.5, 
             random_state = 1, 
-            device = "cpu"
+            device = device
         ) 
         model.fit(
             X=self.X_data_train.values, 
@@ -108,7 +109,7 @@ class featureValues:
 
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         #print("self.feature_names", self.feature_names)
         #print("feature_impt: ", feature_impt)
@@ -118,7 +119,7 @@ class featureValues:
         
         return feature_names_sorted, feature_scores, total_time
         
-    def dynamic_selection_importance(self):
+    def dynamic_selection_importance_old(self):
         """ A method that extracts the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/2301.00557
             Source: https://github.com/iancovert/dynamic-selection/tree/main
@@ -128,6 +129,7 @@ class featureValues:
             feature_scores (list): ranked feature importances
             total_time(float): total runtime for the Sage feature selection process
         """  
+        print("using original")
         start_time = time.time()
         # Convert Pandas DataFrame to a PyTorch Tensor
         train_features = torch.tensor(self.X_data_train.values, dtype=torch.float32)
@@ -168,7 +170,7 @@ class featureValues:
         
         # Pretrain predictor.
         mask_layer = ds.utils.MaskLayer(append=True)
-        pretrain = MaskingPretrainer(predictor, mask_layer)#.cuda()
+        pretrain = MaskingPretrainer(predictor, mask_layer).cuda()
         pretrain.fit(
             train_loader,
             val_loader,
@@ -176,9 +178,9 @@ class featureValues:
             nepochs = 100,
             loss_fn = nn.CrossEntropyLoss(),
             verbose = False)
-        
+
         # Train selector and predictor jointly.
-        gdfs = GreedyDynamicSelection(selector, predictor, mask_layer)#.cuda()
+        gdfs = GreedyDynamicSelection(selector, predictor, mask_layer).cuda()
         gdfs.fit(
             train_loader,
             val_loader,
@@ -214,7 +216,7 @@ class featureValues:
         
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")   
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
         
         #print("self.feature_names:--- ", self.feature_names)
         #print("feature_rank:--- ", feature_rank)
@@ -223,7 +225,115 @@ class featureValues:
         #print("feature_names_sorted:--- ", feature_names_sorted)
         
         return feature_names_sorted, feature_scores, total_time
-    
+
+    def dynamic_selection_importance(self):
+        """ A method that extracts the features, feature scores, and total runtime
+            Paper: https://arxiv.org/abs/2301.00557
+            Source: https://github.com/iancovert/dynamic-selection/tree/main
+            Compiled_by: JYang
+        Returns: 
+            feature_names_sorted (list): ranked features
+            feature_scores (list): ranked feature importances
+            total_time(float): total runtime for the Sage feature selection process
+        """  
+        start_time = time.time()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        # Convert Pandas DataFrame to a PyTorch Tensor
+        train_features = torch.tensor(self.X_data_train.values, dtype=torch.float32)#.to(device)
+        train_targets = torch.tensor(self.y_data_train.values, dtype=torch.long)#.to(device)
+        val_features = torch.tensor(self.X_data_val.values, dtype=torch.float32)#.to(device)
+        val_targets = torch.tensor(self.y_data_val.values, dtype=torch.long)#.to(device)
+        # Create a TensorDataset
+        train_ds = TensorDataset(train_features, train_targets)
+        val_ds = TensorDataset(val_features, val_targets)
+        # Prepare dataloaders
+        train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, pin_memory=False, drop_last=True)
+        val_loader = DataLoader(val_ds, batch_size=1024, pin_memory=False)
+        # Shape of input and output
+        d_in = self.X_data_train.shape[1]
+        d_out = len(set(self.y_data_train))
+        
+        # Set up networks
+        hidden = 128
+        dropout = 0.3
+
+        predictor = nn.Sequential(
+            nn.Linear(2 * d_in, hidden),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, d_out))#.to(device)
+
+        selector = nn.Sequential(
+            nn.Linear(2 * d_in, hidden),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden, d_in))#.to(device)
+        
+        # Pretrain predictor.
+        mask_layer = ds.utils.MaskLayer(append=True)
+        pretrain = MaskingPretrainer(predictor, mask_layer).to(device)
+        pretrain.fit(
+            train_loader,
+            val_loader,
+            lr = 1e-3,
+            nepochs = 100,
+            loss_fn = nn.CrossEntropyLoss(),
+            verbose = False)
+
+        # Train selector and predictor jointly.
+        gdfs = GreedyDynamicSelection(selector, predictor, mask_layer).to(device)
+        gdfs.fit(
+            train_loader,
+            val_loader,
+            lr = 1e-3,
+            nepochs = 5, #250,
+            max_features = d_in,
+            loss_fn = nn.CrossEntropyLoss(),
+            verbose = False)
+        
+        # For saving results.
+        num_features = np.arange(1, d_in).tolist() #list(range(1, 11)) + list(range(15, 30, 5))
+        auroc_list = []
+        acc_list = []
+
+        # Metrics (softmax is applied automatically in recent versions of torchmetrics)
+        auroc_metric = lambda pred, y: AUROC(task='multiclass', num_classes=d_out)(pred.softmax(dim=1), y)
+        acc_metric = Accuracy(task='multiclass', num_classes=d_out)
+        
+        # Evaluate.
+        for num in num_features:
+            #auroc, acc, feature_rank = gdfs.evaluate(test_loader, num, (auroc_metric, acc_metric))
+            score, feature_rank = gdfs.evaluate(val_loader, num, (auroc_metric, acc_metric))
+            auroc_list.append(score[0])
+            acc_list.append(score[1])
+            #print(f'Num = {num}, AUROC = {100*score[0]:.2f}, Acc = {100*score[1]:.2f}')
+            
+        # Compute feature rank
+        feature_rank_index = np.argsort(np.mean(feature_rank, axis = 0))
+        #feature_score_unordered = np.sort(np.mean(feature_rank, axis = 0)).tolist()
+        
+        feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
+        feature_scores = np.arange(len(self.feature_names), 0, -1)
+        
+        end_time = time.time()
+        total_time = end_time - start_time
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
+        
+        #print("self.feature_names:--- ", self.feature_names)
+        #print("feature_rank:--- ", feature_rank)
+        #print("feature_rank_index, np.mean(feature_rank, axis = 0):--- ", np.mean(feature_rank, axis = 0))
+        #print("feature_rank_index, np.argsort(np.mean(feature_rank, axis = 0)):--- ", feature_rank_index)
+        #print("feature_names_sorted:--- ", feature_names_sorted)
+        
+        return feature_names_sorted, feature_scores, total_time
+        
+        
     def boruta_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Source: https://github.com/scikit-learn-contrib/boruta_py
@@ -235,7 +345,7 @@ class featureValues:
         """   
         start_time = time.time()
         # Calcuate boruta feature importance
-        feature_selector = BorutaPy(self.model, n_estimators='auto', verbose=0, random_state=self.seed)
+        feature_selector = BorutaPy(self.model_init, n_estimators='auto', verbose=0, random_state=self.seed)
         feature_selector.fit(self.X_data_val.values, self.y_data_val.values)
         end_time = time.time()
         total_time = end_time - start_time
@@ -257,7 +367,8 @@ class featureValues:
             values (list): ranked feature importances
         """
         # Calculate sage values
-        imputer = sage.MarginalImputer(self.model, self.X_data_train[:512].values)
+        self.model_init.fit(self.X_data_val.values, self.y_data_val.values)
+        imputer = sage.MarginalImputer(self.model_init, self.X_data_train[:512].values)
         estimator = sage.KernelEstimator(imputer, 'cross entropy' if self.pred_type == 'classification' else 'mse', random_state=self.seed)
         self.sage_val = estimator(self.X_data_val.values, self.y_data_val.values, thresh=0.025)
         # Order sage values
@@ -290,7 +401,7 @@ class featureValues:
         sage_features, sage_feature_scores = self.compute_sage_val()
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         display(self.sage_plot())
 
         return sage_features, sage_feature_scores, total_time
@@ -305,13 +416,14 @@ class featureValues:
             total_time (float): total runtime for the Sage feature selection process
         """      
         start_time = time.time()
-        permu_test = permutation_importance(self.model, self.X_data_val, self.y_data_val,  random_state = self.seed)
+        self.model_init.fit(self.X_data_train, self.y_data_train)
+        permu_test = permutation_importance(self.model_init, self.X_data_val, self.y_data_val, random_state = self.seed)
         sorted_idx = permu_test.importances_mean.argsort()[::-1]
         feature_names_sorted = [self.feature_names[i] for i in sorted_idx]
         feature_scores = permu_test.importances_mean[sorted_idx]
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         plt.barh(feature_names_sorted, permu_test.importances_mean[sorted_idx])
         plt.xlabel("Permutation Importance")
         
@@ -327,21 +439,22 @@ class featureValues:
             total_time (float): total runtime for the Sage feature selection process
         """     
         # make predictions for val data
-        y_pred = self.model.predict(self.X_data_val)
+        self.model_init.fit(self.X_data_train, self.y_data_train)
+        y_pred = self.model_init.predict(self.X_data_val)
         # round predictions
         predictions = [round(value) for value in y_pred]
         # evaluate predictions
         #accuracy = accuracy_score(predictions, self.y_data_val)
         start_time = time.time()
         # Calculate feature importance scores
-        feature_importances = self.model.get_booster().get_score(importance_type='weight')
+        feature_importances = self.model_init.get_booster().get_score(importance_type='weight')
         # Sort the feature importance scores
         sorted_idx = sorted(feature_importances.items(), key=lambda x: x[1], reverse=True)
         # Extract the top feature names and scores
         top_features, top_scores = zip(*sorted_idx[:-1])
         end_time = time.time()
         total_time = end_time - start_time                             
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         return top_features, top_scores, total_time
 
@@ -360,7 +473,7 @@ class featureValues:
         #shap.plots.waterfall(shap_values[0])
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Average the absolute values of the importance scores
         mean_abs_shap_values = np.mean(np.abs(shap_values.values), axis=0)
         features = np.array(self.feature_names)
@@ -399,7 +512,7 @@ class featureValues:
 
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         feature_importances=selector_supervised.get_support(indices = True)
         argsort = np.argsort(feature_importances)[::-1]
@@ -422,11 +535,11 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        lasso = Lasso(alpha=0.00001)
+        lasso = Lasso(alpha=0.00001, random_state=self.seed)
         lasso.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by lasso rank
         feature_imp = pd.DataFrame({'Value': np.abs(lasso.coef_), 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
@@ -448,10 +561,10 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        cart_model = DecisionTreeClassifier(random_state=123).fit(self.X_data_train.values, self.y_data_train.values)
+        cart_model = DecisionTreeClassifier(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by CART rank
         feature_imp = pd.DataFrame({'Value': cart_model.feature_importances_, 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
@@ -477,7 +590,7 @@ class featureValues:
         clf.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by SVM rank
         feature_imp = pd.DataFrame({'Value': np.abs(clf.coef_[0]), 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
@@ -499,11 +612,11 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        rf_model = RandomForestClassifier(n_estimators = 100,random_state=123)
+        rf_model = RandomForestClassifier(n_estimators = 100,random_state=self.seed)
         rf_model.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")
+        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by SVM rank
         feature_imp = pd.DataFrame({'Value': rf_model.feature_importances_, 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
