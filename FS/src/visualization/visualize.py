@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-09-2023
+# Last Modified: Oct-24-2023
 # Description: This script provides the method(s) for generating visualizations
 
 import matplotlib.pyplot as plt
@@ -7,7 +7,7 @@ from wordcloud import WordCloud
 from collections import Counter, OrderedDict
 import pandas as pd
 
-class plotScore:
+class plotScore_backup_original:
     """ A class for generating visualizations
     Args:
         data (list): a list of data points
@@ -41,6 +41,38 @@ class plotScore:
         else:
             print(f"\nTop {self.data.index(min(self.data))+1} Features (Ordered by Feature Values):\n\n{self.feature_impt[:self.data.index(min(self.data))+1]}\n")
 
+class plotScore:
+    """ A class for generating visualizations
+    Args:
+        data (list): a list of data points
+        feature_impt (list): a list of feature names
+        pred_type (str): a string indicating the type of prediction problem: classification or regression
+        use_num_features(list): a list containing the number of features selected
+    """
+    def __init__(self, data, feature_impt, pred_type, use_num_features):
+        self.data = data
+        self.feature_impt = feature_impt
+        self.pred_type = pred_type.lower()
+        self.use_num_features = use_num_features
+
+    def score_plot(self):
+        """ A method that displays a bar plot of scores with labels """
+        n = len(self.data)
+        bar_positions = list(range(1, n + 1))
+        plt.bar(bar_positions, self.data, align='center', edgecolor='black')
+        plt.xlabel("Number of Features")
+        score_type = "F1" if self.pred_type == "classification" else "MSE"
+        plt.ylabel(f"{score_type} Score")
+        plt.title(f"{score_type} Score by Number of Features")
+        
+        # Set x-axis labels based on feature names
+        x_labels = self.use_num_features
+        plt.xticks(bar_positions, labels=x_labels)
+        plt.show()
+        
+        for f in self.use_num_features: print(f"\nThe {f} features are: {self.feature_impt[:f]}\n")
+            
+            
 class plotCurve:
     """ A class for stacking multiple plots together
     Args:
