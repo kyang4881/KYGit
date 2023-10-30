@@ -51,21 +51,22 @@ def create_df(all_features, all_scores, all_features_rev, all_scores_rev, datase
         results_df (dataframe): a dataframe containing the above information
     """
     df_len = len(all_scores)
+    
     # Generate a dataframe containing the metrics for all feature subsets
     results_df = pd.DataFrame({
         'timestamp': [datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")]*df_len,
-        "feature": all_features,
-        "score": all_scores,
-        "feature_reversed" : all_features_rev,
-        "score_reversed_rank": all_scores_rev,
+        "feature": all_features if len(all_features)> 0 else ["n/a"]*df_len,
+        "score": all_scores if len(all_scores)> 0 else ["n/a"]*df_len,
+        "feature_reversed" : all_features_rev if len(all_features_rev)> 0 else ["n/a"]*df_len,
+        "score_reversed_rank": all_scores_rev if len(all_scores_rev)> 0 else ["n/a"]*df_len,
         "method": [method_name]*df_len,
         "dataset": [dataset_name]*df_len,
         "dataset_size": [dataset_size]*df_len,
         "runtime_sec": [total_time]*df_len,
         "prediction_type": [pred_type]*df_len,
-        "feature_score": list(feature_score) + [0]*(df_len - len(feature_score)),
-        "cm_val": cm_val,
-        "cm_val_reversed": cm_val_reversed,
+        "feature_score": [list(feature_score) + [0]*(df_len - len(feature_score))]*df_len,
+        "cm_val": cm_val if len(cm_val)> 0 else ["n/a"]*df_len,
+        "cm_val_reversed": cm_val_reversed if len(cm_val_reversed)> 0 else ["n/a"]*df_len,
         "rebalance": [str(rebalance)]*df_len,
         "rebalance_type": [rebalance_type]*df_len,
         "data_shape": [data_shape]*df_len,
