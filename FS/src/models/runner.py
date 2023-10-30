@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-17-2023
+# Last Modified: Oct-24-2023
 # Description: This script provides the method(s) that consolidate multiple methods into a wrapped run function to execute the pipeline
 
 import numpy as np
@@ -12,7 +12,7 @@ from feature_selection_timeseries.src.models.train_model import generateModel
 from feature_selection_timeseries.src.features.feature_selection import featureValues
 
 def get_metrics_df(seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, train_examples,
-                   test_examples, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False):
+                   test_examples, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False, n_features=None, feature_direction=None):
     """ A methold for generating the model results
     Args:
         seed (int): a random state
@@ -27,6 +27,8 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
         rebalance (bool): a boolean indicating whether to rebalance the dataset
         rebalance_type (str): a string indicating what type of rebalancing to perform
         append_to_full_df (bool): a boolean indicating whether to append model results to the existing tracked results
+        n_features (int): number of features to use; used for top n and bottom n features
+        feature_direction (str): a string indicating whether to evaluate top/bottom/both ranking features
     Returns:    
         full_df (dataframe): a dataframe containing all currently tracked model results
     """   
@@ -79,18 +81,20 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     # Generate the scoring metrics
     all_scores, all_scores_reverse, all_features, all_features_reverse, cm_val, cm_val_reversed  = run_scoring_pipeline(
         feature_impt = sorted_features,
+        n_features = n_features,
         input_data_dict = data,
         pred_type = pred_type,
         rebalance=rebalance,
         rebalance_type=rebalance_type,
-        seed=seed
+        seed=seed,
+        feature_direction=feature_direction
     )
 
     X_train_shape = np.shape(data["X_train"])
     X_val_shape = np.shape(data["X_val"])
     y_train_dict = dict(sorted(Counter(data["y_train"]).items()))
     y_val_dict = dict(sorted(Counter(data["y_val"]).items()))
-
+    
     # Compile dataframe containing scoring metrics for all feature subsets
     results_df = create_df(
         all_features = all_features,
@@ -139,7 +143,7 @@ def get_metrics_df(seed, target_colname, data, data_original, full_df, method_na
     return full_df
 
 
-def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_type, num_cv_splits=5, rebalance=False, rebalance_type=None, append_to_full_df=False, train_examples=1, test_examples=1):
+def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_type, num_cv_splits=5, rebalance=False, rebalance_type=None, append_to_full_df=False, train_examples=1, test_examples=1, n_features=0, feature_direction="both"):
     """ A method that runs through the entire pipeline by wrapping the required methods
     Args:
         seed (int): a random state
@@ -156,6 +160,8 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
         n_splits (int): number of cross-validation splits
         train_examples (int): number of train examples in each cv split
         test_examples (int): number of test examples in each cv split
+        n_features (int): number of features to use; used for top n and bottom n features
+        feature_direction (str): a string indicating whether to evaluate top/bottom/both ranking features
     Returns:      
         full_df (dataframe): a dataframe containing all currently tracked model results
     """   
@@ -209,6 +215,8 @@ def run(seed, target_colname, data, full_df, method_name, dataset_name, pred_typ
             num_cv_splits=num_cv_splits,
             rebalance=rebalance, 
             rebalance_type=rebalance_type, 
-            append_to_full_df=append_to_full_df
+            append_to_full_df=append_to_full_df,
+            n_features=n_features,
+            feature_direction=feature_direction
         )
     return full_df, scaler_saved, encoder_saved
