@@ -9,6 +9,10 @@ from collections import Counter
 import copy
 import csv
 import openpyxl
+import os
+import torch
+import random
+import tensorflow as tf
 from imblearn.over_sampling import RandomOverSampler, SMOTE, SMOTEN, SMOTENC, BorderlineSMOTE, ADASYN
 
 def check_column_types(df, label_cols, do_not_encode_cols):
@@ -290,5 +294,17 @@ def create_time_feature(df):
     df['year'] = df['date'].dt.year
     df['dayofyear'] = df['date'].dt.dayofyear
     df['weekofyear'] = df['date'].dt.weekofyear
+
     return df
+
+def setup_seed(seed):
+    os.environ['TF_DETERMINISTIC_OPS'] = '1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    tf.random.set_seed(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
 
