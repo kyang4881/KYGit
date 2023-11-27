@@ -35,6 +35,8 @@ from torchmetrics import Accuracy, AUROC
 from feature_selection_timeseries.author_feature_selection.dynamic_selection_main import dynamic_selection as ds
 from feature_selection_timeseries.author_feature_selection.dynamic_selection_main.dynamic_selection import MaskingPretrainer, GreedyDynamicSelection
 from feature_selection_timeseries.author_feature_selection.stg_master.python.stg.stg import STG
+from feature_selection_timeseries.src.models.utils import setup_seed
+
 
 class featureValues:
     """ A class containing feature selection methods
@@ -59,11 +61,12 @@ class featureValues:
         self.model_init = xgb.XGBClassifier(objective='binary:logistic', eval_metric='error', seed=self.seed) if self.pred_type.lower() == 'classification' else xgb.XGBRegressor(objective='reg:squarederror', eval_metric='rmse', seed=self.seed)
         self.n_features = n_features
         
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed(seed)  
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+        # np.random.seed(seed)
+        # torch.manual_seed(seed)
+        # torch.cuda.manual_seed(seed)  
+        # torch.backends.cudnn.deterministic = True
+        # torch.backends.cudnn.benchmark = False
+        setup_seed(self.seed)
     
     def stg_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
@@ -83,7 +86,7 @@ class featureValues:
             task_type = 'classification' if self.pred_type == "classification" else 'regression',
             input_dim = self.X_data_train.shape[1], 
             output_dim = 2 if self.pred_type == "classification" else 1,
-            hidden_dims = [60, self.X_data_train.shape[1]], 
+            hidden_dims = [60, self.X_data_train.shape[1]] if self.pred_type == "classification" else [500, 50, 10],  
             activation = 'tanh',
             optimizer = 'SGD', 
             learning_rate = 0.1, 
@@ -94,13 +97,18 @@ class featureValues:
             random_state = 1, 
             device = device
         ) 
+
+        #print("self.y_data_train.values", self.y_data_train.values)
+        #print("np.array([self.y_data_train.values]).reshape(-1, 1)", np.array([self.y_data_train.values]).reshape(-1, 1))
+
         model.fit(
             X=self.X_data_train.values, 
-            y=self.y_data_train.values, 
-            nr_epochs=6000, 
+            y=np.array([self.y_data_train.values]).reshape(-1, 1), #self.y_data_train.values,   # reshaped to avoid the shape warning
+            nr_epochs=100000, 
             valid_X=self.X_data_val.values, 
-            valid_y=self.y_data_val.values, 
-            print_interval=1000
+            valid_y=np.array([self.y_data_val.values]).reshape(-1, 1), #self.y_data_val.values,  # reshaped to avoid the shape warning
+            print_interval=10000#,
+            #early_stop="True"
         )
         
         feature_impt = model.get_gates(mode='raw')
@@ -186,7 +194,7 @@ class featureValues:
             train_loader,
             val_loader,
             lr = 1e-3,
-            nepochs = 5, #250,
+            nepochs = 250,
             max_features = d_in,
             loss_fn = nn.CrossEntropyLoss(),
             verbose = False)
@@ -508,7 +516,7 @@ class featureValues:
 
         start_time = time.time()
         
-        setup_seed(self.seed)
+        #setup_seed(self.seed)
         selector_supervised = ConcreteAutoencoderFeatureSelector(K = len(self.feature_names), rand_seed=self.seed, output_function = g, num_epochs = 3, pred_type=self.pred_type)
         selector_supervised.fit(x_train, y_train, x_val, y_val)
 
@@ -764,16 +772,6 @@ class ConcreteAutoencoderFeatureSelector():
     def get_params(self):
         return self.model
 
-def setup_seed(seed):
-    os.environ['TF_DETERMINISTIC_OPS'] = '1'
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-    tf.random.set_seed(seed)
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
 
 def g(x, pred_type):
     x = Dense(320)(x)
