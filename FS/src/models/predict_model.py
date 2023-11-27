@@ -150,7 +150,13 @@ class computeScore:
         self.trained_model = generateModel(data_dict=self.data_dict_new, pred_type=self.pred_type, seed=self.seed).get_model()
         # Generate predictions
         dval = xgb.DMatrix(np.array(self.data_dict_new['X_val']), feature_names=list(self.data_dict_new['X_val'].columns))
+        #self.trained_model = joblib.load(f'./feature_selection_timeseries/models/model.joblib')
         y_pred = self.trained_model.predict(dval)
+
+        # testing:
+        print("self.data_dict_new['X_val']", self.data_dict_new['X_val'])
+        print("testing: y_pred", y_pred)
+
         # Plot prediction time series
         df_for_ts = pd.DataFrame({
           #"date": pd.to_datetime(self.data_dict_new["X_val"][['year', 'month', 'dayofmonth']].apply(lambda x: '-'.join(map(str, x)), axis=1)),  #Issue: Those 3 columns may not be available in the validation set
@@ -184,4 +190,5 @@ class computeScore:
                 "num_features": len(self.data_dict_new['X_val'].columns)
                 }
             return score, str(cm_val), df_for_ts
+
 
