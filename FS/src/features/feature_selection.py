@@ -1,6 +1,6 @@
 # Author: JYang
-# Last Modified: Oct-26-2023
-# Description: This script provides the feature selection method(s) for computing importances
+# Last Modified: Nov-27-2023
+# Description: This script provides the feature selection method(s) for computing feature importances
 
 import numpy as np
 import sage
@@ -19,9 +19,9 @@ from keras.layers import Dense, Dropout, LeakyReLU
 from sklearn.metrics import accuracy_score 
 from sklearn.inspection import permutation_importance
 from sklearn.linear_model import Lasso
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
+from sklearn.svm import SVC, SVR
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import time
 import matplotlib.pyplot as plt
 import shap
@@ -36,7 +36,6 @@ from feature_selection_timeseries.author_feature_selection.dynamic_selection_mai
 from feature_selection_timeseries.author_feature_selection.dynamic_selection_main.dynamic_selection import MaskingPretrainer, GreedyDynamicSelection
 from feature_selection_timeseries.author_feature_selection.stg_master.python.stg.stg import STG
 
-
 class featureValues:
     """ A class containing feature selection methods
     Args:
@@ -45,8 +44,9 @@ class featureValues:
         model (obj): a trained XGBoost model
         seed (int): a random state
         target_colname (str): a string indicating the name of the target variable column
+        n_features (int): number of features to use; used for top n and bottom n features
     """
-    def __init__(self, data_dict, pred_type, model, seed, target_colname):
+    def __init__(self, data_dict, pred_type, model, seed, target_colname, n_features):
         self.X_data_train = data_dict["X_train"]
         self.X_data_val = data_dict["X_val"]
         self.y_data_train = data_dict["y_train"]
@@ -56,7 +56,8 @@ class featureValues:
         self.sage_val = None
         self.feature_names = self.X_data_train.columns.to_list()
         self.seed = seed
-        self.model_init = xgb.XGBClassifier(seed=self.seed)
+        self.model_init = xgb.XGBClassifier(objective='binary:logistic', eval_metric='error', seed=self.seed) if self.pred_type.lower() == 'classification' else xgb.XGBRegressor(objective='reg:squarederror', eval_metric='rmse', seed=self.seed)
+        self.n_features = n_features
         
         np.random.seed(seed)
         torch.manual_seed(seed)
@@ -79,9 +80,9 @@ class featureValues:
         args_cuda = torch.cuda.is_available()
         device = torch.device("cuda" if args_cuda else "cpu") 
         model = STG(
-            task_type = 'classification',
+            task_type = 'classification' if self.pred_type == "classification" else 'regression',
             input_dim = self.X_data_train.shape[1], 
-            output_dim = 2, 
+            output_dim = 2 if self.pred_type == "classification" else 1,
             hidden_dims = [60, self.X_data_train.shape[1]], 
             activation = 'tanh',
             optimizer = 'SGD', 
@@ -191,7 +192,8 @@ class featureValues:
             verbose = False)
         
         # For saving results.
-        num_features = np.arange(1, d_in).tolist() #list(range(1, 11)) + list(range(15, 30, 5))
+        #num_features = np.arange(1, d_in).tolist() #list(range(1, 11)) + list(range(15, 30, 5))
+        num_features = [self.n_features, d_in]
         auroc_list = []
         acc_list = []
 
@@ -507,7 +509,7 @@ class featureValues:
         start_time = time.time()
         
         setup_seed(self.seed)
-        selector_supervised = ConcreteAutoencoderFeatureSelector(K = len(self.feature_names), rand_seed=self.seed, output_function = g, num_epochs = 3)
+        selector_supervised = ConcreteAutoencoderFeatureSelector(K = len(self.feature_names), rand_seed=self.seed, output_function = g, num_epochs = 3, pred_type=self.pred_type)
         selector_supervised.fit(x_train, y_train, x_val, y_val)
 
         end_time = time.time()
@@ -561,7 +563,7 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        cart_model = DecisionTreeClassifier(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values)
+        cart_model = DecisionTreeClassifier(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values) if self.pred_type == "classification" else DecisionTreeRegressor(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
         print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
@@ -586,14 +588,14 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        clf = SVC(kernel='linear', gamma=0.1, C=1)
+        clf = SVC(kernel='linear', gamma=0.1, C=1) if self.pred_type == "classification" else SVR(kernel='linear', gamma=0.1, C=1)
         clf.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
         print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by SVM rank
         feature_imp = pd.DataFrame({'Value': np.abs(clf.coef_[0]), 'Feature': self.feature_names})
-        top_features =feature_imp.sort_values(by="Value",ascending=False)
+        top_features = feature_imp.sort_values(by="Value",ascending=False)
         # Feature names and scores to be returned
         feature_names_sorted=top_features['Feature'].tolist()
         feature_scores=top_features['Value'].tolist()
@@ -612,7 +614,7 @@ class featureValues:
         start_time = time.time()
         # Calcuate lasso feature importance
         # Create an instance of the Lasso model with the desired alpha value
-        rf_model = RandomForestClassifier(n_estimators = 100,random_state=self.seed)
+        rf_model = RandomForestClassifier(n_estimators = 100,random_state=self.seed) if self.pred_type == "classification" else RandomForestRegressor(n_estimators = 100,random_state=self.seed)
         rf_model.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
@@ -680,7 +682,7 @@ class StopperCallback(EarlyStopping):
 
 class ConcreteAutoencoderFeatureSelector():
 
-    def __init__(self, K, output_function, num_epochs = 300, batch_size = None, learning_rate = 0.001, start_temp = 10.0, min_temp = 0.1, tryout_limit = 5, rand_seed=42):
+    def __init__(self, K, output_function, num_epochs = 300, batch_size = None, learning_rate = 0.001, start_temp = 10.0, min_temp = 0.1, tryout_limit = 5, rand_seed=42, pred_type=None):
         self.K = K
         self.output_function = output_function
         self.num_epochs = num_epochs
@@ -690,6 +692,7 @@ class ConcreteAutoencoderFeatureSelector():
         self.min_temp = min_temp
         self.tryout_limit = tryout_limit
         self.rand_seed = rand_seed
+        self.pred_type = pred_type
 
     def fit(self, X, Y = None, val_X = None, val_Y = None):
         if Y is None:
@@ -717,11 +720,12 @@ class ConcreteAutoencoderFeatureSelector():
 
             selected_features = self.concrete_select(inputs)
 
-            outputs = self.output_function(selected_features)
+            outputs = self.output_function(selected_features, self.pred_type)
 
             self.model = Model(inputs, outputs)
 
-            self.model.compile(Adam(self.learning_rate), loss = 'binary_crossentropy')
+            loss_type = "binary_crossentropy" if self.pred_type == "classification" else "mean_squared_error"
+            self.model.compile(Adam(self.learning_rate), loss = loss_type)
 
             print(self.model.summary())
 
@@ -771,12 +775,13 @@ def setup_seed(seed):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
 
-def g(x):
+def g(x, pred_type):
     x = Dense(320)(x)
     x = LeakyReLU(0.2)(x)
     x = Dropout(0.1)(x)
     x = Dense(320)(x)
     x = LeakyReLU(0.2)(x)
     x = Dropout(0.1)(x)
-    x = Dense(2, activation='sigmoid')(x)
+    output_dim = 2 if pred_type == "classification" else 1
+    x = Dense(output_dim, activation='sigmoid')(x)
     return x
