@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Oct-17-2023
+# Last Modified: Nov-27-2023
 # Description: This script provides the helper method(s), such as tracking tables for model benchmark, data rebalancing, etc.
 
 import pandas as pd
@@ -7,12 +7,16 @@ import numpy as np
 import datetime
 from collections import Counter
 import copy
+import csv
+import openpyxl
 from imblearn.over_sampling import RandomOverSampler, SMOTE, SMOTEN, SMOTENC, BorderlineSMOTE, ADASYN
 
-def check_column_types(df):
-    """ A method that checks whether the dataframe columns are numerical or categorical
+def check_column_types(df, label_cols, do_not_encode_cols):
+    """ A method that checks whether the features in the dataframe given are numerical or categorical
     Args:
         df (dataframe): a dataframe containing train and validation data
+        label_cols (list): a list of columns to label encode
+        do_not_encode_cols (list): a list of columns to not encode
     Returns:   
         categorical_columns (list): a list of categorical features
         numerical_columns (list): a list of numerical features
@@ -21,13 +25,13 @@ def check_column_types(df):
     numerical_columns = []
     # Check and return the categorical and numerical columns
     for column in df.columns:
-        if df[column].dtype == 'object' or pd.api.types.is_categorical_dtype(df[column]):
+        if (df[column].dtype == 'object' or pd.api.types.is_categorical_dtype(df[column])) and (column not in label_cols) and (column not in do_not_encode_cols):
             categorical_columns.append(column)
-        elif pd.api.types.is_numeric_dtype(df[column]):
+        elif (pd.api.types.is_numeric_dtype(df[column])) and (column not in label_cols) and (column not in do_not_encode_cols):
             numerical_columns.append(column)
     return categorical_columns, numerical_columns
 
-def create_df(all_features, all_scores, all_features_rev, all_scores_rev, dataset_size, total_time, method_name, dataset_name, pred_type, feature_score, cm_val, cm_val_reversed, rebalance, rebalance_type, data_shape, is_max_acc, cv_iteration):
+def create_df(all_features, all_scores, all_features_rev, all_scores_rev, dataset_size, total_time, method_name, dataset_name, pred_type, feature_score, cm_val, cm_val_reversed, rebalance, rebalance_type, data_shape, is_best_score, cv_iteration):
     """ A method that creates a dataframe containing information from each model run
     Args:
         all_features (list): a list of top features subsets
@@ -45,7 +49,7 @@ def create_df(all_features, all_scores, all_features_rev, all_scores_rev, datase
         rebalance (bool): a boolean indicating whether to rebalance the dataset
         rebalance_type (str): a string indicating what type of rebalancing to perform
         data_shape (dict): a dictionary containing the shapes of the train and validation datasets
-        is_max_acc (bool): a boolean indicating whether the run provides the optimal accuracy score
+        is_best_score (bool): a boolean indicating whether the run provides the optimal score
         cv_iteration (int): an integer indicating the cross validation iteration
     Returns:   
         results_df (dataframe): a dataframe containing the above information
@@ -70,7 +74,7 @@ def create_df(all_features, all_scores, all_features_rev, all_scores_rev, datase
         "rebalance": [str(rebalance)]*df_len,
         "rebalance_type": [rebalance_type]*df_len,
         "data_shape": [data_shape]*df_len,
-        "is_max_acc": [str(x) for x in is_max_acc],
+        "is_best_score": [str(x) for x in is_best_score],
         "cv_iteration": [cv_iteration]*df_len
     })
     return results_df
@@ -127,12 +131,12 @@ def rebalance_data(data, rebalance_type, seed):
 
     # Various methods for resampling
     if rebalance_type.lower() == "random_over_sampler":
-        oversampler = RandomOverSampler(sampling_strategy='auto', random_state=42)
+        oversampler = RandomOverSampler(sampling_strategy='auto', random_state=seed)
         oversampler.fit(X_data_df, y_data_df)
         X_resampled, y_resampled = oversampler.fit_resample(X_data_df, y_data_df)
         
     if rebalance_type.lower() == "smoten":
-        sampler = SMOTEN(random_state=42)
+        sampler = SMOTEN(random_state=seed)
         X_resampled, y_resampled = sampler.fit_resample(X_data_df, y_data_df)
 
     if rebalance_type.lower() == "smote":
@@ -183,7 +187,8 @@ def map_data(input_data, map_cols, prev_col_name, mapped_col_names):
     return pd.concat([df_copy, df_target], axis=1)
 
 def tune_cv_split(data, min_test_val_size=50, val_test_prop_constraint=0.2, num_split_constraint=3):
-    """Create various combinations of cv splits
+    """Create various combinations of cv splits for cross-validation. The default constraints are defined such that the 
+       number of instances in the validation set is about 20% the size of the training set.
     Args:
         data (data_frame): A dataframe containing the train, validation, and test data
         min_test_val_size (int): An integer specifying the minimum number of instances in the validation and test set
@@ -192,21 +197,98 @@ def tune_cv_split(data, min_test_val_size=50, val_test_prop_constraint=0.2, num_
     Returns:
         A list containing lists of train and test size, and number of splits
     """
-    # number of instances in the dataset
-    sample_size = data.shape[0]
-    # generate the possible val/test set size
+    # Number of instances in the dataset
+    sample_size = np.shape(data)[0]
+    # Generate the possible val/test set size
     n_iter = int((sample_size - 2*min_test_val_size)*val_test_prop_constraint / min_test_val_size)
     test_val_size_list = []
     for n in range(1, n_iter):
         test_val_size = min_test_val_size*n
         test_val_size_list.append(test_val_size)
-    # generate the final combinations for train/val/test size
+    # Generate the possible final combinations for train/val/test size
     train_test_list = []
     for train_val_size in test_val_size_list:
+        # Determine the number of splits possible
         num_split = int(np.floor((sample_size - 2*train_val_size) / (train_val_size / val_test_prop_constraint)))
+        # If the calculated number of split doesn't meet num_split_constraint (the min specified)
         if num_split < num_split_constraint: 
             break  
         train_size = int(train_val_size / val_test_prop_constraint)
         train_test_list.append([train_size, train_val_size, num_split])
     print(train_test_list)
     return train_test_list
+
+def convert_to_sample(path_in, path_out, filename_in, filename_out, date_threshold, stocks=[]):
+    """
+    Filter a CSV file based on a date threshold and save the filtered data to a new CSV file.
+
+    Args:
+        path_in (str): The path to the input CSV file.
+        path_out (str): The path to the output CSV file where the filtered data will be saved.
+        date_threshold (str): The date threshold for filtering the data. Rows with a date greater than or equal to this threshold will be included in the output.
+    """
+    if len(stocks) > 0:
+        for stock in stocks:
+            # Create a CSV writer for the output file
+            with open(path_out + stock + "_" + filename_out, 'w', newline='') as output_file:
+                csv_writer = csv.writer(output_file)
+
+                # Write the header to the output file
+                header_written = False
+
+                # Use pandas to read the CSV file in chunks
+                chunksize = 1000  # Adjust the chunk size based on your available memory
+                for chunk in pd.read_csv(path_in + filename_in, chunksize=chunksize):
+                    # Filter rows where the date is greater than the threshold
+                    chunk = chunk[(chunk['date'] >= date_threshold) & (chunk['ticker'] == stock)]
+
+                    # Write the chunk to the output file
+                    chunk.to_csv(output_file, header=not header_written, index=False, mode='a')
+
+                    # Ensure the header is only written once
+                    header_written = True
+            print(f"Filtered data has been saved to '{path_out + stock + '_' + filename_out}'.")
+    else:
+        # Create a CSV writer for the output file
+        with open(path_out + filename_out, 'w', newline='') as output_file:
+            csv_writer = csv.writer(output_file)
+
+            # Write the header to the output file
+            header_written = False
+
+            # Use pandas to read the CSV file in chunks
+            chunksize = 1000  # Adjust the chunk size based on your available memory
+            for chunk in pd.read_csv(path_in + filename_in, chunksize=chunksize):
+                # Filter rows where the date is greater than the threshold
+                chunk = chunk[chunk['date'] >= date_threshold]
+
+                # Write the chunk to the output file
+                chunk.to_csv(output_file, header=not header_written, index=False, mode='a')
+
+                # Ensure the header is only written once
+                header_written = True
+        print(f"Filtered data has been saved to '{path_out + filename_out}'.")
+
+def create_time_feature(df):
+    """
+    Create time-related features from the 'date' column of a DataFrame.
+
+    Args:
+    - df (pd.DataFrame): Input DataFrame containing a 'date' column.
+
+    Returns:
+    pd.DataFrame: DataFrame with additional time-related features.
+    """
+    # Convert the 'date' column to datetime format
+    df["date"] = pd.to_datetime(df["date"])
+
+    # Extract various time-related features
+    df['dayofmonth'] = df['date'].dt.day
+    df['dayofweek'] = df['date'].dt.dayofweek
+    df['quarter'] = df['date'].dt.quarter
+    df['month'] = df['date'].dt.month
+    df['year'] = df['date'].dt.year
+    df['dayofyear'] = df['date'].dt.dayofyear
+    df['weekofyear'] = df['date'].dt.weekofyear
+    return df
+
