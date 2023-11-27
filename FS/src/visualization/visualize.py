@@ -1,45 +1,12 @@
 # Author: JYang
-# Last Modified: Oct-24-2023
+# Last Modified: Nov-27-2023
 # Description: This script provides the method(s) for generating visualizations
 
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from collections import Counter, OrderedDict
 import pandas as pd
-
-class plotScore_backup_original:
-    """ A class for generating visualizations
-    Args:
-        data (list): a list of data points
-        feature_impt (list): a list of feature names
-        pred_type (str): a string indicating the type of prediction problem: classification or regression
-    """
-    def __init__(self, data, feature_impt, pred_type):
-        self.data = data
-        self.feature_impt = feature_impt
-        self.pred_type = pred_type.lower()
-
-    def score_plot(self):
-        """ A method that display a plot with accuracy against the number of features """
-        plt.plot(range(1, len(self.data) + 1), self.data)
-        plt.xlabel("Number of Features")
-        score_type = "F1" if self.pred_type == "classification" else "MSE"
-        plt.ylabel(f"{score_type} Score")
-        plt.title(f"{score_type} Score over Number of Features")
-
-        # Adjust the x-axis labels to show every 5th tick
-        n = 5
-        x_ticks = range(1, len(self.data) + 1, n)
-        plt.xticks(x_ticks)
-
-        feature_index = self.data.index(max(self.data)) + 1 if self.pred_type == 'classification' else self.data.index(min(self.data)) + 1
-        plt.axvline(x=feature_index, color='red', linestyle='dotted')
-        # Display the x-axis number next to the axvline
-        plt.show()
-        if self.pred_type == 'classification':
-            print(f"\nTop {self.data.index(max(self.data))+1} Features (Ordered by Feature Values):\n\n{self.feature_impt[:self.data.index(max(self.data))+1]}\n")
-        else:
-            print(f"\nTop {self.data.index(min(self.data))+1} Features (Ordered by Feature Values):\n\n{self.feature_impt[:self.data.index(min(self.data))+1]}\n")
+from IPython.display import display
 
 class plotScore:
     """ A class for generating visualizations
@@ -61,7 +28,7 @@ class plotScore:
         bar_positions = list(range(1, n + 1))
         plt.bar(bar_positions, self.data, align='center', edgecolor='black')
         plt.xlabel("Number of Features")
-        score_type = "F1" if self.pred_type == "classification" else "MSE"
+        score_type = "F1" if self.pred_type == "classification" else "RMSE"
         plt.ylabel(f"{score_type} Score")
         plt.title(f"{score_type} Score by Number of Features")
         
@@ -71,7 +38,6 @@ class plotScore:
         plt.show()
         
         for f in self.use_num_features: print(f"\nThe {f} features are: {self.feature_impt[:f]}\n")
-            
             
 class plotCurve:
     """ A class for stacking multiple plots together
@@ -93,7 +59,7 @@ class plotCurve:
             plt.plot(range(1, len(data) + 1), data, label=f"Line {i+1}")
 
         plt.xlabel("Number of Features")
-        score_type = "F1" if self.pred_type == "classification" else "MSE"
+        score_type = "F1" if self.pred_type == "classification" else "RMSE"
         plt.ylabel(f"{score_type} Score")
         plt.title(f"{score_type} Score over Number of Features [{self.ds_title}]")
         n = 5
@@ -114,7 +80,6 @@ class plotCurve:
         self.data.append(data)
         self.plot_line()
 
-        
 def word_cloud_freq(file_path, top_n=10):
     """Generate a wordcloud and histogram using feature frequencies
     Args:
@@ -156,3 +121,19 @@ def word_cloud_freq(file_path, top_n=10):
     plt.xticks(rotation=90)  # Rotate x-labels for better readability
     plt.tight_layout()
     plt.show()
+
+def plot_ts(df):
+    """Plot the predictions and true values of a time series
+    Args:
+    df (dataframe): a datafrome containing predictions and actual values of a time series
+    """
+    averaged_data = df.groupby('date')[['y_true', 'y_pred']].mean().reset_index()
+    plt.figure(figsize=(4, 4))
+    plt.scatter(averaged_data['date'], averaged_data['y_true'], label='Average y_true', marker='o', color='blue')
+    plt.scatter(averaged_data['date'], averaged_data['y_pred'], label='Average y_pred', marker='x', color='red')
+    plt.xlabel('Time (Date Converted to Integer Value)')
+    plt.ylabel('Average Returns')
+    plt.title('Scatter Plot of Average y_true and y_pred over Time')
+    plt.legend()
+    plt.show()
+
