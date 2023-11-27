@@ -7,7 +7,7 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.metrics import accuracy_score, mean_squared_error, confusion_matrix, precision_score, recall_score, f1_score
-from feature_selection_timeseries.src.models.train_model import generateModel#, generateModel_test
+from feature_selection_timeseries.src.models.train_model import generateModel
 from feature_selection_timeseries.src.models.utils import check_column_types
 from feature_selection_timeseries.src.preprocessing.preprocessor import Preprocess
 
@@ -180,4 +180,6 @@ class computeTestScore(Preprocess):
             }
 
         return metrics, pd.DataFrame({"y_true": list(y_true), "y_pred": list(y_pred)})
+
+
 
