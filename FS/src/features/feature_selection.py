@@ -112,8 +112,8 @@ class featureValues:
         if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         return feature_names_sorted, feature_scores, total_time
-        
-    def dynamic_selection_importance_old(self):
+    
+    def dynamic_selection_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/2301.00557
             Source: https://github.com/iancovert/dynamic-selection/tree/main
@@ -123,8 +123,8 @@ class featureValues:
             feature_scores (list): ranked feature importances
             total_time(float): total runtime for the Sage feature selection process
         """  
-        print("using original")
         start_time = time.time()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # Convert Pandas DataFrame to a PyTorch Tensor
         train_features = torch.tensor(self.X_data_train.values, dtype=torch.float32)
         train_targets = torch.tensor(self.y_data_train.values, dtype=torch.long)
@@ -134,8 +134,8 @@ class featureValues:
         train_ds = TensorDataset(train_features, train_targets)
         val_ds = TensorDataset(val_features, val_targets)
         # Prepare dataloaders
-        train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, pin_memory=True, drop_last=True)
-        val_loader = DataLoader(val_ds, batch_size=1024, pin_memory=True)
+        train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, pin_memory=False, drop_last=True)
+        val_loader = DataLoader(val_ds, batch_size=1024, pin_memory=False)
         # Shape of input and output
         d_in = self.X_data_train.shape[1]
         d_out = len(set(self.y_data_train))
@@ -164,108 +164,6 @@ class featureValues:
         
         # Pretrain predictor.
         mask_layer = ds.utils.MaskLayer(append=True)
-        pretrain = MaskingPretrainer(predictor, mask_layer).cuda()
-        pretrain.fit(
-            train_loader,
-            val_loader,
-            lr = 1e-3,
-            nepochs = 100,
-            loss_fn = nn.CrossEntropyLoss(),
-            verbose = False)
-
-        # Train selector and predictor jointly.
-        gdfs = GreedyDynamicSelection(selector, predictor, mask_layer).cuda()
-        gdfs.fit(
-            train_loader,
-            val_loader,
-            lr = 1e-3,
-            nepochs = 250,
-            max_features = d_in,
-            loss_fn = nn.CrossEntropyLoss(),
-            verbose = False)
-        
-        # For saving results.
-        #num_features = np.arange(1, d_in).tolist() #list(range(1, 11)) + list(range(15, 30, 5))
-        num_features = [self.n_features, d_in]
-        auroc_list = []
-        acc_list = []
-
-        # Metrics (softmax is applied automatically in recent versions of torchmetrics).
-        auroc_metric = lambda pred, y: AUROC(task='multiclass', num_classes=d_out)(pred.softmax(dim=1), y)
-        acc_metric = Accuracy(task='multiclass', num_classes=d_out)
-        
-        # Evaluate.
-        for num in num_features:
-            #auroc, acc, feature_rank = gdfs.evaluate(test_loader, num, (auroc_metric, acc_metric))
-            score, feature_rank = gdfs.evaluate(val_loader, num, (auroc_metric, acc_metric))
-            auroc_list.append(score[0])
-            acc_list.append(score[1])
-            #print(f'Num = {num}, AUROC = {100*score[0]:.2f}, Acc = {100*score[1]:.2f}')
-            
-        # Compute feature rank
-        feature_rank_index = np.argsort(np.mean(feature_rank, axis = 0))
-        #feature_score_unordered = np.sort(np.mean(feature_rank, axis = 0)).tolist()
-        
-        feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
-        feature_scores = np.arange(len(self.feature_names), 0, -1).tolist()
-        
-        end_time = time.time()
-        total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
-        
-        return feature_names_sorted, feature_scores, total_time
-
-    def dynamic_selection_importance(self):
-        """ A method that extracts the features, feature scores, and total runtime
-            Paper: https://arxiv.org/abs/2301.00557
-            Source: https://github.com/iancovert/dynamic-selection/tree/main
-            Compiled_by: JYang
-        Returns: 
-            feature_names_sorted (list): ranked features
-            feature_scores (list): ranked feature importances
-            total_time(float): total runtime for the Sage feature selection process
-        """  
-        start_time = time.time()
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # Convert Pandas DataFrame to a PyTorch Tensor
-        train_features = torch.tensor(self.X_data_train.values, dtype=torch.float32)#.to(device)
-        train_targets = torch.tensor(self.y_data_train.values, dtype=torch.long)#.to(device)
-        val_features = torch.tensor(self.X_data_val.values, dtype=torch.float32)#.to(device)
-        val_targets = torch.tensor(self.y_data_val.values, dtype=torch.long)#.to(device)
-        # Create a TensorDataset
-        train_ds = TensorDataset(train_features, train_targets)
-        val_ds = TensorDataset(val_features, val_targets)
-        # Prepare dataloaders
-        train_loader = DataLoader(train_ds, batch_size=128, shuffle=True, pin_memory=False, drop_last=True)
-        val_loader = DataLoader(val_ds, batch_size=1024, pin_memory=False)
-        # Shape of input and output
-        d_in = self.X_data_train.shape[1]
-        d_out = len(set(self.y_data_train))
-        
-        # Set up networks
-        hidden = 128
-        dropout = 0.3
-
-        predictor = nn.Sequential(
-            nn.Linear(2 * d_in, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, d_out))#.to(device)
-
-        selector = nn.Sequential(
-            nn.Linear(2 * d_in, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, hidden),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden, d_in))#.to(device)
-        
-        # Pretrain predictor.
-        mask_layer = ds.utils.MaskLayer(append=True)
         pretrain = MaskingPretrainer(predictor, mask_layer).to(device)
         pretrain.fit(
             train_loader,
@@ -281,13 +179,13 @@ class featureValues:
             train_loader,
             val_loader,
             lr = 1e-3,
-            nepochs = 5, #250,
+            nepochs = 50,
             max_features = d_in,
             loss_fn = nn.CrossEntropyLoss(),
             verbose = False)
         
         # For saving results.
-        num_features = np.arange(1, d_in).tolist() #list(range(1, 11)) + list(range(15, 30, 5))
+        num_features = np.arange(1, d_in).tolist() 
         auroc_list = []
         acc_list = []
 
@@ -479,7 +377,6 @@ class featureValues:
 
         return sorted_features, feature_score_shap, total_time                   
 
-
     def cae_importance(self):
         """ A method that extracts the features, feature scores, and total runtime
             Paper: https://arxiv.org/abs/1901.09346
@@ -499,7 +396,6 @@ class featureValues:
 
         start_time = time.time()
         
-        #setup_seed(self.seed)
         selector_supervised = ConcreteAutoencoderFeatureSelector(K = len(self.feature_names), rand_seed=self.seed, output_function = g, num_epochs = 3, pred_type=self.pred_type)
         selector_supervised.fit(x_train, y_train, x_val, y_val)
 
