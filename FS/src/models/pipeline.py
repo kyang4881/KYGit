@@ -6,12 +6,12 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from feature_selection_timeseries.src.models.predict_model import computeScore 
-from feature_selection_timeseries.src.models.utils import create_df, check_column_types #,add_to_dataframe
+from feature_selection_timeseries.src.models.utils import create_df, check_column_types 
 from feature_selection_timeseries.src.preprocessing.preprocessor import Preprocess
 from feature_selection_timeseries.src.models.train_model import generateModel
 from feature_selection_timeseries.src.features.feature_selection import featureValues
 from feature_selection_timeseries.src.models.test_model import computeTestScore
-from feature_selection_timeseries.src.models.utils import rebalance_data, average_cv_outputs, roll_window_split, generate_val_splits #, metrics_to_df
+from feature_selection_timeseries.src.models.utils import rebalance_data, average_cv_outputs, roll_window_split, generate_val_splits 
 from feature_selection_timeseries.src.visualization.visualize import plotScore, plot_ts
 import matplotlib.pyplot as plt
 import time
@@ -22,7 +22,7 @@ import copy
 
 class run:
     """
-    Class for running a set of experiments on different methods, datasets, and rebalance types.
+    Class for running a set of experiments on various combinations of setup.
     
     Attributes:
         cross_validation_type(str): Whether to use moving or expanding window for cross validation
@@ -82,8 +82,6 @@ class run:
         self.print_outputs_train = print_outputs_train
         self.print_outputs_test = print_outputs_test
 
-        self._test_df = None
-        self._train_df = None
         self.scaler_saved = None 
         self.encoder_saved = None 
         self.label_encoder_saved = None 
@@ -116,7 +114,7 @@ class run:
 
     def train(self):
         """
-        Performs the training and evaluation process for different combinations of methods, datasets, and rebalance types.
+        Performs the training and evaluation process for various combinations
         """
         for n in range(len(self.train_test_list)):
             start_time = time.time()
@@ -186,7 +184,7 @@ class run:
 
     def test(self):
         """
-        Performs the testing and evaluation process for the trained combinations of methods, datasets, and rebalance types.
+        Performs the testing and evaluation process 
         """
         self.scaler_saved = joblib.load(self.scaler_filename)
         self.encoder_saved = joblib.load(self.encoder_filename)
@@ -231,7 +229,7 @@ class run:
                     label_cols=self.label_cols, 
                     do_not_encode_cols=self.do_not_encode_cols,
                     selected_features=cur_features,
-                    train_data=self.raw_df.loc[cur_bt_train_window[0]:cur_bt_train_window[1]-1, :].reset_index(drop=True),
+                    train_data=self.raw_df.loc[cur_bt_train_window[0]:cur_bt_train_window[1]-1, :].reset_index(drop=True), # Shift back 1 due to loc including endpoints
                     test_data=self.raw_df.loc[cur_bt_test_window[0]:cur_bt_test_window[1]-1, :].reset_index(drop=True),
                     pred_type=self.pred_type,
                     seed=self.seed,
@@ -579,7 +577,7 @@ def run_scoring_pipeline(print_outputs_train, cv, score_tracker, params, feature
 
 def get_metrics_df(print_outputs_train, cv, score_tracker, params, trained_model, seed, target_colname, data, data_original, full_df, method_name, dataset_name, pred_type, cv_iteration, train_examples,
                    test_examples, num_cv_splits, rebalance=False, rebalance_type=None, append_to_full_df=False, n_features=None, feature_direction=None):
-    """ A methold for generating the model results
+    """ A methold for generating the model training results
     Args:
         print_outputs_train (bool): whether to print train outputs
         cv (int): cross-validation split 
