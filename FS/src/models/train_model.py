@@ -5,15 +5,10 @@
 import xgboost as xgb
 import torch
 import numpy as np
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import TimeSeriesSplit
 from feature_selection_timeseries.src.models.utils import setup_seed
-import pandas as pd
-from sklearn.metrics import f1_score, mean_squared_error, mean_absolute_percentage_error
 
 class generateModel:
-    """A class with a method for generating a trained model that includes hyperparameter tuning for the test data
+    """A class with a method for generating a trained model that includes hyperparameter tuning for the validation and test data
     Args:
         data_dict (dict): a dictionary containing dataframes of the train and validation data
         pred_type (str): a string indicating the type of prediction problem: classification or regression
