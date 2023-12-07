@@ -17,8 +17,6 @@ import matplotlib.pyplot as plt
 import time
 import joblib
 import ast
-import copy
-
 
 class run:
     """
