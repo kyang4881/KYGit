@@ -1,12 +1,11 @@
 # Author: JYang
-# Last Modified: Nov-27-2023
+# Last Modified: Dec-07-2023
 # Description: This script provides the feature selection method(s) for computing feature importances
 
 import numpy as np
 import sage
 import xgboost as xgb
 import random
-import tensorflow as tf
 import pandas as pd
 from tensorflow.keras import backend as K
 from tensorflow.keras import Model
@@ -25,7 +24,6 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import time
 import matplotlib.pyplot as plt
 import shap
-import os
 import torch
 import math
 from boruta import BorutaPy
@@ -48,7 +46,9 @@ class featureValues:
         target_colname (str): a string indicating the name of the target variable column
         n_features (int): number of features to use; used for top n and bottom n features
     """
-    def __init__(self, data_dict, pred_type, model, seed, target_colname, n_features):
+    def __init__(self, print_outputs_train, params, data_dict, pred_type, model, seed, target_colname, n_features):
+        self.print_outputs_train = print_outputs_train
+        self.params = params
         self.X_data_train = data_dict["X_train"]
         self.X_data_val = data_dict["X_val"]
         self.y_data_train = data_dict["y_train"]
@@ -58,14 +58,8 @@ class featureValues:
         self.sage_val = None
         self.feature_names = self.X_data_train.columns.to_list()
         self.seed = seed
-        self.model_init = xgb.XGBClassifier(objective='binary:logistic', eval_metric='error', seed=self.seed) if self.pred_type.lower() == 'classification' else xgb.XGBRegressor(objective='reg:squarederror', eval_metric='rmse', seed=self.seed)
+        self.model_init = xgb.XGBClassifier(**params, objective='binary:logistic', eval_metric='error', seed=self.seed) if self.pred_type.lower() == 'classification' else xgb.XGBRegressor(**params, objective='reg:squarederror', eval_metric='rmse', seed=self.seed)
         self.n_features = n_features
-        
-        # np.random.seed(seed)
-        # torch.manual_seed(seed)
-        # torch.cuda.manual_seed(seed)  
-        # torch.backends.cudnn.deterministic = True
-        # torch.backends.cudnn.benchmark = False
         setup_seed(self.seed)
     
     def stg_importance(self):
@@ -98,15 +92,12 @@ class featureValues:
             device = device
         ) 
 
-        #print("self.y_data_train.values", self.y_data_train.values)
-        #print("np.array([self.y_data_train.values]).reshape(-1, 1)", np.array([self.y_data_train.values]).reshape(-1, 1))
-
         model.fit(
             X=self.X_data_train.values, 
-            y=np.array([self.y_data_train.values]).reshape(-1, 1), #self.y_data_train.values,   # reshaped to avoid the shape warning
+            y=np.array([self.y_data_train.values]).reshape(-1, 1),  # reshaped to avoid the shape warning
             nr_epochs=100000, 
             valid_X=self.X_data_val.values, 
-            valid_y=np.array([self.y_data_val.values]).reshape(-1, 1), #self.y_data_val.values,  # reshaped to avoid the shape warning
+            valid_y=np.array([self.y_data_val.values]).reshape(-1, 1), # reshaped to avoid the shape warning
             print_interval=10000#,
             #early_stop="True"
         )
@@ -114,17 +105,11 @@ class featureValues:
         feature_impt = model.get_gates(mode='raw')
         feature_rank_index = np.argsort(-feature_impt)
         feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
-        feature_scores = feature_impt[feature_rank_index]
+        feature_scores = feature_impt[feature_rank_index].tolist()
 
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
-        
-        #print("self.feature_names", self.feature_names)
-        #print("feature_impt: ", feature_impt)
-        #print("feature_rank_index: ", feature_rank_index)
-        #print("feature_names_sorted: ", feature_names_sorted)
-        #print("feature_scores: ", feature_scores)
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         return feature_names_sorted, feature_scores, total_time
         
@@ -222,17 +207,11 @@ class featureValues:
         #feature_score_unordered = np.sort(np.mean(feature_rank, axis = 0)).tolist()
         
         feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
-        feature_scores = np.arange(len(self.feature_names), 0, -1)
+        feature_scores = np.arange(len(self.feature_names), 0, -1).tolist()
         
         end_time = time.time()
         total_time = end_time - start_time
         print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
-        
-        #print("self.feature_names:--- ", self.feature_names)
-        #print("feature_rank:--- ", feature_rank)
-        #print("feature_rank_index, np.mean(feature_rank, axis = 0):--- ", np.mean(feature_rank, axis = 0))
-        #print("feature_rank_index, np.argsort(np.mean(feature_rank, axis = 0)):--- ", feature_rank_index)
-        #print("feature_names_sorted:--- ", feature_names_sorted)
         
         return feature_names_sorted, feature_scores, total_time
 
@@ -329,18 +308,12 @@ class featureValues:
         #feature_score_unordered = np.sort(np.mean(feature_rank, axis = 0)).tolist()
         
         feature_names_sorted = np.array(self.feature_names)[feature_rank_index].tolist()
-        feature_scores = np.arange(len(self.feature_names), 0, -1)
+        feature_scores = np.arange(len(self.feature_names), 0, -1).tolist()
         
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
-        
-        #print("self.feature_names:--- ", self.feature_names)
-        #print("feature_rank:--- ", feature_rank)
-        #print("feature_rank_index, np.mean(feature_rank, axis = 0):--- ", np.mean(feature_rank, axis = 0))
-        #print("feature_rank_index, np.argsort(np.mean(feature_rank, axis = 0)):--- ", feature_rank_index)
-        #print("feature_names_sorted:--- ", feature_names_sorted)
-        
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")   
+
         return feature_names_sorted, feature_scores, total_time
         
         
@@ -359,7 +332,7 @@ class featureValues:
         feature_selector.fit(self.X_data_val.values, self.y_data_val.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nRuntime: {total_time:.2f} seconds")   
+        if self.print_outputs_train: print(f"\nRuntime: {total_time:.2f} seconds")   
         # Order features by Boruta rank
         selected_features = pd.DataFrame({'feature_name': self.feature_names, 'ranking': feature_selector.ranking_})
         selected_features = selected_features.sort_values(by=['ranking', 'feature_name']) 
@@ -384,7 +357,7 @@ class featureValues:
         # Order sage values
         values = self.sage_val.values
         argsort = np.argsort(values)[::-1]
-        values = values[argsort]
+        values = list(values[argsort])
         sage_features = list(np.array(self.feature_names)[argsort])    
         
         return sage_features, values
@@ -411,8 +384,9 @@ class featureValues:
         sage_features, sage_feature_scores = self.compute_sage_val()
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
-        display(self.sage_plot())
+        if self.print_outputs_train: 
+            print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+            display(self.sage_plot())
 
         return sage_features, sage_feature_scores, total_time
 
@@ -430,12 +404,13 @@ class featureValues:
         permu_test = permutation_importance(self.model_init, self.X_data_val, self.y_data_val, random_state = self.seed)
         sorted_idx = permu_test.importances_mean.argsort()[::-1]
         feature_names_sorted = [self.feature_names[i] for i in sorted_idx]
-        feature_scores = permu_test.importances_mean[sorted_idx]
+        feature_scores = list(permu_test.importances_mean[sorted_idx])
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
-        plt.barh(feature_names_sorted, permu_test.importances_mean[sorted_idx])
-        plt.xlabel("Permutation Importance")
+        if self.print_outputs_train:  
+            print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+            plt.barh(feature_names_sorted, permu_test.importances_mean[sorted_idx])
+            plt.xlabel("Permutation Importance")
         
         return feature_names_sorted, feature_scores, total_time
 
@@ -452,19 +427,24 @@ class featureValues:
         self.model_init.fit(self.X_data_train, self.y_data_train)
         y_pred = self.model_init.predict(self.X_data_val)
         # round predictions
-        predictions = [round(value) for value in y_pred]
+        predictions = [np.round(value) for value in y_pred]
         # evaluate predictions
         #accuracy = accuracy_score(predictions, self.y_data_val)
         start_time = time.time()
         # Calculate feature importance scores
         feature_importances = self.model_init.get_booster().get_score(importance_type='weight')
-        # Sort the feature importance scores
-        sorted_idx = sorted(feature_importances.items(), key=lambda x: x[1], reverse=True)
-        # Extract the top feature names and scores
-        top_features, top_scores = zip(*sorted_idx[:-1])
+        
+        if len(feature_importances.values()) < 2:
+            top_features, top_scores = list(self.X_data_train.columns), [0]*len(self.X_data_train.columns)
+        else:
+            # Sort the feature importance scores
+            sorted_idx = sorted(feature_importances.items(), key=lambda x: x[1], reverse=True)
+            # Extract the top feature names and scores
+            top_features, top_scores = zip(*sorted_idx[:-1])
+
         end_time = time.time()
         total_time = end_time - start_time                             
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         return top_features, top_scores, total_time
 
@@ -483,16 +463,19 @@ class featureValues:
         #shap.plots.waterfall(shap_values[0])
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Average the absolute values of the importance scores
         mean_abs_shap_values = np.mean(np.abs(shap_values.values), axis=0)
         features = np.array(self.feature_names)
         # Sort the features based on their mean absolute SHAP values
         argsort = np.argsort(mean_abs_shap_values)[::-1]
         sorted_features = list(features[argsort])
-        print("Top features:", sorted_features)
-        shap.plots.beeswarm(shap_values, max_display=25)
-        feature_score_shap = np.mean(shap_values.values, axis=0)[np.argsort(np.mean(shap_values.values, axis=0))[::-1]]             
+
+        if self.print_outputs_train: 
+            print("Top features:", sorted_features)
+            shap.plots.beeswarm(shap_values, max_display=25)
+
+        feature_score_shap = list(np.mean(shap_values.values, axis=0)[np.argsort(np.mean(shap_values.values, axis=0))[::-1]])            
 
         return sorted_features, feature_score_shap, total_time                   
 
@@ -522,13 +505,13 @@ class featureValues:
 
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         
         feature_importances=selector_supervised.get_support(indices = True)
         argsort = np.argsort(feature_importances)[::-1]
         features = np.array(self.feature_names)
         sorted_features = list(features[argsort])
-        feature_scores = feature_importances[argsort]
+        feature_scores = list(feature_importances[argsort])
 
         return sorted_features, feature_scores, total_time
     
@@ -549,7 +532,7 @@ class featureValues:
         lasso.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by lasso rank
         feature_imp = pd.DataFrame({'Value': np.abs(lasso.coef_), 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
@@ -574,7 +557,7 @@ class featureValues:
         cart_model = DecisionTreeClassifier(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values) if self.pred_type == "classification" else DecisionTreeRegressor(random_state=self.seed).fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by CART rank
         feature_imp = pd.DataFrame({'Value': cart_model.feature_importances_, 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
@@ -600,7 +583,7 @@ class featureValues:
         clf.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by SVM rank
         feature_imp = pd.DataFrame({'Value': np.abs(clf.coef_[0]), 'Feature': self.feature_names})
         top_features = feature_imp.sort_values(by="Value",ascending=False)
@@ -626,7 +609,7 @@ class featureValues:
         rf_model.fit(self.X_data_train.values, self.y_data_train.values)
         end_time = time.time()
         total_time = end_time - start_time
-        print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
+        if self.print_outputs_train: print(f"\nFeature Selection Runtime: {total_time:.2f} seconds")
         # Order features by SVM rank
         feature_imp = pd.DataFrame({'Value': rf_model.feature_importances_, 'Feature': self.feature_names})
         top_features =feature_imp.sort_values(by="Value",ascending=False)
