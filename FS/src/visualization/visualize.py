@@ -1,5 +1,5 @@
 # Author: JYang
-# Last Modified: Nov-27-2023
+# Last Modified: Dec-07-2023
 # Description: This script provides the method(s) for generating visualizations
 
 import matplotlib.pyplot as plt
@@ -7,6 +7,7 @@ from wordcloud import WordCloud
 from collections import Counter, OrderedDict
 import pandas as pd
 from IPython.display import display
+import numpy as np
 
 class plotScore:
     """ A class for generating visualizations
@@ -127,13 +128,13 @@ def plot_ts(df):
     Args:
     df (dataframe): a datafrome containing predictions and actual values of a time series
     """
-    averaged_data = df.groupby('date')[['y_true', 'y_pred']].mean().reset_index()
     plt.figure(figsize=(4, 4))
-    plt.scatter(averaged_data['date'], averaged_data['y_true'], label='Average y_true', marker='o', color='blue')
-    plt.scatter(averaged_data['date'], averaged_data['y_pred'], label='Average y_pred', marker='x', color='red')
+    plt.scatter(np.arange(0, len(df['y_true'])), df['y_true'], label='Average y_true', marker='o', color='blue')
+    plt.scatter(np.arange(0, len(df['y_true'])), df['y_pred'], label='Average y_pred', marker='x', color='red')
     plt.xlabel('Time (Date Converted to Integer Value)')
     plt.ylabel('Average Returns')
     plt.title('Scatter Plot of Average y_true and y_pred over Time')
     plt.legend()
     plt.show()
+
 
