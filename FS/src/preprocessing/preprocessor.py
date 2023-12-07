@@ -21,7 +21,7 @@ class Preprocess:
         num_cols (list): a list of numerical features
         label_cols (list): a list of columns to label encode
         do_not_encode_cols (list): a list of columns to not encode
-        num_cv_splits (int): an integer indicating the number of cross validation fold
+        num_cv_splits (int): an integer indicating the number of validation splits
         train_examples (int): number of train examples in each cv split
         test_examples (int): number of test examples in each cv split
         cross_validation_type (str): whether to use moving or expanding window
