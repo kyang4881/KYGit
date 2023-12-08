@@ -40,8 +40,27 @@ This project involves the development of a Python pipeline encompassing data ing
 
 ---
 
-## Execution
+## Notebook
 
+Change the file directory to the path where the feature_selection_timeseries folder is located.
+
+```python
+import os
+directory_path = input("Enter your file directory: ")
+os.chdir(directory_path)
+```
+
+Import other necessary libraries.
+
+```python
+from feature_selection_timeseries.src.models.pipeline import run
+from feature_selection_timeseries.src.models.utils import create_time_feature, tune_cv_split, convert_to_sample 
+from datetime import datetime
+import numpy as np
+import pandas as pd
+import warnings
+import csv
+```
 
 ---
 
