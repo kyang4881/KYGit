@@ -8,7 +8,9 @@ This project involves the development of a Python pipeline encompassing data ing
 
 ---
 
-[![PyPI pyversions](https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/py_ver.png)]
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/py_ver.png" width="150" />
+</p>
 
 
 ## Pseudocode
