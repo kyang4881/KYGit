@@ -268,8 +268,28 @@ Test Results Example: All Features
 
 ---
 
-## Citations
+## Sources
 
+1. *SAGE:* Ian Covert, Scott Lundberg, Su-In Lee. "Understanding Global Feature Contributions With Additive Importance Measures." NeurIPS 2020 <https://github.com/iancovert/sage>
 
+2. *Dynamic:* Ian Covert, Wei Qiu, Mingyu Lu, Nayoon Kim, Nathan White, Su-In Lee. "Learning to Maximize Mutual Information for Dynamic Feature Selection." ICML, 2023. <https://github.com/iancovert/dynamic-selection>
 
-            
+3. *CAE:* Abid, Abubakar, Muhammad Fatih Balin, and James Zou. "Concrete autoencoders for differentiable feature selection and reconstruction." arXiv preprint arXiv:1901.09346 (2019). <https://github.com/mfbalin/Concrete-Autoencoders/tree/master>
+
+4. *STG:* Yamada, Yutaro, et al. "Feature selection using stochastic gates." International Conference on Machine Learning. PMLR, 2020 <https://github.com/runopti/stg>
+
+5. *XGBoost:* Chen, Tianqi, and Carlos Guestrin. "Xgboost: A scalable tree boosting system." Proceedings of the 22nd acm sigkdd international conference on knowledge discovery and data mining. 2016. <https://xgboost.readthedocs.io/en/stable/index.html>
+
+6. *SHAP:* Lundberg, Scott M., and Su-In Lee. "A unified approach to interpreting model predictions." Advances in neural information processing systems 30 (2017). <https://github.com/shap/shap>
+
+7. *Boruta:* Kursa, M. B., & Rudnicki, W. R. (2010). Feature Selection with the Boruta Package. Journal of Statistical Software, 36(11), 1–13. https://doi.org/10.18637/jss.v036.i11 <https://github.com/scikit-learn-contrib/boruta_py>
+
+8. *Permutation:* <https://scikit-learn.org/stable/modules/permutation_importance.html>
+
+9. *LASSO:* <https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html>
+
+10. *CART:* <https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html>
+
+11. *SVM:* <https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html>
+
+12. *RF:* <https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html>
