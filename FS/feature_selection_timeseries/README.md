@@ -131,21 +131,24 @@ sp500_df = create_time_feature(sp500_df)
 sp500_df = pd.concat([sp500_df.iloc[:, 1:], y['target']], axis=1)
 ```
 
-As an illustration, to keep execution time manageable a single stock will be used in this example. Additionally, only two sets of hyperparameters are considered in this demo. Run the codes below to filter for the ticker ADBE (Adobe Inc).  
+As an illustration, to keep execution time manageable a single stock will be used in this example. Additionally, only two sets of hyperparameters are considered. Run the codes below to filter for the ticker ADBE (Adobe Inc).  
 
 ```python
 sp500_df = sp500_df[sp500_df['ticker'] == 'ADBE']
 y = y[y['ticker'] == 'ADBE']
 ```
 
+In the train_model.py file.
+
 ```python
 param_grid = {
-    'min_child_weight': [0.5, 1],
-    'gamma': [0],  
-    'max_depth': [6], 
-    'learning_rate': [0.03], 
-    'alpha': [0]  
+   'min_child_weight': [0.5, 1],
+   'gamma': [0.01],  
+   'max_depth': [6], 
+   'learning_rate': [0.3], 
+   'alpha': [0]  
 }
+    
 ```
 
 View the updated dataframes.
