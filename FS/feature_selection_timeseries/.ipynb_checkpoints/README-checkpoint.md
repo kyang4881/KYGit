@@ -234,7 +234,7 @@ The back testing rolling windows are:
 - Train: [[0, 3300], [150, 3450], [300, 3600], [450, 3750], [600, 3900]]
 - Test: [[3300, 3450], [3450, 3600], [3600, 3750], [3750, 3900], [3900, 4050]]
 
-Within each rolling window, the 5-fold train-validation windows are:
+Within each rolling window, there are 5-fold train-validation splits. The first rolling window has the following splits:
 - Train: [[0, 630], [630, 1260], [1260, 1890], [1890, 2520], [2520, 3150]]
 - Validation: [[630, 780], [1260, 1410], [1890, 2040], [2520, 2670], [3150, 3300]]
 
