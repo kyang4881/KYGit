@@ -242,11 +242,11 @@ class run:
                 if self.print_outputs_test:
                     # Plot time series
                     plot_ts(pred_df)
-                    print("Best Hyperparams: ", cur_params)
-                    print("Number of features: ", cur_num_features)
-                    print("Features: ", cur_features)
                     print("Method: ", cur_method)
+                    print("Number of features: ", cur_num_features)
+                    print("Best Hyperparams: ", cur_params)
                     print("Score: ", metrics['rmse'], "\n")
+                    print("Features: ", cur_features)
 
                 # Store iteration info to dictionary
                 compiled_metrics['train_test_list_n'].append(train_test_list_n)
