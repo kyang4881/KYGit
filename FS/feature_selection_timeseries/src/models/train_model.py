@@ -48,7 +48,7 @@ class generateModel:
             'learning_rate': [0.03, 0.3], # [default=0.3, alias: learning_rate]
             'alpha': [0, 3]  #  [default=0, alias: reg_alpha]
         }
-
+        
         param_combinations = [{param_name: value for param_name, value in zip(param_grid.keys(), combination)}
                               for combination in np.array(np.meshgrid(*param_grid.values())).T.reshape(-1, len(param_grid))]
 
