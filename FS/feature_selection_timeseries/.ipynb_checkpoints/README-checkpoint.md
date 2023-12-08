@@ -9,7 +9,7 @@ This project involves the development of a Python pipeline encompassing data ing
 ---
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/py_ver.png" width="100" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/py_ver.png" width="200" />
 </p>
 
 
