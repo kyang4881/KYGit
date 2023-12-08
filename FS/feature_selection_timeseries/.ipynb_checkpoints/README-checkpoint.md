@@ -13,3 +13,29 @@ This project involves the development of a Python pipeline encompassing data ing
 <p align="center">
   <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/pseudocode.png" width="1200" />
 </p>
+
+---
+
+## Rolling Window Back Testing
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/rolling_bt.png" width="1200" />
+</p>
+
+---
+
+## How Features Are Aggregated
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/feature_selection_example.png" width="1200" />
+</p>
+
+---
+
+## 1 Fixed Window Back Testing For All Features
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/bt_all_features.png" width="1200" />
+</p>
+
+---
