@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/flow_diagram.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/flow_diagram.png" width="1200" />
 </p>
 
 ---
@@ -9,14 +9,14 @@ This project involves the development of a Python pipeline encompassing data ing
 ---
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/py_ver.png" width="150" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
 </p>
 
 
 ## Pseudocode
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/pseudocode.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/pseudocode.png" width="1200" />
 </p>
 
 ---
@@ -24,7 +24,7 @@ This project involves the development of a Python pipeline encompassing data ing
 ## Rolling Window Back Testing
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/rolling_bt.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/rolling_bt.png" width="1200" />
 </p>
 
 ---
@@ -32,7 +32,7 @@ This project involves the development of a Python pipeline encompassing data ing
 ## How Features Are Aggregated
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/feature_selection_example.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/feature_selection_example.png" width="1200" />
 </p>
 
 ---
@@ -42,7 +42,7 @@ This project involves the development of a Python pipeline encompassing data ing
 The same concept applies for the top 50 subset features.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/bt_all_features.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/bt_all_features.png" width="1200" />
 </p>
 
 ---
@@ -163,7 +163,7 @@ display(y.head())
 print(f"Dataset Shape: {np.shape(y)}")
 ```
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/adbe_table_y.png" width="300" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/adbe_table_y.png" width="300" />
 </p>
 
 
@@ -172,7 +172,7 @@ display(sp500_df.head())
 print(f"Dataset Shape: {np.shape(sp500_df)}")
 ```
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/adbe_table_x.png" width="1200" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/adbe_table_x.png" width="1200" />
 </p>
 
 Initializing the pipeline.
@@ -192,7 +192,7 @@ print(f"\nUsing Split: {train_test_list}")
 ```
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_val_split.png" width="300" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/train_val_split.png" width="300" />
 </p>
 
 
@@ -237,13 +237,13 @@ r1.train()
 Train Results Example: 50 Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_50.png" width="800" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/train_50.png" width="800" />
 </p>
 
 Test Results Example: All Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_all.png" width="800" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/train_all.png" width="800" />
 </p>
 
 
@@ -256,13 +256,13 @@ r1.test()
 Test Results Example: 50 Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_50.png" width="800" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/test_50.png" width="800" />
 </p>
 
 Test Results Example: All Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_all.png" width="800" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/images/test_all.png" width="800" />
 </p>
 
 
