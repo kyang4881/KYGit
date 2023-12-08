@@ -236,6 +236,8 @@ The back testing rolling windows are:
 
 Within each rolling window, there are 5-fold train-validation splits. 
 
+```python
+"""
 1. 
 - Train: [[0, 630], [630, 1260], [1260, 1890], [1890, 2520], [2520, 3150]]
 - Validation: [[630, 780], [1260, 1410], [1890, 2040], [2520, 2670], [3150, 3300]]
@@ -255,7 +257,8 @@ Within each rolling window, there are 5-fold train-validation splits.
 5.
 - Train: [[600, 1230], [1230, 1860], [1860, 2490], [2490, 3120], [3120, 3750]]
 - Validation: [[1230, 1380], [1860, 2010], [2490, 2640], [3120, 3270], [3750, 3900]]
-
+"""
+```
 
 ```python
 r1.train()
