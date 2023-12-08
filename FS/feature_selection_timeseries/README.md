@@ -159,7 +159,7 @@ print(f"Dataset Shape: {np.shape(sp500_df)}")
 
 Initializing the pipeline.
 
-Compute the list of possible splits and their corresponding train-validation sizes. 5-fold splits will be used in this example, as specified. Note that only the first term is not used, as the rolling window size and train-validation split size are computed separately, but the validation/test size is indicated by the middle term and the number of splits for both the rolling window and train-validation 
+Compute the list of possible splits and their corresponding train-validation sizes. 5-fold splits will be used in this example, as specified. Note that the first term is not used, as the rolling window size and train-validation split size are computed separately, but the validation/test size is indicated by the middle term, and the number of splits for both the back test rolling window and train-validation parts is the same.
 
 ```python
 # Possible train validation splits
@@ -173,9 +173,55 @@ keep_data_index = train_test_list[0][0]*train_test_list[0][2] + 2*train_test_lis
 print(f"\nUsing Split: {train_test_list}")
 ```
 
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_val_split.png" width="300" />
+</p>
 
 
+Initialize the other arguments.
 
+```python
+r1 = run(
+    cross_validation_type= "moving window", 
+    save_output_file = True, 
+    raw_df = sp500_df.iloc[-keep_data_index:, :].reset_index(drop=True), 
+    y = y.iloc[-keep_data_index:, :].reset_index(drop=True),
+    train_test_list = train_test_list, 
+    methods = ["xgboost"], 
+    rebalance_type = ["None"], 
+    label_cols = [], 
+    do_not_encode_cols = ["dayofmonth", "dayofweek", "quarter", "month", "year", "dayofyear", "weekofyear"], 
+    seed = 42,
+    target_colname = "target",
+    dataset_name = "sp500",
+    pred_type = "regression",
+    append_to_full_df = False,
+    n_features = 50,  
+    feature_direction = "top", 
+    train_outputs_file_name = None,
+    current_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S"),
+    scaler_filename = "./feature_selection_timeseries/data/processed/scaler_saved.save",
+    encoder_filename = "./feature_selection_timeseries/data/processed/encoder_saved.save",
+    label_encoder_filename = "./feature_selection_timeseries/data/processed/lalbel_encoder_saved.save",
+    test_output_file_name = f"./feature_selection_timeseries/data/delete/Consolidated_Stocks_FS_timeseries_sp500_outputs_test_results_",
+    test_pred_file_name = f"./feature_selection_timeseries/data/delete/Consolidated_Stocks_FS_timeseries_sp500_outputs_test_preds_",
+    print_outputs_train = True,
+    print_outputs_test = True
+)
+```
+
+Train the model. Average the feature scores, evaluation metrics, and determine the optimal hyperparameters. 
+
+```python
+r1.train()
+```
+
+Set the optimal hyperparameters, and apply the optimal models on the hold out test data.
+
+```python
+r1.test()
+
+```
 
 ---
 
