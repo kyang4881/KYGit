@@ -248,13 +248,13 @@ r1.test()
 Test Results Example: 50 Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_50.png" width="300" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_50.png" width="800" />
 </p>
 
 Test Results Example: All Features
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_all.png" width="300" />
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_all.png" width="800" />
 </p>
 
 
