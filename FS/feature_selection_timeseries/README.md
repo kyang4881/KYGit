@@ -32,7 +32,9 @@ This project involves the development of a Python pipeline encompassing data ing
 
 ---
 
-## 1 Fixed Window Back Testing For All Features
+## Train-Validation Splits (All Features)
+
+The same concept applies for the top 50 subset features.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/bt_all_features.png" width="1200" />
@@ -154,6 +156,25 @@ print(f"Dataset Shape: {np.shape(sp500_df)}")
 <p align="center">
   <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/adbe_table_x.png" width="1200" />
 </p>
+
+Initializing the pipeline.
+
+Compute the list of possible splits and their corresponding train-validation sizes. 5-fold splits will be used in this example, as specified. Note that only the first term is not used, as the rolling window size and train-validation split size are computed separately, but the validation/test size is indicated by the middle term and the number of splits for both the rolling window and train-validation 
+
+```python
+# Possible train validation splits
+train_test_list = [tune_cv_split(
+    sp500_df.iloc[-np.shape(sp500_df)[0]:,:],
+    val_test_prop_constraint = 0.2, # Size of validation set relative to the train set
+    num_split_constraint = 5 # Number of splits
+)[-1]]
+
+keep_data_index = train_test_list[0][0]*train_test_list[0][2] + 2*train_test_list[0][1]
+print(f"\nUsing Split: {train_test_list}")
+```
+
+
+
 
 
 ---
