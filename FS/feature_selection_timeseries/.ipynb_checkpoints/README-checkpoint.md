@@ -140,7 +140,7 @@ View the updated dataframes.
 display(y.head())
 print(f"Dataset Shape: {np.shape(y)}")
 ```
-<p align="center">
+<p align="left">
   <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/adbe_table_y.png" width="300" />
 </p>
 
