@@ -228,7 +228,7 @@ r1 = run(
 )
 ```
 
-Train the model. Average the feature scores, evaluation metrics, and determine the optimal hyperparameters. 
+Train the model. Average the feature scores and validation scores, and determine the optimal hyperparameters. 
 
 ```python
 r1.train()
