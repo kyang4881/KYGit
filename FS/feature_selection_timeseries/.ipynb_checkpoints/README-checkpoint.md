@@ -42,6 +42,8 @@ This project involves the development of a Python pipeline encompassing data ing
 
 ## Notebook
 
+Import the necessary libraries in the requirements.txt file.
+
 Change the file directory to the path where the feature_selection_timeseries folder is located.
 
 ```python
