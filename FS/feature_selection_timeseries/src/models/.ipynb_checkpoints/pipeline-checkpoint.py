@@ -503,10 +503,10 @@ def run_scoring_pipeline(print_outputs_train, cv, score_tracker, params, feature
                 score, y_pred, cm_val, df_for_ts = compute_score_1.pred_score() 
                 if print_outputs_train: 
                     plot_ts(df_for_ts)
-                    print("predictions:")
-                    print(list(y_pred))
-                    print("true_values:")
-                    print(list(df_for_ts["y_true"]), "\n")
+                    #print("predictions:")
+                    #print(list(y_pred))
+                    #print("true_values:")
+                    #print(list(df_for_ts["y_true"]), "\n")
             else:
                 score, y_pred, cm_val, _ = compute_score_1.pred_score() 
             
@@ -543,10 +543,10 @@ def run_scoring_pipeline(print_outputs_train, cv, score_tracker, params, feature
                 score, y_pred, cm_val, df_for_ts = compute_score_1.pred_score() 
                 if print_outputs_train: 
                     plot_ts(df_for_ts)
-                    print("predictions:")
-                    print(list(y_pred))
-                    print("true_values:")
-                    print(list(df_for_ts["y_true"]), "\n")
+                    #print("predictions:")
+                    #print(list(y_pred))
+                    #print("true_values:")
+                    #print(list(df_for_ts["y_true"]), "\n")
             else:
                 score, y_pred, cm_val, _ = compute_score_1.pred_score() 
 

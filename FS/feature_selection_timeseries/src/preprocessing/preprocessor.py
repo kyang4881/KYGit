@@ -63,8 +63,9 @@ class Preprocess:
             num_feature_names = [str(f) for f in self.scaler.get_feature_names_out().tolist()]
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_scaled, columns=num_feature_names)], axis=1)
             X_val_data_transformed = pd.concat([X_val_data_transformed, pd.DataFrame(X_val_scaled, columns=num_feature_names)], axis=1)
-            if self.print_outputs_train:
-                print("Added Transformed Numerical Features")
+            
+            #if self.print_outputs_train:
+                #print("Added Transformed Numerical Features")
                 #display(X_train_data_transformed.head())
 
         # Encode categorical variables
@@ -74,8 +75,9 @@ class Preprocess:
             cat_feature_names = [str(f) for f in self.encoder.get_feature_names_out().tolist()]
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_encoded, columns=cat_feature_names)], axis=1)
             X_val_data_transformed = pd.concat([X_val_data_transformed, pd.DataFrame(X_val_encoded, columns=cat_feature_names)], axis=1)
-            if self.print_outputs_train:
-                print("Added Transformed Categorical Features")
+            
+            #if self.print_outputs_train:
+                #print("Added Transformed Categorical Features")
                 #display(X_train_data_transformed.head())
 
         # Label Encode variables
@@ -85,8 +87,8 @@ class Preprocess:
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_label_encoded, columns=self.label_cols)], axis=1)
             X_val_data_transformed = pd.concat([X_val_data_transformed, pd.DataFrame(X_val_label_encoded, columns=self.label_cols)], axis=1)
             
-            if self.print_outputs_train:
-                print("Added Transformed Label Features")
+            #if self.print_outputs_train:
+                #print("Added Transformed Label Features")
                 #display(X_train_data_transformed.head())
 
         # Features that do not require transformation
@@ -94,8 +96,8 @@ class Preprocess:
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train[self.do_not_encode_cols].values, columns=self.do_not_encode_cols)], axis=1)
             X_val_data_transformed = pd.concat([X_val_data_transformed, pd.DataFrame(X_val[self.do_not_encode_cols].values, columns=self.do_not_encode_cols)], axis=1)
             
-            if self.print_outputs_train:
-                print("Added Non-Transformed Features")
+            #if self.print_outputs_train:
+                #print("Added Non-Transformed Features")
                 #display(X_train_data_transformed.head())
 
         return X_train_data_transformed, X_val_data_transformed

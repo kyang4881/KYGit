@@ -131,11 +131,21 @@ sp500_df = create_time_feature(sp500_df)
 sp500_df = pd.concat([sp500_df.iloc[:, 1:], y['target']], axis=1)
 ```
 
-As an illustration, to keep execution time manageable a single stock will be used in this example. Run the codes below to filter for the ticker ADBE (Adobe Inc).
+As an illustration, to keep execution time manageable a single stock will be used in this example. Additionally, only two sets of hyperparameters are considered in this demo. Run the codes below to filter for the ticker ADBE (Adobe Inc).  
 
 ```python
 sp500_df = sp500_df[sp500_df['ticker'] == 'ADBE']
 y = y[y['ticker'] == 'ADBE']
+```
+
+```python
+param_grid = {
+    'min_child_weight': [0.5, 1],
+    'gamma': [0],  
+    'max_depth': [6], 
+    'learning_rate': [0.03], 
+    'alpha': [0]  
+}
 ```
 
 View the updated dataframes.
@@ -216,13 +226,42 @@ Train the model. Average the feature scores, evaluation metrics, and determine t
 r1.train()
 ```
 
+Train Results Example: 50 Features
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_50.png" width="300" />
+</p>
+
+Test Results Example: All Features
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/train_all.png" width="300" />
+</p>
+
+
 Set the optimal hyperparameters, and apply the optimal models on the hold out test data.
 
 ```python
 r1.test()
-
 ```
+
+Test Results Example: 50 Features
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_50.png" width="300" />
+</p>
+
+Test Results Example: All Features
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/kyang4881/KYGit/master/FS/feature_selection_timeseries/docs/artwork/test_all.png" width="300" />
+</p>
+
 
 ---
 
 ## Citations
+
+
+
+            

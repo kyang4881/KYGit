@@ -50,11 +50,11 @@ class computeTestScore(Preprocess):
              X_train_transformed (dataframe): a dataframe containing transformed train data
              X_test_transformed (dataframe): a dataframe containing transformed test data
         """
-        if self.print_outputs_test:
-            print("X_train")
-            display(X_train.head())
-            print("X_test")
-            display(X_test.head())    
+        #if self.print_outputs_test:
+        #    print("X_train")
+        #    display(X_train.head())
+        #    print("X_test")
+        #    display(X_test.head())    
             
         X_train_data_transformed = pd.DataFrame()
         X_test_data_transformed = pd.DataFrame()
@@ -67,8 +67,8 @@ class computeTestScore(Preprocess):
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_scaled, columns=num_feature_names)], axis=1)
             X_test_data_transformed = pd.concat([X_test_data_transformed, pd.DataFrame(X_test_scaled, columns=num_feature_names)], axis=1)
             
-            if self.print_outputs_test:
-                print("Added Transformed Numerical Features")
+            #if self.print_outputs_test:
+                #print("Added Transformed Numerical Features")
                 #display(X_train_data_transformed.head())
 
         # Encode categorical variables
@@ -79,8 +79,8 @@ class computeTestScore(Preprocess):
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_encoded, columns=cat_feature_names)], axis=1)
             X_test_data_transformed = pd.concat([X_test_data_transformed, pd.DataFrame(X_test_encoded, columns=cat_feature_names)], axis=1)
 
-            if self.print_outputs_test:
-                print("Added Transformed Categorical Features")
+            #if self.print_outputs_test:
+                #print("Added Transformed Categorical Features")
                 #display(X_train_data_transformed.head())
 
         # Label Encode variables
@@ -90,8 +90,8 @@ class computeTestScore(Preprocess):
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train_label_encoded, columns=self.label_cols)], axis=1)
             X_test_data_transformed = pd.concat([X_test_data_transformed, pd.DataFrame(X_test_label_encoded, columns=self.label_cols)], axis=1)
 
-            if self.print_outputs_test:
-                print("Added Transformed Label Features")
+            #if self.print_outputs_test:
+                #print("Added Transformed Label Features")
                 #display(X_train_data_transformed.head())
 
         # Features that do not require transformation
@@ -99,8 +99,8 @@ class computeTestScore(Preprocess):
             X_train_data_transformed = pd.concat([X_train_data_transformed, pd.DataFrame(X_train[self.do_not_encode_cols].values, columns=self.do_not_encode_cols)], axis=1)
             X_test_data_transformed = pd.concat([X_test_data_transformed, pd.DataFrame(X_test[self.do_not_encode_cols].values, columns=self.do_not_encode_cols)], axis=1)
 
-            if self.print_outputs_test:
-                print("Added Non-Transformed Features")
+            #if self.print_outputs_test:
+                #print("Added Non-Transformed Features")
                 #display(X_train_data_transformed.head())
 
         return X_train_data_transformed, X_test_data_transformed
@@ -152,11 +152,11 @@ class computeTestScore(Preprocess):
         y_pred = trained_model.predict(dtest)
         y_true = data_dict['y_test']
 
-        if self.print_outputs_test:
-            print("predictions:")
-            print(list(y_pred))
-            print("true_values:")
-            print(list(y_true), "\n")
+        #if self.print_outputs_test:
+        #    print("predictions:")
+        #    print(list(y_pred))
+        #    print("true_values:")
+        #    print(list(y_true), "\n")
 
         # Compile evaluation metrics
         if self.pred_type == "classification":
