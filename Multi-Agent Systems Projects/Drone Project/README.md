@@ -578,5 +578,5 @@ ql.run(max_iter=1000, max_dev_not_improved=10, verbose=False)
 We observe that the UAVs have converged to a nash equilibrium 
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/qlearning_uav.png" width="600" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/qlearning_uav.png" width="400" />
 </p>
