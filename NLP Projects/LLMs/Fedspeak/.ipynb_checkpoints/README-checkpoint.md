@@ -2,8 +2,6 @@
   <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/LLMs_background.jpg" width="1200" />
 </p>
 
-<h1>Deciphering Fedspeak with NLP</h1>
-
 ---
 
 The Federal Reserve (the Fed) is the central bank of the United States. Its role is to conduct monetary policy to promote the health of the US economy and the stability of the US financial system. Within the Fed, the Federal Open Market Committee (FOMC) meets eight times a year to discuss the economic outlook and set the direction for monetary policy. These meetings are followed by public statements that summarise the committee’s view of the economy and monetary policy decisions.
