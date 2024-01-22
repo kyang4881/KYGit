@@ -13,21 +13,35 @@ A large sporting event can easily draw crowds of spectators that completely over
 
 In this problem we will try to answer this question using game-theoretic approaches. We assume self-interested agents: mobile phone users who aim to optimize their connectivity (i.e., choose base station based on signal power; for simplicity, assume that the closest base station provides the strongest signal) and each base station maximizes the number of served users (i.e., count the number of connected devices). More specifically, we define agent utilities below:
 
-For mobile phone user 𝑖, his/her utility is defined as $u_i = \min_{k=1,...,K}d_ik$ where 𝐾 is the number of UAVs, and 𝑑𝑖𝑘 is the Euclidean distance between user 𝑖 and UAV 𝑘. For UAV 𝑘, it’s utility is defined as the number of users connected to it.
+For mobile phone user 𝑖, his/her utility is defined as $u_i = \min_{k=1,...,K}d_ik$ where 𝐾 is the number of UAVs, and $d_ik$ is the Euclidean distance between user 𝑖 and UAV 𝑘. For UAV 𝑘, it’s utility is defined as the number of users connected to it.
 
-
-
----
-
-## Motivation
-
-Unfortunately, much more needs to be done to educate consumers on proper recycling. For example, Singapore’s domestic recycling rate declined from 22 per cent in 2018 to 17 per cent in 2019, below the European Union, which reported a domestic recycling rate of 46.4 per cent in 2017. (Channel News Asia, 2020). According to experts, a lack of recycling knowledge is one of the contributing factors to the low domestic recycling rate. A study by the Singapore Environment Council in 2018 also found that 70 per cent of respondents did not fully know what was recyclable and how waste should be sorted (Channel News Asia, 2020).
-
-An application that can detect and inform consumers on whether an object may be recycled or not and which waste category they should be disposed to could be an intervention to potentially ameliorate the lack of education on domestic waste sorting. 
-
-The project aims to use computer vision models to detect and classify waste materials. It is important that the models can differentiate between different waste materials so that it can inform consumers of proper waste sorting practice. For example, items that are detected as paper would be discarded into a different recycling bin compared to metal items. A trained model could be deployed to the use case of a waste sorting app, to increase domestic recycling rate by educating and informing consumers on proper waste sorting and waste identification. 
+Consider the following assumptions:
+* Mobile phone users are uniformly spread out over an m-by-m area. For simplicity, we assume that each user occupies a (𝑥,𝑦) coordinate, where 1≤𝑥,𝑦≤𝑚, and both 𝑥 and 𝑦 are integers.
+* All UAVs’ coordinates are also integers.
 
 ---
+
+## Best-Response Learning Algorithm
+
+Assume that the two UAV nodes are initially placed uniformly randomly in the 2D square area. Also assume that a UAV could move one unit to the direction of either north, east, south, or west per time step. Implement the following simple movement algorithm as the baseline (this is sometimes called the Best-Response Learning algorithm, or simply BRL
+
+### What We Know
+
+* Players: The UAVs
+* Actions: Set of directions to move the UAVs {North, East, South, West} in an m by m gridworld
+* Utility Fuction: $UAV_k = \sum_{k=1,...,K}$ users {1 if user i is has the shortest distance with $UAV_k$, 1/2 if equidistant, 0 otherwise}
+
+Nash Equilibrium (NE): The utility for each UAV is determined by the number of users it serves. A Nash equilibrium is reached when neither UAV has an incentive to unilaterally change its position, given the position of the other UAV. In other words, each UAV is serving as many users as it can given its current position, and moving to a different location would not improve its utility. In this case, in a best case scenario, NE occurs when each UAV obtains a utility of $(m*m)/2$, which is equivalent to splitting the users evenly among the UAVs. When m is odd, the utility cannot be split evenly among the uavs if they are side-by-side against each other but can if m is even. Also, the location of the UAVs at NE may not be optimal for the users.
+
+Socially Optimal (SO): The socially optimal solution would be to find a placement of the two UAVs that maximizes the overall utility (minimizing the distance between the UAVs and the users) for all users while ensuring fair distribution as well as the utility for the UAVs. This means positioning the UAVs to serve users in a way that minimizes the overall sum of distance (sum of distances to the nearest UAV) across all users. The objective is then to minimize $sum_{i} (d_{i1} + d_{i2})$, the sum of the distances for both UAVs.
+
+When m is odd, the grid has a central point. The socially optimal solution occurs when the UAVs can be positioned in a way that each UAV serves roughly half of the users relative to the center and positioned in any of the 4 directions to balance the user distribution for minimal total user distance. There are two cases that satisfy those conditions, as defined in the social_opt_position function.
+
+When m is even, there is no central point. The UAVs can be positioned such that each UAV serves approximately half of the users, but the division is not necessarily centered in the grid. A possible approach is to position the UAVs along one of the central rows or columns to balance user allocation. There are 4 cases that satisfy these conditions, as defined in the social_opt_position function.
+
+
+
+
 
 ## Dataset
 
