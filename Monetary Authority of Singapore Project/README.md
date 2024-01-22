@@ -148,15 +148,15 @@ Given the context of predicting a continuous target variable, specifically the 8
 ### Back testing and Hyperparameter Tuning
 
 In contrast to typical cross-validation procedures for non-temporal datasets, time series’ equivalent cross-validation is called back testing, which necessitates preserving the chronological order of the data. Two methods for splitting time series data were considered:
-1. Back testing with a sliding window: This method involves iteratively moving a window through the time series, with each pass updating the training set and predicting on subsequent data points, as shown in Figure 2.
-    a. Training window size: the number of data points included in a training pass.
-    b. Test window size: the number of data points to include for prediction.
-    c. Sliding steps: the number of data points skipped from one pass to another.
-2. Back testing with an expanding window: This method requires four parameters: starting window size, ending window size, test window size, and expanding steps.
-    a. Starting window size: the number of data points included in the first training pass.
-    b. Ending window size: the number of data points included in the last training pass.
-    c. Test window size: number of data points to include for prediction.
-    d. Expanding steps: the number of data points added to the training time series from one pass to another.
+* 1. Back testing with a sliding window: This method involves iteratively moving a window through the time series, with each pass updating the training set and predicting on subsequent data points, as shown in Figure 2.
+    * a. Training window size: the number of data points included in a training pass.
+    * b. Test window size: the number of data points to include for prediction.
+    * c. Sliding steps: the number of data points skipped from one pass to another.
+* 2. Back testing with an expanding window: This method requires four parameters: starting window size, ending window size, test window size, and expanding steps.
+    * a. Starting window size: the number of data points included in the first training pass.
+    * b. Ending window size: the number of data points included in the last training pass.
+    * c. Test window size: number of data points to include for prediction.
+    * d. Expanding steps: the number of data points added to the training time series from one pass to another.
 
 However, only the sliding window approach was tested due to the additional computational cost associated with having larger training sets for the expanding window approach. Moreover, the sliding window method is better aligned with business objectives, given the high-frequency characteristics of the dataset. This decision reflects a choice made in consideration of both computational efficiency and relevance to the project's overarching goals.
 
