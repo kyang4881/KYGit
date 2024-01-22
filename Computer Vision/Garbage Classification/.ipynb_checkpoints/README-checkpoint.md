@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%Vision/Garbage%Classification/docs/images/background.jpg" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/background.png" width="1200" />
 </p>
 
 ---
