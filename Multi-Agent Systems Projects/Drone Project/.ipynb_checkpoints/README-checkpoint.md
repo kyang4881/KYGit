@@ -146,10 +146,38 @@ def user_utility(model, uav_positions_):
     return -total_distance_utility
 ```
 
-A class for BestResponseLearning that includes  
+A BestResponseLearning class that includes method for moving the drones, calculating the distance between drones, finding the closest drone to a user, calculating utility, performing transition step for the UAVs based on their best response strategy, and plotting the results on a graph.
 
+### Instantiate the learning process
 
+```python
+brl = BestResponseLearning(num_uav=2, m=10)
+brl_position_result = brl.run(max_iter=1000, max_dev_not_improved=10, verbose=False)
+```
 
+The termination process in the provided BestResponseLearning class is part of the algorithm's run loop and determines when to stop the iterative process. The termination process is based on a criterion related to the improvement of the standard deviation of UAV utilities over a set number of iterations. The goal is to stop the loop from going to infinity when there is no further significant improvement or change in the transition process.
+
+1. The algorithm starts with an initial set of UAV positions, and a list to keep track of the standard deviation of utilities across UAVs at each iteration.
+2. The algorithm enters an iterative loop with a maximum number of iterations specified by the max_iter parameter.
+3. In each iteration, the algorithm performs a transition for each UAV. The transition involves considering possible movements for each UAV, calculating the utility for the current position, and evaluating the utilities for potential new positions based on the Best-Response Learning (BRL) algorithm.
+4. After the transition for all UAVs, the algorithm calculates the standard deviation of utilities for all UAVs. The standard deviation reflects how evenly users are distributed among UAVs.
+5. The algorithm checks if the current standard deviation is better (lower) than the best standard deviation observed so far. If it is, the current standard deviation becomes the new best standard deviation, and a counter for the number of iterations with no improvement (stdev_not_improved_cnt) is reset to zero.
+6. If the current standard deviation is not better than the best standard deviation, the counter for the number of iterations with no improvement is incremented (stdev_not_improved_cnt).
+7. The termination process checks whether the counter stdev_not_improved_cnt has reached a predefined threshold, which is specified by the max_dev_not_improved parameter. If the counter reaches this threshold, it means that there has been no improvement in the standard deviation of utilities for the past max_dev_not_improved iterations.
+8. If the termination condition is met (stdev_not_improved_cnt equals max_dev_not_improved), the algorithm terminates and stops further iterations
+
+Depending on the random initialization, the two-node case may or may not end up in a Nash equilibrium. Since the UAVs take turn to move, the UAV that reaches the center sooner (captures higher utility due to closer proximity to more users) may execute best responses to prevent the other UAV from taking a better position with a higher utility. This happens due to the game being turn-based and multiple UAVs cannot occupy the same coordinate in the grid. Theforefore, it's possible for the UAVs to get blocked from achieving the best equilibrium and they may also oscillate in certain positions in an infinite loop.
+
+The Nash equilibrium tends to occur in the center of the grid with the two UAVs positioned side by side, as a result each uav may capture half of all users. While the two UAVs has reached a stable equilibrium because neither has the incentive to deivate, it may not be socially optimal for the users. The total distance of the users to the UAVs could be unproportionately distributed, as those along the center region would have the shortest distances to the UAVs, and those further out along the edges tend to have longer distances, or if the user distribution between the uavs are imbalanced. Therefore, the sum of the distances of all users is not minimized, which is required under social optimality.
+
+As shown below, the social optimum cases have a higher utility than in the case of the Nash equilibrium.
+
+### Nash Equilibrium
+
+```python
+print(f"UAV Position: {brl_position_result[0]}, UAV Utility: {brl_position_result[1]}, User Utility: {brl.compute_user_utility_by_uav(brl_position_result[0])}, Total User Utility: {np.sum(list(brl.compute_user_utility_by_uav(brl_position_result[0]).values()))}")
+```
+    UAV Position: [(7, 7), (8, 6)], UAV Utility: [59.5, 40.5], User Utility: {(7, 7): -245.60921, (8, 6): -142.01965}, Total User Utility: -387.62886000000003
 
 
 
