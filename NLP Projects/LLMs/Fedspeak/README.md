@@ -130,7 +130,7 @@ class compileData:
     
 ```
 
-A class for preprocess the data.
+A class for preprocessing the data.
 
 ```python
 class preprocessor:
@@ -642,3 +642,7 @@ trainer.save_model(best_model_path)
 ```
 
 
+## Sources
+
+1. Hansen, A. and Kazinnik, S., Can ChatGPT Decipher Fedspeak?, March 2023
+2. Pan, T., and Lee, H., AI in Finance: Deciphering Fedspeak with Natural Language Processing, March 2021
