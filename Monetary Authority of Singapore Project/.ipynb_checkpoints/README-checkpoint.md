@@ -52,7 +52,7 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 * Shapley Additive Global Importance (SAGE): SAGE focuses on quantifying the global importance of features in machine learning models and achieves state-of-the-art performance (Figure 11). Motivated by a recent emphasis on local interpretability, SAGE introduces model-based and universal predictive power notions. This method addresses challenges posed by feature interactions, aiming to develop a model-agnostic approach that efficiently accounts for future interactions. SAGE employs Shapley values and an efficient sampling-based algorithm to approximate feature importance. The advantages of SAGE include its ability to identify important and corrupted features swiftly (Figure 12), outperforming the widely used SHAP method, and exhibiting top-tier performance across various datasets.
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig11.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig12.png" width="800" />
 </p>
@@ -60,7 +60,7 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 * Dynamic Feature Selection (DFS): DFS is an algorithm designed to select features with minimal budget while maximizing predictive accuracy. It performs approximation of the greedy policy trained using amortized optimization and focuses on the variational perspective of the Conditional Mutual Information (CMI) for the greedy policy, which is leveraged to train a network that directly predicts the optimal selection given the current features. It incorporates "reward shaping" in the training process, which outperforms static feature selection methods, achieving state-of-the-art performance (Figure 14). Its effectiveness lies in the strategic selection of features through repeated calls to the policy network and predictions made after each selection using the predictor network (Figure 13).
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig13.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig14.png" width="800" />
 </p>
@@ -68,7 +68,7 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 * Stochastic Gates Feature Selection (STG): STG introduces an embedded feature selection approach tailored for nonlinear models like neural networks. It achieves high sparsity without compromising performance by leveraging the probabilistic relaxation of the ℓ₀ norm of features. Stochastic gates, drawn from the STG approximation of the Bernoulli distribution, are obtained through the application of the hard-sigmoid function to a mean-shifted Gaussian random variable (Figure 15). The resulting stochastic gate, attached to the input feature, is controlled by the trainable parameter μ𝑑, providing a nuanced solution to feature selection challenges in complex, nonlinear models. As a result, STG is an embedded feature selection method that achieves state-of-art performance (Figure 16).
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig15.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig16.png" width="800" />
 </p>
@@ -153,7 +153,7 @@ However, only the sliding window approach was tested due to the additional compu
 
 In an ideal scenario, the size parameters for the back testing windows should be fine-tuned. However, due to computational and memory constraints, only a set of fixed values could be tested. The number of rolling windows was limited to 5, and the size of the test set (holdout) was configured to be the same as that of the validation set. The validation set exists within each rolling window preceded by the training set. An illustrative example of a 5-fold train-validation split is shown in Figure 3.
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig3.png" width="800" />
 </p>
 
@@ -164,7 +164,7 @@ With so many combinations, to overcome the computation constraints, only two tes
 
 For all those combinations previously described, the hyperparameter combinations that give the best averaged RMSE are retained as the best model. The best hyperparameters are then used for retraining, and predictions are made on the hold-out test data. The RMSE scores are then averaged across all rolling windows for all feature selection methods to determine the method that has the best test score, Figure 5 and 6.
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig4.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig5.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig6.png" width="800" />
@@ -176,7 +176,7 @@ For all those combinations previously described, the hyperparameter combinations
 
 In the process of training and evaluating the machine learning models, visualizations played a pivotal role in enhancing understanding and assessing performance. During the feature selection stage, word clouds and bar plots are employed to visually convey the significance of each feature. Word clouds provide a high-level representation of feature importance, while bar plots offer more detailed insights, facilitating quick identification of key features. The training stage utilizes time series plots to depict model predictions and true values across various parameters, thus enables the visualization of change in performance, and aids in the prompt identification and resolution of issues. Figure 8 exemplifies these visualizations during the training process. In the model evaluation stage, similar time series plots are used to assess model performance on test data, employing optimal hyperparameters for each feature selection method and rolling window. These visualizations not only enhance the interpretability of the model but also provided valuable diagnostic tools for understanding feature importance, training dynamics, and overall model performance. The use of visualizations is integral to ensuring a comprehensive and informed analysis throughout the machine learning pipeline.
 
-<p align="left">
+<p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig8.png" width="800" />
 </p>
 
