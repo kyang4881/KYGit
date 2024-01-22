@@ -584,13 +584,13 @@ We observe that the UAVs have converged to a nash equilibrium
 Best Response Learning Results
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/br_utility.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/br_results.png" width="1200" />
 </p>
 
 Reinforcement Learning Results
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/rl_utility.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/rl_results.png" width="1200" />
 </p>
 
 
@@ -640,7 +640,7 @@ def connect_users_to_uavs(self, uav_positions_):
 Socially Optimal Reinforcement Learning Results
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/social_opt_rl_utility.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/social_opt_rl_results.png" width="1200" />
 </p>
 
 ---
