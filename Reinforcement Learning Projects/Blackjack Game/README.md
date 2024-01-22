@@ -631,259 +631,134 @@ Visualize the performance
   <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_performance.png" width="800" />
 </p>
 
+Visualize the player's actions
 
-
-
-
-
-
-A class for fine-tuning a model and saving the predictions.
-
-```python
-class finetunedModel:
-    """A class for generating results using a finetuned model
-    Args:
-        repository_id (str): A string id for the repository
-        device (str): A string for selecting either cpu or gpu
-        model_type (str): A string indicating the type of model
-        data_dict (dataset): A dataset containing the train, validation, and test data
-        data_selected (str): A string for selecting either the train, validation, or test data
-        pred_filepath (str): The folder path to save the predictions
-    """
-    def __init__(self, repository_id, device, model_type, data_dict, data_selected, pred_filepath):
-        self.repository_id = repository_id
-        self.device = device
-        self.model_type = model_type
-        self.data_dict = data_dict
-        self.data_selected = data_selected
-        self.predicted_labels = []
-        self.predicted_labels_int = []
-        self.input_data_selected = self.data_dict[self.data_selected]
-        self.true_labels = self.input_data_selected["labels"]
-        self.true_labels_int = self.input_data_selected["labels_int"]
-        self.pred_filepath = pred_filepath
-
-    def load_model(self):
-        """A method for loading a fine-tuned model
-        Returns:
-            A fined-tuned model
-        """
-        # Load model
-        start_time = time.time()
-        print(f"Loading model...{self.repository_id}")
-        loaded_model = pipeline(self.model_type, model=self.repository_id, device=self.device)
-        end_time = time.time()
-        print("Completed.")
-        print(f"Total time taken: {(end_time-start_time)/60} mins")
-        return loaded_model
-
-    def generate_pred(self, model):
-        """Generate the predicted labels
-        Args:
-            model (obj): A pre-trained model
-        Returns:
-            A dataframe containing the features, labels, and predicted labels
-        """
-        start_time = time.time()
-        print("Generating predictions...")
-        # Prepare input data
-        input_data = self.input_data_selected['features']
-        # Generate predictions
-        for i in range(len(self.input_data_selected['features'])):
-            predicted_label = model(input_data[i])[0]['generated_text']
-            # Append the binary predicted values for the labels
-            if predicted_label == self.input_data_selected['option1'][i]:
-                self.predicted_labels_int.append(1)
-                # Append the text predicted labels
-                self.predicted_labels.append(model(input_data[i])[0]['generated_text'])
-            elif predicted_label == self.input_data_selected['option2'][i]:
-                self.predicted_labels_int.append(2)
-                # Append the text predicted labels
-                self.predicted_labels.append(model(input_data[i])[0]['generated_text'])
-            elif predicted_label == self.input_data_selected['option3'][i]:
-                self.predicted_labels_int.append(3)
-                # Append the text predicted labels
-                self.predicted_labels.append(model(input_data[i])[0]['generated_text'])
-            elif predicted_label == self.input_data_selected['option4'][i]:
-                self.predicted_labels_int.append(4)
-                # Append the text predicted labels
-                self.predicted_labels.append(model(input_data[i])[0]['generated_text'])
-            elif predicted_label == self.input_data_selected['option5'][i]:
-                self.predicted_labels_int.append(5)
-                # Append the text predicted labels
-                self.predicted_labels.append(model(input_data[i])[0]['generated_text'])
-            else:
-                rand_int = random.randint(1, 5)
-                self.predicted_labels_int.append(rand_int)
-                if rand_int == 1:
-                    self.predicted_labels.append(self.input_data_selected['option1'][i])
-                if rand_int == 2:
-                    self.predicted_labels.append(self.input_data_selected['option2'][i])
-                if rand_int == 3:
-                    self.predicted_labels.append(self.input_data_selected['option3'][i])
-                if rand_int == 4:
-                    self.predicted_labels.append(self.input_data_selected['option4'][i])
-                if rand_int == 5:
-                    self.predicted_labels.append(self.input_data_selected['option5'][i])
-
-        # Compile results into a dataframe
-        res_df = pd.DataFrame({
-            'original_sentence': self.input_data_selected['original_sentence'],
-            "features": self.input_data_selected['features'],
-            "labels": self.input_data_selected['labels'],
-            "labels_int": self.input_data_selected['labels_int'],
-            "option1": self.input_data_selected['option1'],
-            "option2": self.input_data_selected['option2'],
-            "option3": self.input_data_selected['option3'],
-            "option4": self.input_data_selected['option4'],
-            "option5": self.input_data_selected['option5'],
-            "predicted_labels": self.predicted_labels,
-            "predicted_labels_int": self.predicted_labels_int
-        })
-        end_time = time.time()
-        print("Completed.")
-        print(f"Total time taken: {(end_time-start_time)/60} mins")
-        return res_df
-
-    def scoring_metric(self):
-        """Generate the accuracy score for the predicted labels
-        """
-        print("Accuracy: ", accuracy_score(self.true_labels_int, self.predicted_labels_int))
-
-    def save_preds(self, preds):
-        """Save predictions to a csv file
-        """
-        preds['predicted_labels_int'].to_csv(self.pred_filepath + '.csv', index=False, header = False)
-        preds.to_excel(self.pred_filepath + '.xlsx', index=False)
-        with open(self.pred_filepath + '.txt','w') as f:#, encoding='utf-16-le') as f:
-            for p in preds['predicted_labels_int']: f.write(f"{strip(p)}\n")
-        print(f"Predictions saved to: {self.pred_filepath}")
-```
-
-A function for mapping the data
-
-```python
-def map_data(file_name):
-    data = pd.read_excel(file_name)
-    data['Score'] = [str(s) for s in data['Score']]
-    mapping = {'-1.0': 'Dovish', '-0.5':'Mostly Dovish', '0.0': 'Neutral', '0.5': 'Mostly Hawkish', '1.0':'Hawkish'}
-    mapping2 = {'-1.0': 1, '-0.5': 2, '0.0': 3, '0.5': 4, '1.0': 5}
-    mapped_values = [mapping[value] for value in data['Score']]
-    mapped_values2 = [mapping2[value] for value in data['Score']]
-    data['answer'] = mapped_values
-    data['answer_int'] = mapped_values2
-    data_labels = list(mapping.values())
-    for i in range(len(data_labels)): data['option' + str(i+1)] = data_labels[i]
-    data['sentence'] = [w.replace("_x000D_", "").strip() for w in data['Sentence']]
-    return data
-```
-
-Prepare the data for training
-
-```python
-train_valid_df = map_data(file_name="kenn_fedspeak_20perc_train_small_mod_v5.xlsx")
-display(train_valid_df.head())
-test_df = map_data(file_name="kenn_fedspeak_20perc_test_small_v5.xlsx")
-display(test_df.head())
-
-X_train, X_validation, y_train, y_validation = train_test_split(train_valid_df[['sentence', 'option1', 'option2', 'option3', 'option4', 'option5']], train_valid_df[['answer', 'answer_int']], test_size=0.1, random_state=42, shuffle=True)
-X_train = X_train.reset_index(drop=True)
-X_validation = X_validation.reset_index(drop=True)
-y_train = y_train.reset_index(drop=True)
-y_validation = y_validation.reset_index(drop=True)
-
-X_test = test_df[['sentence', 'option1', 'option2', 'option3', 'option4', 'option5']]
-y_test = test_df[['answer', 'answer_int']]
-
-print("X_train", np.shape(X_train))
-print("X_validation", np.shape(X_validation))
-print("X_test", np.shape(X_test))
-print("y_train", np.shape(y_train))
-print("y_validation", np.shape(y_validation))
-print("y_test", np.shape(y_test))
-
-# Compile dataset
-data_compiler = compileData(X_train=X_train, X_validation=X_validation, X_test=X_test, y_train=y_train, y_validation=y_validation, y_test=y_test, prompt='What is the most logical completion for the following text?')
-nlp_dataset_dict_wtest = data_compiler.compile_dataset()
-nlp_dataset_dict_wtest
-```
-Initialize and start training
-
-```python
-# Load a pre-trained checkpoint model
-checkpoint = "google/flan-t5-large"
-repository_id=checkpoint + "_ky_test_copy_v11"
-model=AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
-tokenizer=AutoTokenizer.from_pretrained(checkpoint)
-
-# Instantiate the preprocessor class
-preprocess_data = preprocessor(
-    data_dict = nlp_dataset_dict_wtest,
-    padding = False,
-    truncation = False,
-    tokenizer = tokenizer
-)
-tokenized_dict = preprocess_data.map_inputs()
-
-# Instantiate the trainPipeline class
-make_pred = trainPipeline(
-    model=model,
-    repository_id=repository_id,
-    learning_rate= 5e-5,
-    per_device_train_batch_size=1,
-    per_device_eval_batch_size=1,
-    weight_decay=0.001,
-    save_total_limit=3,
-    num_train_epochs=15,
-    data_dict=nlp_dataset_dict_wtest,
-    padding=True,
-    truncation=True,
-    tokenizer=tokenizer,
-    tokenized_dict=tokenized_dict,
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
-    load_best_model_at_end="True",
-    logging_strategy="steps",
-    logging_steps=500,
-    overwrite_output_dir=False,
-    device=0,
-    metric_for_best_model="accuracy",
-    greater_is_better=True,
-    seed=42
-)
-trainer = make_pred.training()
-
-# Train the model (medium)
-trainer.train()
-trainer.evaluate()
-```
-
-Training results printed
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/training_printouts.png" width="1200" />
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_player_actions.png" width="800" />
 </p>
 
 
-Veiw the best model checkpoint
+### Method 2 - Monte Carlo Model
+
+This class implements a Monte Carlo agent for playing Blackjack. The generate_episode method generates a single episode using the current policy. It simulates a Blackjack game, making decisions based on the agent's current policy. It returns a list of (state, action) tuples representing the episode and the total reward obtained in the episode. The agent explores by taking random actions with probability epsilon and exploits by choosing actions based on the Q-values.
+
+The train method trains the agent by running multiple episodes and updating the Q-table. It iterates through the specified number of training episodes and, for each episode, generates an episode using the current policy. The method computes the return G for each state-action pair and uses a Monte Carlo update rule to update the Q-values. It prioritizes less frequently visited states to promote exploration.
+
+The choose_action method selects the action for a given state based on the current Q-values. It determines whether to "hit" or "stand" based on the Q-values of the state-action pairs in the Q-table.
 
 ```python
-trainer.state.best_model_checkpoint
+class MonteCarloAgent:
+    """
+    Initialize the Monte Carlo Agent.
+
+    Args:
+        env: The environment the agent interacts with.
+        epsilon: The exploration-exploitation trade-off parameter.
+        num_episodes: The number of episodes to run during training.
+        verbose: If True, the agent will print episode information.
+    """
+    def __init__(self, env, epsilon=0.1, gamma=0.9, num_episodes=100000, verbose=False):
+        self.env = env
+        self.epsilon = epsilon
+        self.num_episodes = num_episodes
+        self.Q = {}  # Q-table to store state-action values
+        self.N = {}  # Keeps track of the number of visits to each state-action pair
+        self.verbose = verbose
+        self.gamma = gamma
+
+    def generate_episode(self):
+        """
+        Generate a single episode using the current policy.
+
+        Returns:
+            episode: A list of (state, action) tuples representing the episode.
+            reward: The total reward obtained in the episode.
+        """
+        episode = []
+        player_hand, dealer_hand = self.env.initial_state()
+        done = False
+
+        while not done:
+            state = tuple(player_hand)
+            if state not in self.Q:
+                self.Q[state] = {'hit': 0, 'stand': 0}  # If the satte is not available, initialize with 0
+
+            if np.random.rand() < self.epsilon:  # Randomly choose an action
+                action = np.random.choice(['hit', 'stand'])
+            else:  # Choose an action based on the Q value of the state-action pair
+                action = 'hit' if self.Q[state]['hit'] > self.Q[state]['stand'] else 'stand'
+
+            episode.append((state, action))  # Save state-action pair into episode list
+            player_hand, dealer_hand, reward, done = self.env.step(player_hand, dealer_hand, action)
+
+        return episode, reward
+
+    def train(self):
+        """
+        Train the agent by running multiple episodes and updating the Q-table.
+        """
+        for _ in range(self.num_episodes):
+            episode, reward = self.generate_episode()
+            G = 0
+            for state, action in episode:
+                G = self.gamma * G + reward
+                if state not in self.N:
+                    self.N[state] = {'hit': 0, 'stand': 0}  # If the satte is not available, initialize with 0
+                self.N[state][action] += 1   # Increase the counter if episode already visited
+                alpha = 1 / self.N[state][action]
+                self.Q[state][action] += alpha* (G - self.Q[state][action])  # Update Q table by normalizing updates to prioritize less frequently visited states
+
+    def choose_action(self, player_hand):
+        """
+        Choose the action for a given state based on the current Q-values.
+
+        Args:
+            player_hand: The current player's hand.
+
+        Returns:
+            action: The selected action ('hit' or 'stand').
+        """
+        state = tuple(player_hand)
+        if state not in self.Q:
+            self.Q[state] = {'hit': 0, 'stand': 0}
+        return 'hit' if self.Q[state]['hit'] > self.Q[state]['stand'] else 'stand'
 ```
 
-Save the model
+Instantiate the environment and train the agent
 
 ```python
-# Path to save the best model
-best_model_path = repository_id
-# Save the tokenizer
-tokenizer.save_pretrained(best_model_path)
-# Save the model
-trainer.save_model(best_model_path)
+# Create the environment and agent
+env = BlackjackEnvironment(verbose=True)
+agent2 = MonteCarloAgent(env=env, epsilon=0.1, gamma=0.9, num_episodes=1000000, verbose=True)
+# Train the agent
+agent2.train()
+```
+
+Benchmark the performance of the trained agent
+
+```python
+rewards2, avg_reward2, tracker2 = test(env=env, agent=agent2, verbose=True, num_episodes=10000)
 ```
 
 
-## Sources
+Visualize the performance
 
-1. Hansen, A. and Kazinnik, S., Can ChatGPT Decipher Fedspeak?, March 2023
-2. Pan, T., and Lee, H., AI in Finance: Deciphering Fedspeak with Natural Language Processing, March 2021
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_performance_monte_carlo.png" width="800" />
+</p>
+
+Visualize the player's actions
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_player_actions_monte_carlo.png" width="800" />
+</p>
+
+
+### Discussion
+
+The results of the comparison between the Q-learning agent and the Monte Carlo agent in a Blackjack environment indicate significant differences in their playing strategies. The Q-learning agent is more aggressive, often choosing to hit for card totals below 19, while the Monte Carlo agent is more risk-averse and tends to stand at around a card total of 15.
+
+Surprisingly, the Q-learning agent exhibits a lower winning rate (38%) and an average total reward of -0.15, whereas the Monte Carlo agent achieves a higher winning rate (45%) and an average total reward of 0.002. This difference may be attributed to the Q-learning agent's aggressive playstyle, resulting in a higher bust rate (24%) compared to the Monte Carlo agent's bust rate of 7%.
+
+It's worth noting that the expected odds of winning for a player in a typical game of Blackjack are around 42%, and the Monte Carlo agent's results align more closely with this expectation. To further improve results, considerations include implementing advanced strategies such as doubling down and splitting pairs, incorporating card counting, fine-tuning hyperparameters, and experimenting with different reward structures.
+
