@@ -21,7 +21,7 @@ Consider the following assumptions:
 
 ---
 
-## Best-Response Learning Algorithm
+## Notebook 
 
 Assume that the two UAV nodes are initially placed uniformly randomly in the 2D square area. Also assume that a UAV could move one unit to the direction of either north, east, south, or west per time step. Implement the following simple movement algorithm as the baseline (this is sometimes called the Best-Response Learning algorithm, or simply BRL
 
@@ -41,7 +41,7 @@ When m is even, there is no central point. The UAVs can be positioned such that 
 
 ---
 
-## Notebook
+## Best-Response Learning Algorithm
 
 Helper functions to visualize drone positions, and to determine the socially optimum postiions and user utility.
 
@@ -180,729 +180,403 @@ As shown below, the social optimum cases have a higher utility than in the case 
 UAV Position: [(7, 7), (8, 6)], UAV Utility: [59.5, 40.5], User Utility: {(7, 7): -245.60921, (8, 6): -142.01965}, Total User Utility: -387.62886000000003
 ```
     
-
-
-
-
-## Dataset
-
-The dataset selected was sourced from Kumsetty et Al (2022). Titled ‘Trashbox’, the dataset was split into and labelled as seven distinct subcategories: cardboard, e-waste, glass, medical, metal, paper and plastic. Ultimately, five of the seven subcategories (cardboard, glass, metal, plastic and paper) were selected for the sake of brevity. The dataset consisted of 28,564 files and 4.29GB of memory. The images within the dataset largely comprised of stock images of varying sizes (figure 1, left), with few images representative of the waste found in an organic environment such as pavement, void decks, grassy environments etc. To better improve the performance of the models, the training data was altered from its initial state.
-
-Thirty-one different background images containing no garbage were sourced from google images, with environments ranging from but not limited to roads, canals, tiled flooring, void decks, grassy environments etc. Rembg, PIL and OpenCv libraries were used to remove the existing background, crop the stock images found in the ‘Trashbox’ dataset and eventually overlaid at random locations on top of a random selection of the previously mentioned backgrounds. The locations and the image size of the overlaid garbage was noted as the ground truth of the object bounding boxes, used later in the assessment section of the project. 
-
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/data_overlay.png" width="1200" />
-</p>
-
-The resulting dataset consisted of 39,965 files and 67.6 GB of memory, too large of a dataset to be used unaltered without taking a significant amount of time for model training. The images were resized to 224 by 224 pixels from their original 1120 by 1120 pixels, accepting a trade-off in possible performance gains from the increased image resolution for training speed. 
-
----
-
-## Methodology 
-
-The project aimed to overcome two main tasks: Image classification and object detection. Image classification is defined as the ability of the ability for a trained model to correctly label a provided image among a set of trained classes, while object detection is defined as the ability for a train model to draw a bounding box around an object of interest within a provided image (thereby identifying the location) and then execute a proper classification of that object. A set of models were selected to tackle each of the two tasks, selected due to their recency, ease of implementation and performance whilst having a variety of architecture.
-
-The models were trained and tested with the generated images, with the results documented in the attached appendix (figures 8 to 11). To validate the models, a curated set of non-generated images consisting of garbage found in organic environments (such as one shown in figure 2 below) were used.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/train_val_test.png" width="1200" />
-</p>
-
-
----
-
-## Model Selection (Classification)
-
-Transfer learning using models Resnet 50, EfficientNetV2L and Vision Transformer (ViT) were selected for the task of image classification. 
-
-### Resnet 50
-
-Developed by He et al (2015), Resnet50 is a computer vision model on a 50-layer convolutional neural network architecture (CNN). Utilization of residual learning (figure 2) allows the convolution network to overcome commonly encountered degradation associated with vanishing and exploding gradients. The pre-trained model was trained on images available on ImageNet.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/resnet.png" width="1200" />
-</p>
-
-### EfficientNetV2L
-
-EfficientNetV2L (Tan & Le, 2021) is built upon two main concepts, compound coefficient model scaling and neural architecture search (NAS). Often, the continual addition of neural network layers do not necessarily result in a performance improvement of a CNN. By having a set of scaling coefficients, EfficientNet architecture allows for neural networks to be developed with a uniform set of neural network widths, depth and resolution (figure 3). NAS allows for a systematic approach to model tuning via defining search space, search strategy and set performance metrics to further develop a model with good performance. 
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/effnet.png" width="1200" />
-</p>
-
-
-### Vision Transformer (ViT)
-
-Vision Transformer (henceforth referred to as ViT) was developed by Dosovitskiy et al (2020). Trained on Google’s JFT-300M image dataset, ViT architecture (figure 4) differs vastly from CNN architecture. Transformers, often used in natural language processing (NLP), focus on creating encodings for each set of data (such as a sentence, document or image) by forming associations between a token (or image pixel) and all other tokens. To apply a similar NLP approach to an image without alteration will be impractical, as the time complexity of such an operation would be O(n2), impractically large for images often thousands of pixels in width and height. Instead, ViT segments each image into multiple patches (sub-images 16 by 16 pixels in size), creates embeddings for each patch before creating a global association through a transformer encoder. Multi-layer perceptrons (MLP) consolidate the learned weights to form the classification layer of the neural network.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/vit.png" width="1200" />
-</p>
-
----
-
-## Model Selection (Object detection)
-
-Transfer learning using model YOLOV3 was selected for the task of object identification. 
-
-### YOLOV3
-
-YOLOV3 (Redmon et al, 2016) tackles object identification in a method not unlike ViTs, by splitting a image into a series of sub-images in a grid like fashion. Conventionally, the sliding window object detection method is used for the task of object detection, which uses an approach similar to kernels in CNNs, the model learning from a window moved across the image with the image data and bounding box data. What makes YOLO unique in its approach to object detection is to first split an image into a grid and embedding visual and bounding box data within each cell of the grid. Feeding each sub-image through a CNN, the assessment of the location and appropriate label of the object of interest is assessed as a whole image. A trained model would then be able to predict several viable bounding boxes, with nonmax suppression, a method used to assess probabilities of the bounding boxes, used to determine the most appropriate bounding box for that image.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/yolo.png" width="1200" />
-</p>
-
----
-
-#### YOLO Methodology
-
-After the data augmentation step, a separate input file was created for each image, containing the bounding box information in the format: class x coordinate, y coordinate, width, height. Subsequently, each image was labelled using the same name as the image file for the model's data processing. Then, the darknet weights and YOLO configuration, trained on the imagenet dataset, were utilized to train the model. Model training however, took a very long time due to the large size of the custom dataset and the specific requirements of the YOLO architecture. 
-    
-Consequently, a pretrained YOLO model was used to test the custom images. To achieve this, the hyperparameters were tuned according to the dataset, which consisted of 5 classes, and the output layer of the YOLO architecture was modified accordingly.
-    
-Regarding the architecture, the image was initially resized to 448x448 pixels, and the pixel values were normalized within the range of -1 to 1. These values were then processed through the network, which produced the network output. The architecture primarily consisted of a CNN network that extracted high-level features through a series of convolution and pooling layers. These layers captured contextual information, enabling the network to gain a deeper understanding of the image. The detection layers were responsible for predicting the bounding boxes and class probabilities. The output of the network was a tensor representing grid cells, which contained information about the bounding boxes and class probabilities.
-    
-When comparing the performance between overlayed images and natural images, the model exhibits superior performance on natural images compared to overlayed images. This discrepancy can be attributed to the dataset on which the model was trained. The pretrained model was trained on the COCO dataset, which consisted of common object images. As a result, the model is more adept at recognizing objects in their original context, where the background is coherent with the object itself, rather than objects superimposed on a different background.
-
----
-    
-##  Evaluation 
-
-Evaluation of the previously mentioned models was be done primarily through the analysis of performance metrics. The main performance metrics are the accuracy, precision, recall and eventually the F1 score. For object detection, intersection over union (IOU) will be used as another evaluation metric. Intersection over union (IOU), the measure of the model’s ability to distinguish the objects from the background, will also be used as a performance metric. In addition, models were tested against a selection of images contributed by team members to roughly determine the model accuracies.
-
----
-
-##  Results
-
-For image classification, it appears that performance of the model improves with the more recent, sophisticated models. For YOLOV3, while the accuracy, precision and recall performance metrics are not as high as the test classification models, the IOU was found to be 57%, a relatively acceptable level for a model not yet trained specially on the selected dataset.
-    
- <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/results.png" width="1200" />
-</p>   
-
- <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/pred.png" width="1200" />
-</p>   
-
----
-
-## Challenges
-
-It is to be noted that the number of tests datapoints were not consistent between model evaluations. Through the refinement from Trashbox’s stock images, the resulting dataset consisted of images 1120 by 1120 pixels in size, approximately 40, 000 images over the 4 sub-categories, spanning 67.6 GB. With the limitation of time and computing resources, images were resized down to 224 by 224 pixels in size to allow for ease of model training. Despite this however, model training took a significant amount of time, with training of an object detection model with additional google colaboratory GPU resources on 20% of the training dataset took upwards of 7 hours. Each model was trained and tested on a variety of subset sizes in an attempt to feed in as much training and test data as possible in a reasonable amount of time. While this will introduce a level of inconsistency into model comparisons, representative sampling of both the training and testing datasets make it less likely to have large deviations in model performance than what has been tested.
-
----
-
-## Memory Optimization
-
-To grapple with the large memory size of the image data, two memory optimization methods had to be implemented, the usage of the DeepSpeed library and the application of low rank approximation (LoRA).
-
-DeepSpeed is an open-source deep learning optimization library for PyTorch. It aims to enhance the efficiency of deep learning training by reducing computational power and memory usage while enabling better parallelism on existing hardware. The library is specifically designed for training large, distributed models with a focus on low latency and high throughput. DeepSpeed incorporates the Zero Redundancy Optimizer (ZeRO), which enables training models with 1 trillion or more parameters. Key features of DeepSpeed include mixed precision training, support for single-GPU, multi-GPU, and multi-node training, as well as customizable model parallelism.
-
-Given the limitations imposed by computational resources, recurrent instances of GPU memory overflow were encountered during the training of the models. Despite attempts to mitigate these issues by reducing sample size and image resolution, the fine-tuning of expansive models like google/vit-large-patch16-224-in21k, available on HuggingFace, demanded substantial computing power and consistently led to runtime crashes. However, by harnessing the power of DeepSpeed, not only was a successful execution of the prodigious ViT model achieved, but significant advancements in the model optimization endeavours. Specifically, larger batch sizes, finer-grained learning rates and more expansive training sample sizes were able to be incorporated, thus capitalizing on the enhanced capabilities provided by DeepSpeed's state-of-the-art deep learning optimization library for PyTorch.
-Low Rank Approximation (LoRA) is an optimization technique that reduces the number of trainable parameters by learning pairs of rank-decomposition matrices while freezing the original weights. By leveraging LoRA, the storage footprint and memory usage of the model were able to be reduced, and larger models with better performance on the downstream classification task were able to be trained.
-
----
-
-## Future Work
-
-Four approaches may be taken which are likely to further refine model performance.
-
-### Further image augmentation
-
-The current dataset is limited to the overlay of cropped stock images at random points on the selection of background. The inclusion of additional backgrounds, rotation and resizing of the cropped images during the overlay process would further increase the amount of training data available. Image level transformations such as flips and rotation, as well as pixel level transformations like brightness, contrast and hue adjustments is likely to provide a model performance improvement.
-
-### Increased training time and resources
-
-It is to be noted however, that the proposed image augmentation will further inflate the datasets, resulting in significant increases in the training and testing time required for each model. Given sufficient time and computing resources, the models may be trained and tested using the augmented dataset consisting of the original sized images (1120x1120). This will allow for the standardization of the training, as well as the testing of the models thereby resulting in a more objective comparison in model performance.
-
-### Hyperparameter tuning
-
-More extensive hyperparameter tuning is likely to further improve model performance. Different approaches, such as grid searches, random searches or execution of hyperparameter sweeps.
-
-
-## Conclusion
-
-The ability to classify images and identify objects was tested through transfer learning of models Resnet50, EfficientNetV2L, ViT and YOLOV3. Preliminary testing shows a general improvement of performance with more recent and sophisticated models. Given additional time and resources, a properly tuned model will be able to assist members of the public in the sorting of recyclables.
-
----
-
-
-## Notebook
-
-Import necessary libraries.
+### Social Optimums
 
 ```python
-import deepspeed
-from datasets import load_dataset
-from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay
-import numpy as np
-from transformers import TrainingArguments, Trainer, ViTImageProcessor, ViTForImageClassification, AutoImageProcessor
-from torch.utils.data import DataLoader
-import torch
-from torchvision.transforms import Normalize, ToTensor, Compose, transforms
-from peft import get_peft_config, get_peft_model, LoraConfig, TaskType
-import os
-import matplotlib.pyplot as plt
-import numpy as np
-import math
+>>> for positions in social_opt_position(m=10):
+    print(f"UAV Position: {positions}, UAV Utility: {[brl.connect_users_to_uavs_original(position, positions) for position in positions]}, User Utility: {brl.compute_user_utility_by_uav(positions)}, Total User Utility: {np.sum(list(brl.compute_user_utility_by_uav(positions).values()))}")
+
+UAV Position: [(3, 5), (8, 6)], UAV Utility: [50.0, 50.0], User Utility: {(3, 5): -147.66515, (8, 6): -147.66515}, Total User Utility: -295.3303
+UAV Position: [(3, 6), (8, 5)], UAV Utility: [50.0, 50.0], User Utility: {(3, 6): -147.66515, (8, 5): -147.66515}, Total User Utility: -295.3303
+UAV Position: [(5, 3), (6, 8)], UAV Utility: [50.0, 50.0], User Utility: {(5, 3): -147.66515, (6, 8): -147.66515}, Total User Utility: -295.3303
+UAV Position: [(5, 8), (6, 3)], UAV Utility: [50.0, 50.0], User Utility: {(6, 3): -147.66515, (5, 8): -147.66515}, Total User Utility: -295.3303
 ```
 
-Set up DeepSpeed for optimization
+With the addition of more UAV nodes, the competition among UAVs to serve users intensifies. Each UAV is self-interested and aims to maximize the number of users it serves. The equilibrium outcomes, in this case, will involve a complex interplay of UAV positions as they continuously adjust to optimize their utilities. The algorithm will seek to find positions for UAVs that balance user allocations to maximize their individual utilities. The UAV nodes appear to cluster near the center region. With 3 UAVs, they tend to still stick near each other with no node of separation. Beyond 3 UAV nodes however, it can be observed that the nodes have a tendency to split into groups of two and stick around each other.
+
+These equilibrium outcomes are still not socially optimal because socially optimal outcomes are determined by minimizing the total distance for all users across the grid, ensuring that each UAV serves users efficiently and equally. The self-interested nature of UAVs makes them continue to search for optimal positions to maximize individual utility rather than achieving a globally optimal distribution of users in most cases. However, assuming that m stays fixed, when the number of UAV nodes increase, the distance among the nodes tend to increase, thus the average distance between users and UAVs decreases, although is still not socially optimal, the utility of the users should increase.
 
 ```python
-# DeepSpeed requires a distributed environment even when only one process is used.
-# This emulates a launcher in the notebook
-os.environ["MASTER_ADDR"] = "localhost"
-os.environ["MASTER_PORT"] = "9994"  # modify if RuntimeError: Address already in use
-os.environ["RANK"] = "0"
-os.environ["LOCAL_RANK"] = "0"
-os.environ["WORLD_SIZE"] = "1"
+brl = BestResponseLearning(num_uav=3, m=10)
+brl.run(max_iter=1000, max_dev_not_improved=10, verbose=False)
+
+brl = BestResponseLearning(num_uav=4, m=10)
+brl.run(max_iter=1000, max_dev_not_improved=10, verbose=False)
 ```
 
-A class for preprocessing the data.
+Q learning is a reinforcement learning algorithm well-suited for solving problems with discrete state and action spaces, making it an appropriate choice for optimizing UAV action selection. In this problem, the state space represents the positions of UAVs and users within an m-by-m area, while actions are discrete movements: North, East, South, and West. Q-Learning could navigates this discrete landscape. The algorithm balances exploration and exploitation by allowing UAVs to explore different positions while also exploiting known good ones, crucial for optimizing connectivity. It does so through an exploration probability, ensuring a probabilistic approach to action selection.
+
+The Q learning model's goal is to learn the optimal action-value function, representing expected cumulative rewards for taking actions in given states. This aligns well with the objective of finding the best UAV placement to maximize user connectivity. It does so through iteratively updating Q-values based on observed rewards (user connectivity) and transitions (UAV movements), ultimately converging to the optimal policy. More importantly, Q-Learning is model-free, making it suitable for dynamic, complex scenarios where explicit modeling may be challenging. Like the BRL model, this model also incorporates a termination condition based on the standard deviation of utilities, allowing it to terminate when further optimization is unlikely. Also, the Q learning algorithm is flexible to changes and scales well as the number of UAVs and users increases, with its ability to handle discrete state and action spaces, along with its ability to balance exploration and exploitation, which is makes it suitable for this problem.
+
+---
+
+## Reinforcement Learning
+
+A class that uses Q-Learning to train the agents
 
 ```python
-class setupPipeline:
-    """A pipeline for setting up the input images into the required format for training and inference
-    Args:
-          dataset_name(str): The name of the dataset to extract from the datasets library
-          train_size(int): The size of the train dataset to extract from the datasets library
-          test_size(int): The size of the test dataset to extract from the datasets library
-          validation_split(float): A ratio for splitting the training data
-          shuffle_data(bool): Wether to shuffle the data
-          model_checkpoint(str): A pretrained model checkpoint from HuggingFace
-          image_transformation(obj): An object specifying the type of image transformation required
+class QLearningBestResponse:
     """
-    def __init__(self, dataset_name, train_size, test_size, validation_split, shuffle_data, model_checkpoint):
-        self.dataset_name = dataset_name
-        self.train_size = train_size
-        self.test_size = test_size
-        self.validation_split = validation_split
-        self.shuffle_data = shuffle_data
-        self.model_checkpoint = model_checkpoint
-        self.image_transformation = None
+    Initialize the QLearningBestResponse class.
 
-    def load_data(self):
-        """Load the required dataset using the load_dataset method
-        """
-        ds = load_dataset(self.dataset_name) #, split=['train[:' + str(self.train_size) + ']', 'test[:'+ str(self.test_size) + ']']) #, split=['train[:' + str(self.train_size) + ']', 'test[:'+ str(self.test_size) + ']'])
-
-        return ds['train'], ds['test']
-
-    def image_transform(self, data):
-        """Transform the input images to pixel values
-        Args:
-            Data(dataset): A dataset containing the images, labels, and pixel values
-        Returns:
-            An updated dataset with transformed pixel values
-        """
-        data['pixel_values'] = [self.image_transformation(image.convert("RGB")) for image in data['image']]
-        return data
-
-    def preprocess_data(self, train_ds, test_ds):
-        """Preprocess the input images to the required format by applying various transformations
-        Args:
-            train_ds(dataset): A train dataset containing the images, labels, and pixel values
-            test_ds(dataset): A test dataset containing the images, labels, and pixel values
-        Returns:
-            The train, validation, and test datasets with transformation applied; the id2label and label2id maps, and the model image processor
-        """
-        # Split the data into train and validation sets
-        train_ds = train_ds.shuffle(seed=42).select(range(self.train_size))
-        test_ds = test_ds.shuffle(seed=42).select(range(self.test_size))
-
-        splits = train_ds.train_test_split(test_size=self.validation_split, shuffle=self.shuffle_data)
-        train_ds = splits['train']
-        val_ds = splits['test']
-        # Map labels to ids and ids to labels
-        id2label = {id:label for id, label in enumerate(train_ds.features['label'].names)}
-        label2id = {label:id for id,label in id2label.items()}
-        # Define the image processor based on a checkpoint ViT model to process the images
-        processor = ViTImageProcessor.from_pretrained(self.model_checkpoint)
-        # Normalize, resize, and convert the images to tensor format
-        image_mean, image_std = processor.image_mean, processor.image_std
-        normalize = Normalize(mean=image_mean, std=image_std)
-        # The pretrained model uses 224x224 images only; upscale the input images to this size
-        self.image_transformation = Compose([ToTensor(), normalize, transforms.Resize((224, 224))])
-        # Apply the transformation on the datasets
-        train_ds.set_transform(self.image_transform)
-        val_ds.set_transform(self.image_transform)
-        test_ds.set_transform(self.image_transform)
-        return train_ds, val_ds, test_ds, id2label, label2id, processor
-
-```
-
-A class for executing the training and inference steps.
-
-```python
-class runPipeline(setupPipeline):
-    """A pipeline for executing the training and inference steps
     Args:
-          learning_rate (float): The initial learning rate for AdamW optimizer
-          per_device_train_batch_size (int): The batch size per GPU/TPU core/CPU for training
-          per_device_eval_batch_size (int): The batch size per GPU/TPU core/CPU for evaluation
-          num_train_epochs (int): Number of epoch to train
-          weight_decay (float): The weight decay to apply (if not zero) to all layers except all bias and LayerNorm weights
-          eval_metric(str): A evaluation metric to be displayed when training
-          pipeline_type(str): Specifying whether to use the pipeline for training or making prediction
-          dataset_name(str): The name of the image dataset
-          train_ds(dataset): A train dataset containing the images, labels, and pixel values
-          val_ds(dataset): A validation dataset containing the images, labels, and pixel values
-          test_ds(dataset): A test dataset containing the images, labels, and pixel values
-          label2id(dict): A dictionary to map labels to ids
-          id2label(dict): A dictionary to map ids to labels
-          model_checkpoint(str): Specifying the model checkpoint based on the HuggingFace API
-          processor(obj): A torchvision object for tokenizing the images
-          torch_weights_filename(str): A pytorch file containing the fine-tuned weights of the model
-          device (obj): Specifies whether to use cpu or gpu
-          apply_lora (bool): Whether to apply Lora
-          load_weights (bool): Whether to saved torch weights
+        num_uav (int): Number of UAVs.
+        m (int): Grid size (m x m).
+        learning_rate (float): Learning rate for Q-learning.
+        discount_factor (float): Discount factor for future rewards.
+        exploration_prob (float): Probability of taking a random action.
+        verbose (bool): Whether to print verbose information.
     """
-    def __init__(self, learning_rate, per_device_train_batch_size, per_device_eval_batch_size, num_train_epochs, weight_decay, eval_metric, pipeline_type, dataset_name, train_ds, val_ds, test_ds, label2id, id2label, model_checkpoint, processor, torch_weights_filename, device, apply_lora, load_weights):
+    def __init__(self, num_uav, m, learning_rate=0.1, discount_factor=0.9, exploration_prob=0.1, verbose=False):
+        self.num_uav = num_uav
+        self.m = m
+        self.user_positions = [(x, y) for x in range(1, self.m + 1) for y in range(1, self.m + 1)]
         self.learning_rate = learning_rate
-        self.per_device_train_batch_size = per_device_train_batch_size
-        self.per_device_eval_batch_size = per_device_eval_batch_size
-        self.num_train_epochs = num_train_epochs
-        self.weight_decay = weight_decay
-        self.eval_metric = eval_metric
-        self.pipeline_type = pipeline_type
-        self.dataset_name = dataset_name
-        self.train_ds = train_ds
-        self.val_ds = val_ds
-        self.test_ds = test_ds
-        self.label2id = label2id
-        self.id2label = id2label
-        self.model_checkpoint = model_checkpoint
-        self.processor = processor
-        self.torch_weights_filename = torch_weights_filename
-        self.device = device
-        self.apply_lora = apply_lora
-        self.load_weights = load_weights
+        self.discount_factor = discount_factor
+        self.exploration_prob = exploration_prob
 
-    def collate_fn(self, data):
-        """A custom collate function for the dataLoader
+        if self.num_uav > len(self.user_positions):
+            raise ValueError("The number of UAVs exceeds the maximum possible unique positions.")
+
+        self.uav_positions = random.sample(self.user_positions, self.num_uav)
+        self.q_table = {k: {"N": 0, "E": 0, "S": 0, "W": 0} for k in self.user_positions} #{}  # Q-table to store Q-values
+        self.verbose = verbose
+
+    def get_valid_new_state(self, state, max_attempts=10):
+        """
+        Get a valid new state for a given state.
+
         Args:
-            data(list): List of individual samples
-        Returns:
-            A dictionary containing the batched pixel values and labels
-        """
-        pixel_values = torch.stack([d["pixel_values"] for d in data])
-        labels = torch.tensor([d["label"] for d in data])
-        return {"pixel_values": pixel_values, "labels": labels}
+            state (tuple): Current state.
+            max_attempts (int): Maximum attempts to find a valid new state.
 
-    def compute_metrics(self, eval_pred):
-        """Compute evaluation metrics based on the predicted and true labels
+        Returns:
+            tuple: Valid new state.
+        """
+        # Find the action with the highest Q-value
+        max_action = max(self.q_table[state], key=self.q_table[state].get)
+        new_state = self.move(state, max_action)
+        attempts = 0
+
+        while new_state in self.uav_positions and attempts < max_attempts:
+            # If there's an overlap, keep trying different new states based on Q-values until a valid one is found
+            actions = sorted(self.q_table[state], key=lambda k: self.q_table[state][k], reverse=True)
+            actions.remove(max_action)  # Remove the current max action
+
+            for action in actions:
+                new_state = self.move(state, action)
+                if new_state not in self.uav_positions:
+                    return new_state
+            attempts += 1
+
+        return new_state
+
+    def move(self, position, direction):
+        """
+        Move from a current position to a new position based on a given direction.
+
         Args:
-            eval_pred (tuple): Tuple containing predicted labels and true labels.
-        Returns:
-            A dictionary containing the computed evaluation metrics
-        """
-        predictions, labels = eval_pred
-        predictions = np.argmax(predictions, axis=1)
-        return dict(accuracy=accuracy_score(predictions, labels))
+            position (tuple): Current position.
+            direction (str): Direction to move ('N', 'E', 'S', 'W').
 
-    def execute_pipeline(self):
-        """Execute the pipeline based on the specified pipeline type
         Returns:
-            The Trainer object for training or prediction
+            tuple: New position after the move.
         """
-        # Load the ViT model for image classification
-        model = ViTForImageClassification.from_pretrained(self.model_checkpoint, id2label=self.id2label, label2id=self.label2id, ignore_mismatched_sizes=True)
-        if self.load_weights: model.load_state_dict(torch.load("./" + self.torch_weights_filename, map_location=torch.device(self.device.type)))
-        if self.apply_lora: model = get_peft_model(model, peft_config)
-        # Set the training arguments for the Trainer
-        args = TrainingArguments(
-            output_dir = self.dataset_name,
-            save_strategy = "epoch",
-            evaluation_strategy = "epoch",
-            learning_rate = self.learning_rate,
-            per_device_train_batch_size = self.per_device_train_batch_size,
-            per_device_eval_batch_size = self.per_device_eval_batch_size,
-            num_train_epochs = self.num_train_epochs,
-            weight_decay = self.weight_decay,
-            load_best_model_at_end = True,
-            metric_for_best_model = self.eval_metric,
-            logging_dir = 'logs',
-            remove_unused_columns = False,
-            deepspeed="./ds_config_zero3.json"
-        )
-        # Check the pipeline type and create the Trainer accordingly
-        if self.pipeline_type.lower() == "train":
-            executor = Trainer(
-                model=model,
-                args=args,
-                train_dataset=self.train_ds,
-                eval_dataset=self.val_ds,
-                data_collator=self.collate_fn,
-                compute_metrics=self.compute_metrics,
-                tokenizer=self.processor
-            )
-        if self.pipeline_type.lower() == "predict":
-            # Load the pre-trained weights for prediction
-            executor = Trainer(
-                model=model,
-                args=args,
-                train_dataset=self.train_ds,
-                eval_dataset=self.val_ds,
-                data_collator=self.collate_fn,
-                compute_metrics=self.compute_metrics,
-                tokenizer=self.processor
-            )
-        return executor
+        x, y = position
+        if direction == 'N':
+            new_position = (x, y + 1)
+        elif direction == 'E':
+            new_position = (x + 1, y)
+        elif direction == 'S':
+            new_position = (x, y - 1)
+        elif direction == 'W':
+            new_position = (x - 1, y)
+        else:
+            raise ValueError("Invalid direction")
 
-    def visualize_results(self, preds):
-        """Visualize the evaluation results
+        # Check if the new position is within the grid boundaries
+        new_x, new_y = new_position
+        if 1 <= new_x <= self.m and 1 <= new_y <= self.m:
+            return new_position
+        else:
+            return position  # Return the current position if it's outside the boundaries
+
+    def euclidean_distance(self, point1, point2):
+        """
+        Calculate the Euclidean distance between two points.
+
         Args:
-            preds(obj): A transformer object containing prediction outputs
+            point1 (tuple): First point (x, y).
+            point2 (tuple): Second point (x, y).
+
         Returns:
-            None
+            float: Euclidean distance between the two points.
         """
-        # Print the evaluation metrics
-        print(f"\n\n{preds.metrics} \n")
-        # Get the true labels and predicted labels
-        y_true = preds.label_ids
-        y_pred = preds.predictions.argmax(1)
-        # Get the label names
-        labels = self.test_ds.features['label'].names
-        # Compute the confusion matrix
-        cm = confusion_matrix(y_true, y_pred)
-        # Create a ConfusionMatrixDisplay and plot the confusion matrix
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-        disp.plot(xticks_rotation=45)
+        x1, y1 = point1
+        x2, y2 = point2
+        return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+    def update_uav_positions(self, tuples_list, target_position, new_tuple):
+        """
+        Update the UAV positions list by replacing a target position with a new position.
+
+        Args:
+            tuples_list (list of tuples): List of tuples representing UAV positions.
+            target_position (tuple): Position to be replaced.
+            new_tuple (tuple): New position to replace the target position.
+        """
+        for i, t in enumerate(tuples_list):
+            if t == target_position:
+                tuples_list[i] = new_tuple
+        return tuples_list
+
+    def connect_users_to_uavs_original(self, curr_uav_position, uav_positions_):
+        """
+        Calculate the number of users connected to a specific UAV. The utility of the UAVs.
+
+        Args:
+            curr_uav_position (tuple): Current UAV position.
+            uav_positions_ (list of tuples): List of UAV positions.
+
+        Returns:
+            int: Number of users connected to the current UAV.
+        """
+        users_connected_to_uav = {p: 0 for p in uav_positions_}
+
+        for user_position in self.user_positions:
+            # Find the index of the closest UAV based on minimum Euclidean distance
+            #print("user_position", user_position)
+            dist = []
+            for uav_position in uav_positions_:
+                dist.append(self.euclidean_distance(user_position, uav_position))
+                #print(f"user_position:{user_position}, uav_position: {uav_position}, euclidean_distance:{euclidean_distance(user_position, uav_position)}, dist: {dist}")
+            if len(set(dist)) == 1: # All distances are the same
+                #print(f"len(set(dist)) == 1: {len(set(dist)) == 1:}")
+                for uav_position in uav_positions_:
+                    users_connected_to_uav[uav_position] += 1/len(uav_positions_)
+                #print(f"users_connected_to_uav: {users_connected_to_uav}")
+            else:
+                #print("else:")
+                uav_idex = np.argmin(dist)
+                users_connected_to_uav[uav_positions_[uav_idex]] += 1
+                #print(f"users_connected_to_uav: {users_connected_to_uav}")
+
+        return users_connected_to_uav[curr_uav_position]
+
+
+    def compute_user_utility_by_uav(self, uav_positions_):
+        """
+        Calculate the utility based on the total distances of all users relative to the UAVs.
+
+        Args:
+            uav_positions_ (list of tuples): List of UAV positions.
+
+        Returns:
+            dict: Dictionary with UAV positions as keys and their respective total distance-based utility as values.
+        """
+        uav_total_utility = {}
+        for user_position in self.user_positions:
+            uav_distances = []
+            uav_positions = []
+            for uav_position in uav_positions_:
+                uav_distances.append(self.euclidean_distance(user_position, uav_position))
+                uav_positions.append(uav_position)
+
+            min_indices = [index for index, value in enumerate(uav_distances) if value == min(uav_distances)]
+
+            for ind in min_indices:
+                if len(min_indices) > 1:
+                    uav_total_utility[uav_positions[ind]] = round(uav_total_utility.get(uav_positions[ind], 0) - uav_distances[ind]/len(min_indices), 5)
+
+                else:
+                    uav_total_utility[uav_positions[ind]] = round(uav_total_utility.get(uav_positions[ind], 0) - uav_distances[ind], 5)
+
+        return uav_total_utility
+
+    def plot_user_and_uav_positions(self):
+        """
+        Plot the user and UAV positions on a grid.
+        """
+        # Extract x and y coordinates for users and UAVs
+        user_x, user_y = zip(*self.user_positions)
+        uav_x, uav_y = zip(*self.uav_positions)
+        # Create a plot to display user and UAV positions
+        plt.figure(figsize=(3, 3))
+        plt.scatter(user_x, user_y, color='grey', label='Users', marker='o', s=30)
+        plt.scatter(uav_x, uav_y, color='blue', label='UAVs', marker='^', s=80)
+        plt.xlabel('X Coordinate')
+        plt.ylabel('Y Coordinate')
+        plt.title('User and UAV Positions')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        # Set the grid to show 10x10 with 1 spacing
+        plt.xticks(range(1, self.m + 1))
+        plt.yticks(range(1, self.m + 1))
+        plt.grid(True, which='both', linestyle='--', lw=1)
+        plt.show()
+
+    def update_q_table(self, state, action, reward, next_state):
+        """
+        Update the Q-table with new Q-values.
+
+        Args:
+            state (tuple): Current state.
+            action (str): Chosen action.
+            reward (float): Received reward.
+            next_state (tuple): Next state.
+        """
+        # Best value for the next state
+        max_next_action_value = max(self.q_table[next_state].values())
+        # Update q table
+        self.q_table[state][action] = (1 - self.learning_rate) * self.q_table[state][action] + self.learning_rate * (reward + self.discount_factor * max_next_action_value)
+
+    def select_action(self, state):
+        """
+        Select an action based on the Q-table.
+
+        Args:
+            state (tuple): Current state.
+
+        Returns:
+            str: Chosen action ('N', 'E', 'S', 'W').
+        """
+        # Choose a random action
+        if random.random() < self.exploration_prob:
+            if self.verbose: print("Random Action")
+            return random.choice(["N", "E", "S", "W"])
+        else:
+            # Choose the available best action
+            max_actions = [action for action in self.q_table[state] if self.q_table[state][action] == max(self.q_table[state].values())]
+            action = random.choice(max_actions)
+            if self.verbose: print(f"self.q_table[state]: {self.q_table[state]}")
+            if self.verbose: print(f"Action: max(self.q_table[state], key=self.q_table[state].get): max({self.q_table[state]}, key=self.q_table[state].get): {max(self.q_table[state], key=self.q_table[state].get)}")
+            return action
+
+    def transition(self, uav_index, verbose=False):
+        """
+        Perform a state transition for a UAV.
+
+        Args:
+            uav_index (int): Index of the UAV.
+            verbose (bool): Whether to print verbose information.
+
+        Returns:
+            tuple: New state, flag indicating if the transition is done, and the new utility value.
+        """
+        state = self.uav_positions[uav_index]
+        occupied_positions = set(self.uav_positions)
+        uav_curr_utility = self.connect_users_to_uavs_original(state, self.uav_positions)
+        action = self.select_action(state)
+        new_state = self.move(state, action)
+
+        if verbose:
+            print(f"UAV {uav_index} - state: {state}, uav_curr_utility: {uav_curr_utility}, action: {action}, new_state: {new_state}")
+        # Check if the new state is an occupied position by another UAV
+        if new_state not in occupied_positions:
+            uav_positions_copy = copy.deepcopy(self.uav_positions) # Keep a copy of the UAV's positions
+            uav_positions_copy = self.update_uav_positions(uav_positions_copy, state, new_state) # Update the UAV's copied positions
+            uav_new_utility = self.connect_users_to_uavs_original(new_state, uav_positions_copy) # Number of users connected to the new position
+            # Check if the new position has a better utility
+            if uav_new_utility >= uav_curr_utility:
+                self.update_q_table(state, action, uav_new_utility, new_state)  # Update the q table
+                self.uav_positions = uav_positions_copy  # Update the UAV's actual positions
+                return new_state, False, uav_new_utility
+
+        return state, True, uav_curr_utility
+
+    def train(self, num_episodes=1000):
+        """
+        Train the Q-learning agent over a specified number of episodes.
+
+        Args:
+            num_episodes (int): Number of episodes to train.
+        """
+        # Train for specified number of episodes
+        for episode in range(num_episodes):
+            self.uav_positions = random.sample(self.user_positions, self.num_uav)  # Randomly initialize a new starting state
+            is_done = False
+            # Loop through all UAVs until termination
+            while not is_done:
+                for uav_index in range(len(self.uav_positions)):
+                    uav_new_position, uav_is_done, utility = self.transition(uav_index, verbose=False)  # Transition to the next step
+                    is_done = uav_is_done
+
+    def run(self, max_iter=1000, max_dev_not_improved=10, verbose=False, verbose_plot=True):
+        """
+        Run the Q-learning agent to optimize UAV positions.
+
+        Args:
+            max_iter (int): Maximum number of iterations.
+            max_dev_not_improved (int): Maximum number of iterations with no improvement.
+            verbose (bool): Whether to print verbose information.
+        """
+        if verbose_plot:
+            print("Iteration: 0")
+            self.plot_user_and_uav_positions()
+
+        iteration = 1
+        stdev_not_improved_cnt = 0
+        stdev_list = [float("Inf")]
+        stdev_best = float("Inf")
+        all_uav_positions_list = [[(0,0), (0,0)]]
+        all_utilities = [[0,0]]
+
+        # Loop until the max iteration threshold is reached or the terminate proess kicks in
+        while iteration < max_iter:
+            utilities = []
+            uav_positions_list = []
+            for uav_index in range(len(self.uav_positions)): # Loop through all UAVs
+                state = self.uav_positions[uav_index]
+                #action = max(self.q_table[state], key=self.q_table[state].get)  # Choose an action based on the best Q value
+                action = self.select_action(state)
+                new_state = self.move(state, action)
+                new_state = self.get_valid_new_state(new_state)  # Check if the new state is valid position that is not already occupied by another UAV
+                self.uav_positions = self.update_uav_positions(self.uav_positions, state, new_state) # Update the UAV's position
+                state = new_state
+                uav_positions_list.append(self.uav_positions[uav_index])
+
+            utilities.append([self.connect_users_to_uavs_original(position, self.uav_positions) for position in self.uav_positions])
+            stdev_list.append(np.std(utilities))
+            all_uav_positions_list.append(uav_positions_list)
+            all_utilities.append(utilities)
+
+            if verbose_plot: print(f"\nIteration: {iteration}, \nall_uav_positions_list: {all_uav_positions_list}, \nall_utilities: {all_utilities}, \nstdev_list: {stdev_list}, \nmin(stdev_list): {min(stdev_list)}")
+            # Check if there's improvement in the standard deviation of the UAV's utility
+            if stdev_list[-1] < stdev_best:
+                stdev_best = stdev_list[-1]
+                stdev_not_improved_cnt = 0
+                if verbose: print("improved:", stdev_not_improved_cnt)
+            else:
+                stdev_not_improved_cnt += 1
+                if verbose: print("NOT improved:", stdev_not_improved_cnt)
+
+            if stdev_not_improved_cnt == max_dev_not_improved:
+                if verbose: print(f"\nTerminating. No improvement from the previous standard deviation of the UAV utilities in the last {max_dev_not_improved} iterations.")
+                break
+
+            iteration += 1
+            if verbose_plot: self.plot_user_and_uav_positions()
+
+        # Display the positions of the UAVs with the first best utility standard deviation
+        best_index = np.argmin(stdev_list)
+        if verbose: print(f"Best_index: {best_index}")
+        if verbose_plot: print(f"Best positions for minimum utility standard deviation: {all_uav_positions_list[best_index]}, Utilities: {all_utilities[best_index]}, StDev: {stdev_list[best_index]}")
+        if verbose_plot: plot_uav_positions(self.user_positions, all_uav_positions_list[best_index], self.m)
+
+        return all_uav_positions_list[best_index], all_utilities[best_index]
 ```
 
-A class for performing the image classification process.
+Instantiate the model and train the agent then run the model for 2 UAVs
 
 ```python
-class imageClassification:
+ql = QLearningBestResponse(num_uav=2, m=10, learning_rate=0.1, discount_factor=0.9, exploration_prob=0.1)
+ql.train(num_episodes=1000)
 
-    def __init__(self, test_folder_path, fine_tuned_model, num_img_show, device):
-        self.test_folder_path = test_folder_path
-        self.fine_tuned_model = fine_tuned_model
-        self.num_img_show = num_img_show
-        self.device = device
-
-    def load_data(self):
-        """Load the required dataset using the load_dataset method
-        """
-        ds = load_dataset(self.test_folder_path)
-        return ds['test']
-
-    def image_transform(self, data):
-        """Transform the input images to pixel values
-        Args:
-            Data(dataset): A dataset containing the images, labels, and pixel values
-        Returns:
-            An updated dataset with transformed pixel values
-        """
-        data['pixel_values'] = [self.image_transformation(image.convert("RGB")) for image in data['image']]
-        return data
-
-    def preprocess_data(self, test_data):
-        """Preprocess the input images to the required format by applying various transformations
-        Args:
-            test_data(dataset): A test dataset containing the images, labels, and pixel values
-        Returns:
-            The test datasets with transformation applied; the id2label and label2id maps, and the model image processor
-        """
-        # Map labels to ids and ids to labels
-        # Define the image processor based on a checkpoint ViT model to process the images
-        # Normalize, resize, and convert the images to tensor format
-        processor = ViTImageProcessor.from_pretrained(self.fine_tuned_model)
-        image_mean, image_std = processor.image_mean, processor.image_std
-        normalize = Normalize(mean=image_mean, std=image_std)
-        # The pretrained model uses 224x224 images only; upscale the input images to this size
-        self.image_transformation = Compose([ToTensor(), normalize, transforms.Resize((224, 224))])
-        # Apply the transformation on the datasets
-        test_data.set_transform(self.image_transform)
-        return test_data
-
-    def run_demo(self):
-        plt.close()
-
-        test_ds = self.load_data()
-        id2label = {id:label for id, label in enumerate(test_ds.features['label'].names)}
-        label2id = {label:id for id, label in id2label.items()}
-        image_processor = AutoImageProcessor.from_pretrained(self.fine_tuned_model)
-        model = ViTForImageClassification.from_pretrained(self.fine_tuned_model, id2label=id2label, label2id=label2id, ignore_mismatched_sizes=True).to(self.device)
-
-        test_ds_processed = self.preprocess_data(test_ds)
-        num_images = test_ds_processed.num_rows
-        num_rows = int(math.ceil(min(self.num_img_show, num_images) / 3))  # Set the max number of images per row to 3
-        num_cols = min(num_images, 3)  # Limit the number of columns to 3
-        fig, axs = plt.subplots(num_rows, num_cols, figsize=(10, 3* num_rows))
-        desired_size = (224, 224)
-
-        preds = []
-        labels = []
-        for i in range(min(self.num_img_show, num_images)):
-            inputs = image_processor(test_ds_processed[i]['image'], return_tensors="pt").to(self.device)
-            with torch.no_grad(): logits = model(**inputs).logits
-            predicted_label = logits.argmax(-1).item()
-
-            preds.append(predicted_label)
-            labels.append(test_ds_processed[i]['label'])
-
-            img = test_ds_processed[i]['image']
-            img = img.resize(desired_size)
-
-            row = i // num_cols
-            col = i % num_cols
-            axs[row, col].imshow(img)
-            title_color = "green" if predicted_label == test_ds_processed[i]['label'] else "red"
-            axs[row, col].set_title(f"[Prediction = {id2label[predicted_label]}]\n[Truth = {id2label[labels[i]]}]", fontsize=10, color=title_color)  # Set the title
-            axs[row, col].axis('off')
-
-        for ax in axs.flat: ax.axis('off')
-        plt.tight_layout()
-        print(f"\nModel Accuracy: {accuracy_score(preds, labels)}\n")
+ql.uav_positions = random.sample(ql.user_positions, ql.num_uav)
+ql.run(max_iter=1000, max_dev_not_improved=10, verbose=False)
 ```
 
-Step 1: Compile and Preprocess Data
-
-```python
-pipe1 = setupPipeline(
-    dataset_name='./ky_test_natural',
-    train_size= 10000, #30416,
-    test_size= 1242,
-    validation_split=0.2,
-    shuffle_data=True,
-    model_checkpoint="google/vit-large-patch16-224-in21k"
-)
-
-train_dsx, test_dsx = pipe1.load_data()
-train_dsx, val_dsx, test_dsx, id2labelx, label2idx, processorx = pipe1.preprocess_data(train_ds=train_dsx, test_ds=test_dsx)
-dataset_loaded_train, dataset_loaded_test = pipe1.load_data()
-train_ds, val_ds, test_ds, id2label, label2id, processor = pipe1.preprocess_data(train_ds=dataset_loaded_train, test_ds=dataset_loaded_test)
-
-```
-
-Set up LoRa for efficient fine-tuning
-
-```python
-%%bash
-cat <<'EOT' > ds_config_zero3.json
-{
-    "fp16": {
-        "enabled": "auto",
-        "loss_scale": 0,
-        "loss_scale_window": 1000,
-        "initial_scale_power": 16,
-        "hysteresis": 2,
-        "min_loss_scale": 1
-    },
-
-    "optimizer": {
-        "type": "AdamW",
-        "params": {
-            "lr": "auto",
-            "betas": "auto",
-            "eps": "auto",
-            "weight_decay": "auto"
-        }
-    },
-
-    "scheduler": {
-        "type": "WarmupLR",
-        "params": {
-            "warmup_min_lr": "auto",
-            "warmup_max_lr": "auto",
-            "warmup_num_steps": "auto"
-        }
-    },
-
-    "zero_optimization": {
-        "stage": 2,
-        "offload_optimizer": {
-            "device": "cpu",
-            "pin_memory": true
-        },
-        "offload_param": {
-            "device": "cpu",
-            "pin_memory": true
-        },
-        "overlap_comm": true,
-        "contiguous_gradients": true,
-        "sub_group_size": 1e9,
-        "reduce_bucket_size": "auto",
-        "stage3_prefetch_bucket_size": "auto",
-        "stage3_param_persistence_threshold": "auto",
-        "stage3_max_live_parameters": 1e9,
-        "stage3_max_reuse_distance": 1e9,
-        "stage3_gather_16bit_weights_on_model_save": true
-    },
-
-    "gradient_accumulation_steps": "auto",
-    "gradient_clipping": "auto",
-    "steps_per_print": 2000,
-    "train_batch_size": "auto",
-    "train_micro_batch_size_per_gpu": "auto",
-    "wall_clock_breakdown": false
-}
-EOT
-
-peft_config = LoraConfig(
-    task_type=TaskType.SEQ_2_SEQ_LM, inference_mode=False, r=8, lora_alpha=32, lora_dropout=0.1
-)
-
-
-```
-
-Step 2: Train the model
-
-```python
-# Note:
-# The first model checkpoint input was "google/vit-large-patch16-224-in21k", executed on 5 epochs but due to
-# insufficient storage space, only the first 3 model checkpoints were saved.
-# "./garbage/checkpoint-3000" was further fine-tuned to produce the final checkpoint "garbage/checkpoint-250-final"
-
-%%time
-run1 = runPipeline(
-    learning_rate=5e-5,
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
-    num_train_epochs=1,
-    weight_decay=0.001,
-    eval_metric="accuracy",
-    pipeline_type="train",
-    dataset_name='garbage',
-    train_ds=train_ds,
-    val_ds=val_ds,
-    test_ds=test_ds,
-    label2id=label2id,
-    id2label=id2label,
-    model_checkpoint="./garbage/checkpoint-3000", # "google/vit-large-patch16-224-in21k",
-    processor=processor,
-    torch_weights_filename=None,
-    device=device,
-    apply_lora=False,
-    load_weights=False
-)
-executor1 = run1.execute_pipeline()
-executor1.train()
-torch.save(executor1.model.state_dict(), 'AML_p1_v5.pt')
-```
-
-
-Step 3: Inference
-
-* Fine-tuned weights and model checkpoint can be downloaded via the Google drive link below:
-
-* Weights: https://drive.google.com/file/d/10N5Lnb2Kd_3rZ6qniMAE2jnDPk3P7JPV/view?usp=sharing
-
-* Checkpoint: https://drive.google.com/drive/folders/1-Kc6ymVShEIpCry59IKKmXw7K9XY10sc?usp=sharing
-
-
-```python
-%%bash
-cat <<'EOT' > ds_config_zero3.json
-{
-    "fp16": {
-        "enabled": "auto",
-        "loss_scale": 0,
-        "loss_scale_window": 1000,
-        "initial_scale_power": 16,
-        "hysteresis": 2,
-        "min_loss_scale": 1
-    },
-
-    "optimizer": {
-        "type": "AdamW",
-        "params": {
-            "lr": "auto",
-            "betas": "auto",
-            "eps": "auto",
-            "weight_decay": "auto"
-        }
-    },
-
-    "scheduler": {
-        "type": "WarmupLR",
-        "params": {
-            "warmup_min_lr": "auto",
-            "warmup_max_lr": "auto",
-            "warmup_num_steps": "auto"
-        }
-    },
-
-    "zero_optimization": {
-        "stage": 3,
-        "offload_optimizer": {
-            "device": "cpu",
-            "pin_memory": true
-        },
-        "offload_param": {
-            "device": "cpu",
-            "pin_memory": true
-        },
-        "overlap_comm": true,
-        "contiguous_gradients": true,
-        "sub_group_size": 1e9,
-        "reduce_bucket_size": "auto",
-        "stage3_prefetch_bucket_size": "auto",
-        "stage3_param_persistence_threshold": "auto",
-        "stage3_max_live_parameters": 1e9,
-        "stage3_max_reuse_distance": 1e9,
-        "stage3_gather_16bit_weights_on_model_save": true
-    },
-
-    "gradient_accumulation_steps": "auto",
-    "gradient_clipping": "auto",
-    "steps_per_print": 2000,
-    "train_batch_size": "auto",
-    "train_micro_batch_size_per_gpu": "auto",
-    "wall_clock_breakdown": false
-}
-EOT
-
-
-%%time
-run2 = runPipeline(
-    learning_rate=1e-5,
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
-    num_train_epochs=1,
-    weight_decay=0.001,
-    eval_metric="accuracy",
-    pipeline_type="predict",
-    dataset_name='garbage',
-    train_ds=train_ds,
-    val_ds=val_ds,
-    test_ds=test_ds,
-    label2id=label2id,
-    id2label=id2label,
-    model_checkpoint="garbage/checkpoint-250-final",
-    processor=processor,
-    torch_weights_filename="AML_p1_v5.pt",
-    device=device,
-    apply_lora=False,
-    load_weights=True
-)
-executor2 = run2.execute_pipeline()
-preds = executor2.predict(test_ds)
-run2.visualize_results(preds)
-```
-
-Visualize performance
+We observe that the UAVs have converged to an equilibrium 
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/pred_results.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/qlearning_uav.jpg" width="600" />
 </p>
-
----
-
-
-## Sources
-
-1. Channel News Asia. 2020. IN FOCUS: 'It is not easy, but it can be done' - The challenges of raising Singapore's recycling rate. https://www.channelnewsasia.com/singapore/in-focus-singapore-recycling-sustainability-blue-bins-waste-1339091 
-2. Kaza, S., Yao, L. C., Bhada-Tata, P., & Van Woerden, F. (2018). What a Waste 2.0: A Global Snapshot of Solid Waste Management to 2050. Washington, DC: World Bank. https://doi.org/10.1596/978-1-4648-1329-0
-3. N. V. Kumsetty, A. Bhat Nekkare, S. K. S. and A. Kumar M. 2018. TrashBox: Trash Detection and Classification using Quantum Transfer Learning. 31st Conference of Open Innovations. Association (FRUCT), 2022, pp. 125-130, doi: 10.23919/FRUCT54823.2022.9770922. https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9770922&isnumber=9770880
-4. He, K., Zhang, X., Ren, S., Sun, J. 2015. Deep Residual Learning for Image Recognition. arXiv.org. https://arxiv.org/abs/1512.03385 
-5. Boesch, G. (n.d). Vision Transformer (ViT) in Image Recognition – 2023 Guide. https://viso.ai/deep-learning/vision-transformer-vit/
-6. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., & Houlsby, N. (2021, June 3). An image is worth 16x16 words: Transformers for image recognition at scale. arXiv.org. https://arxiv.org/abs/2010.11929
-7. Tan, M., Le, Q., 2021. EfficientNetV2: Smaller Models and Faster Training. arXiv.org: https://arxiv.org/abs/2104.00298
-8. Redmon, K. Divvala, S., Girshick, R., Farhadi, A. 2016, You Only Look Once: Unified, Real-Time Object Detection arXiv.org. https://arxiv.org/abs/1506.02640v5
-
