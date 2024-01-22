@@ -33,8 +33,6 @@ The available dataset includes two files:
 
 Import the necessary libraries.
 
-Change the file directory to the path where the feature_selection_timeseries folder is located.
-
 ```python
 import os
 directory_path = input("Enter your file directory: ")
