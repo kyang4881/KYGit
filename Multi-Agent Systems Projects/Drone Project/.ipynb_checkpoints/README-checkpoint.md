@@ -176,8 +176,9 @@ As shown below, the social optimum cases have a higher utility than in the case 
 
 ```python
 print(f"UAV Position: {brl_position_result[0]}, UAV Utility: {brl_position_result[1]}, User Utility: {brl.compute_user_utility_by_uav(brl_position_result[0])}, Total User Utility: {np.sum(list(brl.compute_user_utility_by_uav(brl_position_result[0]).values()))}")
+# UAV Position: [(7, 7), (8, 6)], UAV Utility: [59.5, 40.5], User Utility: {(7, 7): -245.60921, (8, 6): -142.01965}, Total User Utility: -387.62886000000003
 ```
-    UAV Position: [(7, 7), (8, 6)], UAV Utility: [59.5, 40.5], User Utility: {(7, 7): -245.60921, (8, 6): -142.01965}, Total User Utility: -387.62886000000003
+    
 
 
 
