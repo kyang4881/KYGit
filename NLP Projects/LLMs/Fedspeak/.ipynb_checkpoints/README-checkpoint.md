@@ -16,12 +16,16 @@ Fedspeak is a term used to describe the language used by the Fed to communicate 
 </p>
 
 
-## Pseudocode
+## Dataset
 
-A high-level view for the pipeline processes.
+The available dataset includes two files:
+1. A file containing the text of all FOMC statements released after meetings since 1997.
+2. A file containing 200 randomly-drawn sentences from all the statements. Each sentence has been pre-labelled by human analysts with a hawkishness/dovishness score as defined in the table below. There are also some sentences labelled as “Remove” which indicates sentences that are irrelevant to monetary policies and should be removed in the data cleaning stage.
+
+
 
 <p align="center">
-  <img src="https://github.com/kysrc/ky_mas/blob/main/feature_selection_timeseries/docs/images/pseudocode.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/fedspeak_table.jpg" width="1200" />
 </p>
 
 ---
