@@ -1,5 +1,9 @@
 ## MAS Project
 
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
+</p>
+
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/flow_diagram.png" width="1200" />
 </p>
@@ -57,16 +61,122 @@ The literature review on state-of-the-art feature selection methods aimed to est
 </p>
 
 
-
-
 * Dynamic Feature Selection (DFS): DFS is an algorithm designed to select features with minimal budget while maximizing predictive accuracy. It performs approximation of the greedy policy trained using amortized optimization and focuses on the variational perspective of the Conditional Mutual Information (CMI) for the greedy policy, which is leveraged to train a network that directly predicts the optimal selection given the current features. It incorporates "reward shaping" in the training process, which outperforms static feature selection methods, achieving state-of-the-art performance (Figure 14). Its effectiveness lies in the strategic selection of features through repeated calls to the policy network and predictions made after each selection using the predictor network (Figure 13).
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig13.png" width="800" />
+</p>
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig14.png" width="800" />
+</p>
+
 
 * Stochastic Gates Feature Selection (STG): STG introduces an embedded feature selection approach tailored for nonlinear models like neural networks. It achieves high sparsity without compromising performance by leveraging the probabilistic relaxation of the ℓ₀ norm of features. Stochastic gates, drawn from the STG approximation of the Bernoulli distribution, are obtained through the application of the hard-sigmoid function to a mean-shifted Gaussian random variable (Figure 15). The resulting stochastic gate, attached to the input feature, is controlled by the trainable parameter μ𝑑, providing a nuanced solution to feature selection challenges in complex, nonlinear models. As a result, STG is an embedded feature selection method that achieves state-of-art performance (Figure 16).
 
----
 <p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig15.png" width="800" />
 </p>
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig16.png" width="800" />
+</p>
+
+---
+
+## Data Gathering and Processing
+
+Established datasets from the University of California's [archive](https://archive.ics.uci.edu/datasets) were utilized to implement and evaluate various feature selection methods. This approach was adopted as the final dataset for the project was still under development. The chosen datasets covered diverse topics for classification and regression tasks, the datasets were: bike sharing, wine quality, census, spam, breast cancer, Polish companies bankruptcy, chess, and cars. This strategy allowed for the assessment of feature selection methods in terms of their ability to generalize across different conditions, including varying data volumes and feature set complexities.
+
+---
+
+## Custom Dataset
+
+The University of California datasets provided a valuable benchmark for assessing various feature selection methods. However, limitations arose when attempting to find a suitable time series dataset from financial sources for testing existing methods. Given the scarcity of freely available financial time series datasets meeting project requirements, a pragmatic decision was made to create a mock time series dataset. This mock dataset aimed to replicate an experiment closely aligned with the anticipated actual dataset.
+
+Leveraging financial data from the S&P 500 stock index, the mock dataset was enriched with additional features from diverse sources. The target variable is binary, either up or down (1 or 0), based on the 20-days forward returns of the S&P500 index. Numerical features included the Dollar Index, MSCI Emerging Market Index, VIX, Gold Price, Crude Oil WTI Spot Price, Treasury 2Y Yield, Treasury 10Y Yield, S&P 500 Daily Volume, 20-days lagged moving average returns, and 20 randomly generated noise features. The additional categorical features encompassed daily changes in currencies like SGDTWD Daily Chg, JPYCAD Daily Chg, NZDAUD Daily Chg, EURCNY Daily Chg, Nordpool Power Price Daily Chg, and STXE 600 Daily Chg. Notably, the 20 randomly generated noise features played an important role. They served to identify the feature selection methods that were adept at filtering out irrelevant features and provided a quantitative basis for comparing the performance of these methods. This approach addresses the challenge of limited availability of suitable financial time series datasets, enabling the project to proceed with more robust experiments and refinement of the feature selection methodologies using a dataset that is meant to resemble the actual dataset more closely, until it becomes available.
+
+---
+
+## Rebalancing
+
+The issue of class imbalance was observed in some of the alternative datasets, where certain datasets exhibited uneven class distribution. Class imbalance occurs when one class (minority class) has significantly fewer instances than another (majority class), impacting machine learning model performance. Imbalances lead to biases favoring the majority class, poor generalization to the minority class, misleading evaluation metrics, and biased feature importance estimates.
+
+To address these challenges, resampling techniques were employed for skewed datasets. These techniques aim to mitigate bias, improve generalization, provide more informative evaluation metrics, and alleviate biases in feature importance estimates caused by imbalanced datasets.
+
+1. Random Over Sampling: Involves randomly duplicating samples from the minority class to balance class representation.
+2. SMOTE (Synthetic Minority Over-sampling Technique): Selects minority examples close in feature space, then generates new samples along the line connecting them.
+3. SMOTEN: An extension of SMOTE for categorical data, generating new samples with feature values corresponding to the most common category among neighbors.
+4. BorderlineSMOTE: Generates synthetic samples for minority class instances near the borderline between minority and majority classes.
+
+---
+
+## Transformation
+
+To prepare data for the feature selection methods and model prediction, a data transformation pipeline was established to standardize the features. Depending on the dataset, three potential transformation methods could be applied:
+
+1. One-Hot Encode: Represents each category as a binary vector, ensuring appropriate numerical representation for models without introducing ordinal relationships.
+2. Label Encode: Assigns a unique integer to each category, providing a numerical representation suitable for ordinal data where the order matters.
+3. Normalization: Utilizes Z-score normalization, scaling features to have a mean of 0 and a standard deviation of 1. This ensures consistent scales among numerical features in the dataset.
+
+To ensure that all features in the dataset are consistently transformed for the train, validation, and test data, the sklearn data preprocessing objects, OneHotEncoder, StandardScaler, and LabelEncoder were defined for the training set, and applied on all three sets separately. This ensured that the sklearn transformation objects are consistent and that data leakage would not occur. However, it’s important to note that any new categorical feature values found in the validation or test set that were not observed in the train set, will default to zero by setting the parameter, handle_unknown='ignore', for the one hot encoder, a necessary measure to prevent an error from getting raised.
+
+---
+
+## Model Development
+
+### Pipeline Configuration
+
+For project configuration, to enhance pipeline flexibility for various model setups, the pipeline was configured to accommodate both classification and regression tasks. Additionally, the use of modularization and object-oriented programming in the source code aimed to create a scalable and easy to maintain pipeline. To complement that, the Cookiecutter project template, a commonly used structure for machine learning, was used as it has all the necessary folder and subfolder directories and has strong support in Python. As a result of these configurations, most adjustments need only be done at initialization, such as specifying the feature selection methods, task type, number of back testing windows or train-validation splits, number of top features to select, preferred rebalancing methods, and other relevant variables, contributing to adaptability and simplicity in project management.
+
+### Time Series
+
+The computational resources available are a local machine with only 8 GB RAM and 12.7 GB via Colab. Considering memory and runtime constraints, the original dataset has been scaled down to a single stock (Adobe Inc.). This filtering process results in about 4100 instances. To understand why downsizing is a necessary requirement with the hardware available; with 5 feature selection methods to be tested, each method will undergo 5 back testing windows, each back testing window contains 5 train-validation splits, and each of these combinations will be subjected to 2 hyperparameters combinations for the 2 categories on the number of features (top 50 and all). The purpose of having many back testing windows and train-validation splits is to establish a model with better generalization for such high frequency and volatility data. In total, there are 5x5x5x2x2 = 500 combinations or models to train based on this one configuration. As the number of hyperparameters scales up, the cost of execution time will increase substantially.
+
+To address the temporal nature of the dataset, the date field has been transformed into additional features, including dayofweek, dayofmonth, dayofyear, weekofyear, month, quarter, and year. Additionally, financial indicators such as moving average and exponential moving average features of various time periods are leveraged to capture historical trends in the data. Given that the ticker field contains string values, it will be subjected to one-hot encoding. Consequently, the final input dataset encompasses a total of 407 features, spanning the date range from 2006 to 2022. Normalization will be applied to all numerical features except for the newly introduced date fields, which will remain in their original form.
+
+This preprocessing strategy not only optimizes the dataset to fit within resource constraints but also incorporates essential temporal features and prepares categorical data for effective use in machine learning models. The transformation ensures that the resulting input is well-structured and relevant for subsequent analysis and model training.
+
+### Evaluation
+
+The choice of metrics is contingent upon the nature of the problem, whether it's a classification or regression task. For classification tasks, common metrics include accuracy, precision, recall, F1 score, and AUC. On the other hand, regression tasks, like the one at hand, often utilize metrics such as mean squared error (MSE), mean absolute error (MAE), root mean squared error (RMSE), mean percentage error (MPE), and R-square (R^2). The selection of a specific metric is guided by the unique characteristics of the data and the overarching goals of the analysis.
+
+### Metrics
+
+Given the context of predicting a continuous target variable, specifically the 84-day forward returns in this regression problem, the Root Mean Squared Error (RMSE) was chosen as the primary evaluation metric. RMSE stands out due to its widespread applicability, interpretability (as it shares the same unit as the target variable), and suitability for scenarios where larger errors should be penalized more significantly than smaller errors. This choice is particularly pertinent in the financial domain, where the implications of prediction inaccuracies can have a substantial impact on decision-making and strategic planning. The emphasis on RMSE underscores a commitment to robustly assessing model performance and ensuring that predictions align closely with the real-world implications of financial data.
+
+### Back testing and Hyperparameter Tuning
+
+In contrast to typical cross-validation procedures for non-temporal datasets, time series’ equivalent cross-validation is called back testing, which necessitates preserving the chronological order of the data. Two methods for splitting time series data were considered:
+1. Back testing with a sliding window: This method involves iteratively moving a window through the time series, with each pass updating the training set and predicting on subsequent data points, as shown in Figure 2.
+    a. Training window size: the number of data points included in a training pass.
+    b. Test window size: the number of data points to include for prediction.
+    c. Sliding steps: the number of data points skipped from one pass to another.
+2. Back testing with an expanding window: This method requires four parameters: starting window size, ending window size, test window size, and expanding steps.
+    a. Starting window size: the number of data points included in the first training pass.
+    b. Ending window size: the number of data points included in the last training pass.
+    c. Test window size: number of data points to include for prediction.
+    d. Expanding steps: the number of data points added to the training time series from one pass to another.
+
+However, only the sliding window approach was tested due to the additional computational cost associated with having larger training sets for the expanding window approach. Moreover, the sliding window method is better aligned with business objectives, given the high-frequency characteristics of the dataset. This decision reflects a choice made in consideration of both computational efficiency and relevance to the project's overarching goals.
+
+In an ideal scenario, the size parameters for the back testing windows should be fine-tuned. However, due to computational and memory constraints, only a set of fixed values could be tested. The number of rolling windows was limited to 5, and the size of the test set (holdout) was configured to be the same as that of the validation set. The validation set exists within each rolling window preceded by the training set. An illustrative example of a 5-fold train-validation split is shown in Figure 3.
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig3.png" width="800" />
+</p>
+
+
+Due to the complicated nature of combining feature selection with validation splits and hyperparameter tuning, the set of features selected within each train-validation split needs to be handled appropriately for generalization. Since we have 5-fold validation, each split would have a different set of features and feature scores, thus the features need to be aggregated and the feature scores averaged. The resulting features with their average scores are then sorted, and the top predefined number of features are returned, representing the feature set for all 5-fold validation splits, an example on the computation is shown in Figure 4. This procedure is iterated for all feature selection methods, rolling windows, hyperparameter combinations, and number of features. The pseudocode for the process is shown in Figure 5.
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig4.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig5.png" width="800" />
+</p>
+
+With so many combinations, to overcome the computation constraints, only two test cases for the number of features will be used, top 50 features and the full feature set, rather than comparing the performance from 1 feature to all n features. The full feature set provides the baseline performance, while the subset of features is used to gauge the effectiveness of the feature selection methods. The objective is to have fewer features but capture the variances in the data for generalization capabilities, thus having fewer features yet achieves performance as good as having all features is a good measure, while having a better performance than with all features is an indication of excellent performance. Other benefits of models with fewer features are that they are cheaper to train and easier to interpret.
+
+For all those combinations previously described, the hyperparameter combinations that give the best averaged RMSE are retained as the best model. The best hyperparameters are then used for retraining, and predictions are made on the hold-out test data. The RMSE scores are then averaged across all rolling windows for all feature selection methods to determine the method that has the best test score, Figure 5 and 6.
 
 
 ## Pseudocode
