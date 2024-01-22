@@ -39,6 +39,117 @@ When m is odd, the grid has a central point. The socially optimal solution occur
 
 When m is even, there is no central point. The UAVs can be positioned such that each UAV serves approximately half of the users, but the division is not necessarily centered in the grid. A possible approach is to position the UAVs along one of the central rows or columns to balance user allocation. There are 4 cases that satisfy these conditions, as defined in the social_opt_position function.
 
+---
+
+## Notebook
+
+Helper functions to visualize drone positions, and to determine the socially optimum postiions and user utility.
+
+```python
+
+def plot_uav_positions(user_positions, uav_positions, m):
+    """
+    Plot the positions of users and UAVs in a 2D grid.
+
+    Args:
+        user_positions (list of tuples): List of (x, y) coordinates of user positions.
+        uav_positions (list of tuples): List of (x, y) coordinates of UAV positions.
+        m (int): The size of the grid in both X and Y dimensions.
+
+    Returns:
+        None
+    """
+    # Extract x and y coordinates for users and UAVs
+    user_x, user_y = zip(*user_positions)
+    uav_x, uav_y = zip(*uav_positions)
+    # Create a plot to display user and UAV positions
+    plt.figure(figsize=(5, 5))
+    plt.scatter(user_x, user_y, color='grey', label='Users', marker='o', s=30)
+    plt.scatter(uav_x, uav_y, color='blue', label='UAVs', marker='^', s=80)
+    plt.xlabel('X Coordinate')
+    plt.ylabel('Y Coordinate')
+    plt.title('User and UAV Positions')
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+    # Set the grid to show 10x10 with 1 spacing
+    plt.xticks(range(1, m + 1))
+    plt.yticks(range(1, m + 1))
+    plt.grid(True, which='both', linestyle='--', lw=1)
+    plt.show()
+
+def social_opt_position(m):
+    """
+    Compute the socially optimal positions for 2 UAVs
+
+    Args:
+        m (int): the size of the grid
+
+    Returns:
+        A list of socially optimum positions
+    """
+    x_min = y_min = 1
+    x_max = y_max = m
+    x_mid = y_mid = (m+1)/2
+
+    if m % 2 == 0: # If even
+        # Even
+        even_opt_1 = [
+            (math.floor((x_min + x_mid)/2), math.floor((y_min + y_max)/2)), (math.ceil((x_mid + x_max)/2), math.ceil((y_min + y_max)/2))
+        ]
+
+        even_opt_2 = [
+            (math.floor((x_min + x_mid)/2), math.ceil((y_min + y_max)/2)), (math.ceil((x_mid + x_max)/2), math.floor((y_min + y_max)/2))
+        ]
+
+        even_opt_3 = [
+            (math.floor((x_min + x_max)/2), math.floor((y_min + y_mid)/2)), (math.ceil((x_min + x_max)/2), math.ceil((y_mid + y_max)/2))
+        ]
+
+        even_opt_4 = [
+            (math.floor((x_min + x_max)/2), math.ceil((y_mid + y_max)/2)), (math.ceil((x_min + x_max)/2), math.floor((y_min + y_mid)/2))
+        ]
+
+        return [even_opt_1, even_opt_2, even_opt_3, even_opt_4]
+
+    else: # Odd
+        odd_opt_1 = [
+            (int((x_min + x_mid)/2), int((y_min + y_max)/2)), (int((x_mid + x_max)/2), int((y_min + y_max)/2))
+        ]
+
+        odd_opt_2 = [
+            (int((x_min + x_max)/2), int((y_min + y_mid)/2)), (int((x_min + x_max)/2), int((y_mid + y_max)/2))
+        ]
+
+        return [odd_opt_1, odd_opt_2]
+
+def user_utility(model, uav_positions_):
+    """
+    Calculate the utility based on the total distances of all users relative to the UAVs.
+
+    Args:
+        uav_positions_ (list of tuples): List of UAV positions.
+
+    Returns:
+        float: Total distance-based utility.
+    """
+    total_distance_utility = 0.0
+
+    for user_position in model.user_positions:
+        min_distance = float('inf')
+
+        for uav_position in uav_positions_:
+            distance = model.euclidean_distance(user_position, uav_position)
+            if distance < min_distance:
+                min_distance = distance
+
+        total_distance_utility += min_distance
+
+    return -total_distance_utility
+```
+
+A class for BestResponseLearning that includes  
+
+
+
 
 
 
