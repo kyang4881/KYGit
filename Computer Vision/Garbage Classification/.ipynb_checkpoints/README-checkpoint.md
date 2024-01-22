@@ -4,84 +4,78 @@
 
 ---
 
-## Abstract
-
-The recent advancements in Natural Language Processing (NLP) can provide finance professionals with tools to analyse the sentiments of various news and statements. Among this financial news, statements made by the Federal Reserve during their meeting are some of the most studied by financial professionals. These statements, referred to also as FedSpeak, contains valuable information on the Federal Open Market Committee’s sentiment on the future of the US economy. Hence, knowing their sentiment could help predict the future action the committee will take which would influence the direction of the financial market. In this project, we fine-tuned several Large Language Models (Flan-T5, DeBERTa, FinBERT, GPT 3.5) to decipher the sentiment of FedSpeak statements. Our best performing model was Flan-T5 Large model, which achieved 77% accuracy, higher than what has been reported by other studies.
-
----
-
 ## Introduction 
 
-The Federal Reserve plays a pivotal role in shaping economic policies that have a direct impact on financial markets. One of the keyways they influence these markets is through adjustments in interest rates, which in turn affect asset prices, stock markets, bond market on a global scale. A crucial aspect of communicating these policy decisions lies in the announcements made by the Federal Reserve which happen eight times a year, commonly referred to as FedSpeak. During these meetings, members of the Federal Open Market Committee (FOMC) share their perspectives on the state of the economy and monetary policy options. These insights often serve as valuable indicators for investors, aiding them in making informed investment decisions. However, the language and terminology used in these meetings can be quite technical and laden with jargon, posing challenges for many investors to interpret and understand the implications.
+In today's world, the environmental challenges have become increasingly urgent, with 3.40 billion tonnes of waste expected to be generated annually by 2050 (Kaza et al, 2018), demanding innovative solutions to mitigate the detrimental impacts of human activities. One critical issue is the proper management of waste and the pressing need to minimise its adverse effects on the ecosystems. 
 
-The utilization of Natural Language Processing (NLP) has proven to be an invaluable tool in various applications, including sentiment analysis, news classification, and more. In line with this, Large Language Models in NLP could potentially be used to effectively classify the statements made during FedSpeak communications for Andromeda Capital. However, previous attempts at classification using ChatGPT ZeroShot Learning yielded unsatisfactory accuracy. 
-
-To improve these previous attempts, we believe that employing more advanced and specialized large language models trained specifically on text data can significantly enhance the accuracy of sentence classification in this context. By effectively classifying these statements, we can provide Andromeda Capital with a deeper understanding of the sentiments expressed by the Federal Reserve during these meetings. This, in turn, enables them to develop improved investment strategies, considering the nuanced insights gleaned from the Fed's communication. A trained model can be deployed in the current operations of the company which can decipher FedSpeak and give an overall sentiment score for each statement which then can be correlated with the interest rate policy changes happening after the announcement creating more market opportunities for better investments strategies.
+Recycling is one way to reduce waste. However, before waste can be recycled it needs to be sorted and processed. For example, segregating paper from plastics or removing hazardous waste ensures each type can be processed safely and appropriately. Apart from industrial waste production, consumers are also a first mile of the recycling process. 
 
 ---
 
-## Related Work
+## Motivation
 
-Recently, studies have been done to decipher FedSpeak using several Large Language Models. In particular, the work of Hansen & Kazinnik (2023) is a focal point of reference for this project. In their work, it was shown that the maximum accuracy attained using fine-tuned ChatGPT is 61%. The table below summarizes the key findings from the paper that we will use to evaluate our model performance.
+Unfortunately, much more needs to be done to educate consumers on proper recycling. For example, Singapore’s domestic recycling rate declined from 22 per cent in 2018 to 17 per cent in 2019, below the European Union, which reported a domestic recycling rate of 46.4 per cent in 2017. (Channel News Asia, 2020). According to experts, a lack of recycling knowledge is one of the contributing factors to the low domestic recycling rate. A study by the Singapore Environment Council in 2018 also found that 70 per cent of respondents did not fully know what was recyclable and how waste should be sorted (Channel News Asia, 2020).
 
-<p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/related_work.png" width="1200" />
-</p>
+An application that can detect and inform consumers on whether an object may be recycled or not and which waste category they should be disposed to could be an intervention to potentially ameliorate the lack of education on domestic waste sorting. 
+
+The project aims to use computer vision models to detect and classify waste materials. It is important that the models can differentiate between different waste materials so that it can inform consumers of proper waste sorting practice. For example, items that are detected as paper would be discarded into a different recycling bin compared to metal items. A trained model could be deployed to the use case of a waste sorting app, to increase domestic recycling rate by educating and informing consumers on proper waste sorting and waste identification. 
 
 ---
 
-## Approach
+## Dataset
+
+The dataset selected was sourced from Kumsetty et Al (2022). Titled ‘Trashbox’, the dataset was split into and labelled as seven distinct subcategories: cardboard, e-waste, glass, medical, metal, paper and plastic. Ultimately, five of the seven subcategories (cardboard, glass, metal, plastic and paper) were selected for the sake of brevity. The dataset consisted of 28,564 files and 4.29GB of memory. The images within the dataset largely comprised of stock images of varying sizes (figure 1, left), with few images representative of the waste found in an organic environment such as pavement, void decks, grassy environments etc. To better improve the performance of the models, the training data was altered from its initial state.
+
+Thirty-one different background images containing no garbage were sourced from google images, with environments ranging from but not limited to roads, canals, tiled flooring, void decks, grassy environments etc. Rembg, PIL and OpenCv libraries were used to remove the existing background, crop the stock images found in the ‘Trashbox’ dataset and eventually overlaid at random locations on top of a random selection of the previously mentioned backgrounds. The locations and the image size of the overlaid garbage was noted as the ground truth of the object bounding boxes, used later in the assessment section of the project. 
+
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/modeling.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/data_overlay.png" width="1200" />
 </p>
 
-The project aimed to overcome the text multi-class classification task. Text classification is defined as the ability for the trained model to correctly label the provided text among the set of trained classes. A set of models were selected to tackle this task, based on recency, performance, and architectural complexity. The models were trained and tested on a combination of datasets described in the next section under dataset selection.
+The resulting dataset consisted of 39,965 files and 67.6 GB of memory, too large of a dataset to be used unaltered without taking a significant amount of time for model training. The images were resized to 224 by 224 pixels from their original 1120 by 1120 pixels, accepting a trade-off in possible performance gains from the increased image resolution for training speed. 
 
-### Model Selection
+## Methodology 
 
-FLAN T5, DeBERTa, FinBERT and GPT 3.5 were the better models reported for this task and FLAN T5 was chosen as the final model based on classification accuracy. Other models such as BERT, RoBERTa, and ensemble with Random Forrest classifiers were also explored. 
+The project aimed to overcome two main tasks: Image classification and object detection. Image classification is defined as the ability of the ability for a trained model to correctly label a provided image among a set of trained classes, while object detection is defined as the ability for a train model to draw a bounding box around an object of interest within a provided image (thereby identifying the location) and then execute a proper classification of that object. A set of models were selected to tackle each of the two tasks, selected due to their recency, ease of implementation and performance whilst having a variety of architecture.
 
-#### FLAN T5
-
-The Flan T5 models, developed by Google Research, were selected due to 1) they were recently released (2022), showcasing cutting-edge performance on various NLP benchmarks [1], and 2) they have a distinctive instruction-based text-to-text architecture, allowing for adaptable fine-tuning across diverse NLP tasks. Through extensive instruction finetuning on a large corpus of text data, the Flan T5 models have acquired enhanced language knowledge and robust generalization capabilities to handle unseen data and tasks. Notably, these models surpass the original T5 models when fine-tuned for single task problems, while also exhibiting accelerated training speed and convergence [2], thereby offering superior performance and efficiency.
-
-The small, base, large, and XLarge variants with 80M, 250M, 780M, and 3B parameters respectively, were explored, through the HuggingFace API. Testing the XLarge model was made possible through the application of optimization techniques such as DeepSpeed with ZeRO and LoRA, the details are provided in section 9.1.1. However, due to limited computational and storage resources, the Flan T5 large model was eventually selected as the largest viable option, with the best cost to performance ratio, that can be executed on Colab efficiently, although the larger variants may potentially enhance performance further [3].
-
-Prior to the training process, the provided datasets were processed into the prompt format shown in Figure 1, for passing as inputs to the models. This prompt format was decided upon by referring to the Flan GitHub repository on template prompts used for specific tasks [4]. Among the various prompt formats explored, the prompt shown in Figure 1 gave the best test performance. However, due to the vast number of prompts available and computational constraints, the search space of the prompts was non exhaustive.
-The initial predictions on the validation set, conducted without any fine-tuning, resulted in poor performance as shown in Table 2. The accuracy achieved was only 11%, indicating that the predictions were worse than random guessing. The poor zero-shot performance may be attributed to the model’s inability to generalize effectively to an unseen task that is as difficult as a classification problem on Fed speeches, because FedSpeak often employs language that is deliberately ambiguous and vague. The Fed officials may choose their words carefully to avoid making explicit statements or commitments that could have immediate market or economic impacts. Consequently, the zero-shot model struggles to understand the context and often output the same predictions for most instances, resulting in worse-than-guessing performance. 
-
-Through fine-tuning on the FedSpeak dataset, the Flan T5 large model improves its understanding of the specific language patterns and contextual nuances present in Fed speeches, leading to a substantial improvement in performance. The fine-tuned model adapts its parameters to focus on the relevant features and patterns required for accurate classification. The resulting optimization allowed the model to achieve a 77% test accuracy, which is seven times higher than the accuracy of the zero-shot model. However, we have noticed a slight decrease in performance, as shown in Figure 1, when the augmented data was included, likely because the augmented data introduced some noise or variations that were not representative of the true patterns in the FedSpeak dataset. This noise could have led to confusion and hindered the model's ability to accurately classify the speeches. Additionally, the augmented data might have introduced biases or inconsistencies that affected the overall performance. 
-
-<p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/prompt.png" width="1200" />
-</p>
-
----
-
-## Experiments
-
-### Dataset
-
-The available dataset includes two files:
-1. A file containing the text of all FOMC statements released after meetings since 1997.
-2. A file containing 200 randomly-drawn sentences from all the statements. Each sentence has been pre-labelled by human analysts with a hawkishness/dovishness score as defined in the table below. There are also some sentences labelled as “Remove” which indicates sentences that are irrelevant to monetary policies and should be removed in the data cleaning stage.
+The models were trained and tested with the generated images, with the results documented in the attached appendix (figures 8 to 11). To validate the models, a curated set of non-generated images consisting of garbage found in organic environments (such as one shown in figure 2 below) were used.
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/fedspeak_table.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/validation_img.png" width="1200" />
 </p>
 
-The dataset was sources from Andromeda Capital who provided two csv files with the meeting minutes statements and the sentiment score with labels ranging from 5 categories – “Hawkish, Mostly Hawkish, Neutral, Mostly Dovish and Dovish. Hawkish means that the Fed strongly expresses a belief that the economy is growing too quickly and may need to be slowed down through monetary policy. Whereas Dovish means that the Fed strongly expresses a belief that the economy is growing too slowly and may need to be stimulated through monetary policies. The cleaned dataset consisted of 200 statements and labels. 
+## Model Selection
 
-Although the dataset was sufficient to run small classification tasks, it was not enough to run using Large Language Model weights. Therefore, data augmentation techniques like similar sentence generation from ChatGPT were employed. This enabled a lot more data to be generated in a short period of time with almost zero cost. Approximately 1200 more similar statements were added to the initial dataset and then split into 80 percent training and 20 percent testing. The data was generated using prompts to ask ChatGPT to act like an expert finance professional.
+Transfer learning using models Resnet 50, EfficientNetV2L and Vision Transformer (ViT) were selected for the task of image classification. 
 
-In our experimental training, we utilized three datasets: the original dataset provided by Andromeda Capital, an augmented dataset combining the original data with GPT-generated data, and a GPT-generated dataset only. After evaluating the outcomes, we determined that the augmented dataset (combining original and GPT-generated data) yielded the best results in most of our tested models. This finding suggests that the inclusion of GPT-generated data in the original dataset enhanced the model's performance, indicating the value of incorporating a mixture of original and generated data for training. Nonetheless, this is not always the case. There are cases where the augmentation yields slightly worse results compared to the original dataset alone. This points to the need for further experimentation with ChatGPT prompts that could potentially yield better training data that is more consistent with FedSpeak.
+### Resnet 50
 
-### Evaluation 
+Developed by He et al (2015), Resnet50 is a computer vision model on a 50-layer convolutional neural network architecture (CNN). Utilization of residual learning (figure 2) allows the convolution network to overcome commonly encountered degradation associated with vanishing and exploding gradients. The pre-trained model was trained on images available on ImageNet.
 
-In our evaluation process, we employed the accuracy score as the primary metric to assess the accuracy of our predictions. The accuracy score measures the proportion of correct predictions compared to the total number of predictions made. By calculating the accuracy score, we were able to quantitatively evaluate the performance of our predictive model and determine its overall effectiveness in accurately classifying or predicting outcomes. This metric provides a clear and straightforward measure of the model's performance, allowing us to gauge its success in making correct predictions and to make comparisons between different models or approaches.
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/resnet.png" width="1200" />
+</p>
 
-Additionally, we have also deployed another method to evaluate our predictions based on a comparison of the actual interest rate to the hypothetical interest rate generated based on our best model’s predictions. The details of the evaluation can be found in the analysis section. 
+### EfficientNetV2L
+
+EfficientNetV2L (Tan & Le, 2021) is built upon two main concepts, compound coefficient model scaling and neural architecture search (NAS). Often, the continual addition of neural network layers do not necessarily result in a performance improvement of a CNN. By having a set of scaling coefficients, EfficientNet architecture allows for neural networks to be developed with a uniform set of neural network widths, depth and resolution (figure 3). NAS allows for a systematic approach to model tuning via defining search space, search strategy and set performance metrics to further develop a model with good performance. 
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/effnet.png" width="1200" />
+</p>
+
+
+### Vision Transformer (ViT)
+
+Vision Transformer (henceforth referred to as ViT) was developed by Dosovitskiy et al (2020). Trained on Google’s JFT-300M image dataset, ViT architecture (figure 4) differs vastly from CNN architecture. Transformers, often used in natural language processing (NLP), focus on creating encodings for each set of data (such as a sentence, document or image) by forming associations between a token (or image pixel) and all other tokens. To apply a similar NLP approach to an image without alteration will be impractical, as the time complexity of such an operation would be O(n2), impractically large for images often thousands of pixels in width and height. Instead, ViT segments each image into multiple patches (sub-images 16 by 16 pixels in size), creates embeddings for each patch before creating a global association through a transformer encoder. Multi-layer perceptrons (MLP) consolidate the learned weights to form the classification layer of the neural network.
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/vit.png" width="1200" />
+</p>
+
+
+
 
 #### Experimental Details
 
