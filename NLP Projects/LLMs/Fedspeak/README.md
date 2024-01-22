@@ -31,15 +31,7 @@ The available dataset includes two files:
 
 ## Notebook
 
-Import the necessary libraries.
-
-```python
-import os
-directory_path = input("Enter your file directory: ")
-os.chdir(directory_path)
-```
-
-Import other necessary libraries.
+Import necessary libraries.
 
 ```python
 import jsonlines
