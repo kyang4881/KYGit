@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kysrc/ky_mas/blob/main/Fedspeak/docs/images/LLMs_background.jpg" width="1200" />
+  <img src="https://github.com/kysrc/ky_mas/blob/main/docs/images/LLMs_background.jpg" width="1200" />
 </p>
 
 ---
