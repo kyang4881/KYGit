@@ -25,7 +25,7 @@ To improve these previous attempts, we believe that employing more advanced and 
 Recently, studies have been done to decipher FedSpeak using several Large Language Models. In particular, the work of Hansen & Kazinnik (2023) is a focal point of reference for this project. In their work, it was shown that the maximum accuracy attained using fine-tuned ChatGPT is 61%. The table below summarizes the key findings from the paper that we will use to evaluate our model performance.
 
 <p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/related_work.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/related_work.png" width="1200" />
 </p>
 
 ---
@@ -36,7 +36,7 @@ The project aimed to overcome the text multi-class classification task. Text cla
 
 ### Model Selection
 
-FLAN T5, DeBERTa, FinBERT and GPT 3.5 were the better models reported for this task and FLAN T5 was chosen as the final model based on classification accuracy. Other models such as BERT, RoBERTa, and ensemble with Random Forrest classifiers were also explored. However, these are not discussed since the performance were shown to be limited.
+FLAN T5, DeBERTa, FinBERT and GPT 3.5 were the better models reported for this task and FLAN T5 was chosen as the final model based on classification accuracy. Other models such as BERT, RoBERTa, and ensemble with Random Forrest classifiers were also explored. 
 
 #### FLAN T5
 
@@ -50,23 +50,129 @@ The initial predictions on the validation set, conducted without any fine-tuning
 Through fine-tuning on the FedSpeak dataset, the Flan T5 large model improves its understanding of the specific language patterns and contextual nuances present in Fed speeches, leading to a substantial improvement in performance. The fine-tuned model adapts its parameters to focus on the relevant features and patterns required for accurate classification. The resulting optimization allowed the model to achieve a 77% test accuracy, which is seven times higher than the accuracy of the zero-shot model. However, we have noticed a slight decrease in performance, as shown in Figure 1, when the augmented data was included, likely because the augmented data introduced some noise or variations that were not representative of the true patterns in the FedSpeak dataset. This noise could have led to confusion and hindered the model's ability to accurately classify the speeches. Additionally, the augmented data might have introduced biases or inconsistencies that affected the overall performance. 
 
 <p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/prompt.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/prompt.png" width="1200" />
 </p>
 
+---
 
+## Experiments
 
-
-
-## Dataset
+### Dataset
 
 The available dataset includes two files:
 1. A file containing the text of all FOMC statements released after meetings since 1997.
 2. A file containing 200 randomly-drawn sentences from all the statements. Each sentence has been pre-labelled by human analysts with a hawkishness/dovishness score as defined in the table below. There are also some sentences labelled as “Remove” which indicates sentences that are irrelevant to monetary policies and should be removed in the data cleaning stage.
 
-
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/fedspeak_table.png" width="1200" />
 </p>
+
+The dataset was sources from Andromeda Capital who provided two csv files with the meeting minutes statements and the sentiment score with labels ranging from 5 categories – “Hawkish, Mostly Hawkish, Neutral, Mostly Dovish and Dovish. Hawkish means that the Fed strongly expresses a belief that the economy is growing too quickly and may need to be slowed down through monetary policy. Whereas Dovish means that the Fed strongly expresses a belief that the economy is growing too slowly and may need to be stimulated through monetary policies. The cleaned dataset consisted of 200 statements and labels. 
+
+Although the dataset was sufficient to run small classification tasks, it was not enough to run using Large Language Model weights. Therefore, data augmentation techniques like similar sentence generation from ChatGPT were employed. This enabled a lot more data to be generated in a short period of time with almost zero cost. Approximately 1200 more similar statements were added to the initial dataset and then split into 80 percent training and 20 percent testing. The data was generated using prompts to ask ChatGPT to act like an expert finance professional.
+
+In our experimental training, we utilized three datasets: the original dataset provided by Andromeda Capital, an augmented dataset combining the original data with GPT-generated data, and a GPT-generated dataset only. After evaluating the outcomes, we determined that the augmented dataset (combining original and GPT-generated data) yielded the best results in most of our tested models. This finding suggests that the inclusion of GPT-generated data in the original dataset enhanced the model's performance, indicating the value of incorporating a mixture of original and generated data for training. Nonetheless, this is not always the case. There are cases where the augmentation yields slightly worse results compared to the original dataset alone. This points to the need for further experimentation with ChatGPT prompts that could potentially yield better training data that is more consistent with FedSpeak.
+
+### Evaluation 
+
+In our evaluation process, we employed the accuracy score as the primary metric to assess the accuracy of our predictions. The accuracy score measures the proportion of correct predictions compared to the total number of predictions made. By calculating the accuracy score, we were able to quantitatively evaluate the performance of our predictive model and determine its overall effectiveness in accurately classifying or predicting outcomes. This metric provides a clear and straightforward measure of the model's performance, allowing us to gauge its success in making correct predictions and to make comparisons between different models or approaches.
+
+Additionally, we have also deployed another method to evaluate our predictions based on a comparison of the actual interest rate to the hypothetical interest rate generated based on our best model’s predictions. The details of the evaluation can be found in the analysis section. 
+
+#### Experimental Details
+
+We built our models using specific configurations to conduct our experiments. The exact model configurations included details such as the architecture and type of model used, hyperparameters, learning rate, and training time. These configurations were chosen based on prior research and experimentation to ensure optimal performance, cost utilization, and reliable results.
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/exp_details.png" width="1200" />
+</p>
+
+---
+
+## Results
+
+Results of our models are shown in table below:
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/results.png" width="1200" />
+</p>
+
+From our results, FLAN-T5 Large model’s accuracy is the highest, followed by DeBERTa Large model. The results we obtained managed to beat the baseline (Figure below) reported by Hansen & Kazinnik (2023), with our best model gaining a 16% increase in accuracy. This shows significant improvement can be achieved by our fine-tuning methods, which can be considered by Andromeda capital.
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/comparison.png" width="1200" />
+</p>
+
+---
+
+## Analysis
+
+FLAN-T5 large (Fine-tuned) gave the best results compared to other models. This could be because, FLAN-T5 Large benefits from its underlying T5 architecture, which is known for its strong performance in various NLP tasks. T5 (Text-To-Text Transfer Transformer) is a transformer-based model that has been extensively trained on a diverse range of language tasks, allowing it to grasp complex linguistic structures effectively. Fine tuning it further enhances its performance by training it on task specific data, helping the model specialize and adept to the specific nuances and characteristics of the FedSpeak statements.
+
+Moving down the rank is the DeBERTa and FinBERT model. Both models may not perform as well as FLAN-T5 because they were not trained as extensively compared to FLAN-T5 model’s underlying pre-training tasks. However, our exploration of these BERT models suggests that we should potentially look at finetuning our Large Language Models using a lot more financial corpus. This is shown by FinBERT’s ability to achieve better accuracy compared to many other models we’ve tried even though it was still mainly based on the original BERT architecture, which is less advanced compared to GPT and DeBERTa architecture for example. Hence, this led us to believe that more advanced models trained on larger financial corpuses may potentially result in performance gain.
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/timeseries.png" width="1200" />
+</p>
+
+---
+
+Finally, based on our best model, we created a time series plot in the figure above (Figure 3) to compare the actual historical interest rate (in blue) against the hypothetical rates (in orange) that were computed with listed procedures and assumptions below:
+
+1)	Using our best model, predict the FedSpeak scores for the unlabelled FOMC speeches.
+
+2)	Generate the frequencies of each label by date in the following format: 
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/table_format.png" width="1200" />
+</p>
+
+3)	Choose the label with the max frequency and assign rates as shown below. Choose neutral if no max value.
+    a.	Dovish: -50 basis points
+    b.	Mostly Dovish: -25 basis points
+    c.	Neutral: 0 basis points
+    d.	Mostly Hawkish: +25 basis points
+    e.	Hawkish: +50 basis points
+    
+4)	For the first instance of interest rate, use the actual historical rate. For the rest, sum up the hypothetical interest rates from the steps above sequentially with the previous rate, such that we take max (0, rate change + previous rate) to prevent the curve from dipping below 0%.
+
+5)	Due to the above assumptions, which were needed to generate the hypothetical time series of the interest rates, we were more interested in the overall trend alignment of the curves than the magnitude of the interest rates. As seen in the figure above, our FedSpeak scores can be roughly translated into a time series, the trend shows that our model is effective in capturing the dovishness/hawkishness of the Fed’s speeches. It appears that in the period between 2014-2016, according to our predictions, the Fed was Mostly Hawkish in their speeches, but they had kept the interest rate fixed. Nevertheless, this simple illustration shows that the FedSpeak scores are incredibly useful and can model the actual interest rate trend quite well.
+
+--- 
+
+## Memory Optimization
+
+To grapple with the large memory size of the data, two memory optimization methods had to be implemented, the usage of the DeepSpeed library and the application of low rank approximation (LoRA).
+
+DeepSpeed is an open-source deep learning optimization library for PyTorch. It aims to enhance the efficiency of deep learning training by reducing computational power and memory usage while enabling better parallelism on existing hardware. The library is specifically designed for training large, distributed models with a focus on low latency and high throughput. DeepSpeed incorporates the Zero Redundancy Optimizer (ZeRO), which enables training models with 1 trillion or more parameters. Key features of DeepSpeed include mixed precision training, support for single-GPU, multi-GPU, and multi-node training, as well as customizable model parallelism.
+
+Given the limitations imposed by computational resources, recurrent instances of GPU memory overflow were encountered during the training of the models. Despite attempts to mitigate these issues by reducing sample size, the fine-tuning of expansive models like FLAN-T5 Large, available on HuggingFace, demanded substantial computing power. However, by harnessing the power of DeepSpeed, not only was a successful execution of the larger prodigious FLAN T5 model achieved, but also significant advancements in our endeavours for model optimization. Specifically, longer token length, finer-grained learning rates and more expansive training sample sizes were able to be incorporated, thus capitalizing on the enhanced capabilities provided by DeepSpeed's state-of-the-art deep learning optimization library for Pytorch.
+
+Low Rank Approximation (LoRA) is an optimization technique that reduces the number of trainable parameters by learning pairs of rank-decomposition matrices while freezing the original weights. By leveraging LoRA, the storage footprint and memory usage of the model were able to be reduced, and larger models with better performance on the downstream classification task were able to be trained.
+
+---
+
+## Future Work
+
+Three approaches may be taken which are likely to further refine model performance.
+* More relevant data collection and augmentation
+* Increased training time and resources
+* Hyperparameter tuning.
+More extensive hyperparameter tuning is likely to further improve model performance. Different approaches, such as grid searches, random searches, or execution of hyperparameter sweeps.
+
+---
+
+## Conclusion
+
+In conclusion, this project aimed to leverage Natural Language Processing (NLP) techniques to classify statements made during FedSpeak communications for Andromeda Capital. The goal was to provide a deeper understanding of the sentiments expressed by the Federal Reserve during these meetings, enabling improved investment strategies.
+
+Multiple models were evaluated, including FLAN T5, DeBERTa, FinBERT, and GPT 3.5, with FLAN T5 Large emerging as the best-performing model. The Flan T5 large model was fine-tuned on a dataset of FedSpeak statements and achieved a test accuracy of 77%, significantly outperforming other models.
+
+The main challenge faced in this project was the limited availability of training data. Data augmentation techniques, such as generating similar sentences using ChatGPT, were employed to augment the dataset. However, some of the augmented data may have introduced noise that affected the overall model performance. Further experiments on a variety of other ChatGPT prompts in the future may help overcome this issue.
+
+Future work for this project includes collecting more relevant data, increasing training time and resources, and conducting hyperparameter tuning to further improve model performance. These approaches have the potential to enhance the accuracy and robustness of the classification model.
+
+Overall, by effectively classifying the statements made during FedSpeak communications, Andromeda Capital can gain valuable insights into the sentiments expressed by the Federal Reserve, leading to improved investment strategies and marker opportunities.
 
 ---
 
