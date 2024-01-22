@@ -32,6 +32,10 @@ Recently, studies have been done to decipher FedSpeak using several Large Langua
 
 ## Approach
 
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/modeling.png" width="1200" />
+</p>
+
 The project aimed to overcome the text multi-class classification task. Text classification is defined as the ability for the trained model to correctly label the provided text among the set of trained classes. A set of models were selected to tackle this task, based on recency, performance, and architectural complexity. The models were trained and tested on a combination of datasets described in the next section under dataset selection.
 
 ### Model Selection
@@ -101,6 +105,10 @@ From our results, FLAN-T5 Large model’s accuracy is the highest, followed by D
 
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/comparison.png" width="1200" />
+</p>
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/flan_family.png" width="1200" />
 </p>
 
 ---
