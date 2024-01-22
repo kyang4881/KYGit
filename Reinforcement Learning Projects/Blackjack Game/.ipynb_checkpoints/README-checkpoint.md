@@ -8,11 +8,6 @@ In the game of Blackjack, a modified version of the classic casino game is playe
 
 ---
 
-<p align="left">
-  <img src="https://github.com/kysrc/ky_mas/blob/main/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
-</p>
-
-
 ## Overview
 
 * Deck: Ace, 2-10, Jack and Queen
@@ -633,7 +628,7 @@ rewards1, avg_reward1, tracker1 = test(env=env, agent=agent1, verbose=True, num_
 Visualize the performance
 
 <p align="left">
-  <img src="https://github.com/kysrc/ky_mas/blob/main/feature_selection_timeseries/docs/images/blackjack_agent_performance.png" width="150" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_performance.png" width="150" />
 </p>
 
 
