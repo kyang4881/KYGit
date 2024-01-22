@@ -589,7 +589,7 @@ peft_config = LoraConfig(
 
 ```
 
-Train the model
+Step 2: Train the model
 
 ```python
 # Note:
@@ -727,7 +727,7 @@ run2.visualize_results(preds)
 Visualize performance
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/pred_results.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/pred_results.png" width="1200" />
 </p>
 
 ---
