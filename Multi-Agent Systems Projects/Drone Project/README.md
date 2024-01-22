@@ -13,7 +13,7 @@ A large sporting event can easily draw crowds of spectators that completely over
 
 In this problem we will try to answer this question using game-theoretic approaches. We assume self-interested agents: mobile phone users who aim to optimize their connectivity (i.e., choose base station based on signal power; for simplicity, assume that the closest base station provides the strongest signal) and each base station maximizes the number of served users (i.e., count the number of connected devices). More specifically, we define agent utilities below:
 
-For mobile phone user 𝑖, his/her utility is defined as $$u_i = \min_{k=1,...,K}d_ik$$, where 𝐾 is the number of UAVs, and 𝑑𝑖𝑘 is the Euclidean distance between user 𝑖 and UAV 𝑘. For UAV 𝑘, it’s utility is defined as the number of users connected to it.
+For mobile phone user 𝑖, his/her utility is defined as $`u_i = \min_{k=1,...,K}d_ik`$ where 𝐾 is the number of UAVs, and 𝑑𝑖𝑘 is the Euclidean distance between user 𝑖 and UAV 𝑘. For UAV 𝑘, it’s utility is defined as the number of users connected to it.
 
 
 
