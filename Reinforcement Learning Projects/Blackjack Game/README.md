@@ -33,10 +33,6 @@ Agents:
 * Q Learning
 * Monte Carlo
 
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/fedspeak_table.png" width="1200" />
-</p>
-
 ---
 
 ## Environment
