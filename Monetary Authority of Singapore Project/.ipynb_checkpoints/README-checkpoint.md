@@ -54,9 +54,6 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 <p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig11.png" width="800" />
-</p>
-
-<p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig12.png" width="800" />
 </p>
 
@@ -65,9 +62,6 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 <p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig13.png" width="800" />
-</p>
-
-<p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig14.png" width="800" />
 </p>
 
@@ -76,9 +70,6 @@ The literature review on state-of-the-art feature selection methods aimed to est
 
 <p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig15.png" width="800" />
-</p>
-
-<p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig16.png" width="800" />
 </p>
 
@@ -149,14 +140,14 @@ Given the context of predicting a continuous target variable, specifically the 8
 
 In contrast to typical cross-validation procedures for non-temporal datasets, time series’ equivalent cross-validation is called back testing, which necessitates preserving the chronological order of the data. Two methods for splitting time series data were considered:
 1. Back testing with a sliding window: This method involves iteratively moving a window through the time series, with each pass updating the training set and predicting on subsequent data points, as shown in Figure 2.
-    * a. Training window size: the number of data points included in a training pass.
-    * b. Test window size: the number of data points to include for prediction.
-    * c. Sliding steps: the number of data points skipped from one pass to another.
+    * Training window size: the number of data points included in a training pass.
+    * Test window size: the number of data points to include for prediction.
+    * Sliding steps: the number of data points skipped from one pass to another.
 2. Back testing with an expanding window: This method requires four parameters: starting window size, ending window size, test window size, and expanding steps.
-    * a. Starting window size: the number of data points included in the first training pass.
-    * b. Ending window size: the number of data points included in the last training pass.
-    * c. Test window size: number of data points to include for prediction.
-    * d. Expanding steps: the number of data points added to the training time series from one pass to another.
+    * Starting window size: the number of data points included in the first training pass.
+    * Ending window size: the number of data points included in the last training pass.
+    * Test window size: number of data points to include for prediction.
+    * Expanding steps: the number of data points added to the training time series from one pass to another.
 
 However, only the sliding window approach was tested due to the additional computational cost associated with having larger training sets for the expanding window approach. Moreover, the sliding window method is better aligned with business objectives, given the high-frequency characteristics of the dataset. This decision reflects a choice made in consideration of both computational efficiency and relevance to the project's overarching goals.
 
@@ -169,16 +160,44 @@ In an ideal scenario, the size parameters for the back testing windows should be
 
 Due to the complicated nature of combining feature selection with validation splits and hyperparameter tuning, the set of features selected within each train-validation split needs to be handled appropriately for generalization. Since we have 5-fold validation, each split would have a different set of features and feature scores, thus the features need to be aggregated and the feature scores averaged. The resulting features with their average scores are then sorted, and the top predefined number of features are returned, representing the feature set for all 5-fold validation splits, an example on the computation is shown in Figure 4. This procedure is iterated for all feature selection methods, rolling windows, hyperparameter combinations, and number of features. The pseudocode for the process is shown in Figure 5.
 
-<p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig4.png" width="800" />
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig5.png" width="800" />
-</p>
-
 With so many combinations, to overcome the computation constraints, only two test cases for the number of features will be used, top 50 features and the full feature set, rather than comparing the performance from 1 feature to all n features. The full feature set provides the baseline performance, while the subset of features is used to gauge the effectiveness of the feature selection methods. The objective is to have fewer features but capture the variances in the data for generalization capabilities, thus having fewer features yet achieves performance as good as having all features is a good measure, while having a better performance than with all features is an indication of excellent performance. Other benefits of models with fewer features are that they are cheaper to train and easier to interpret.
 
 For all those combinations previously described, the hyperparameter combinations that give the best averaged RMSE are retained as the best model. The best hyperparameters are then used for retraining, and predictions are made on the hold-out test data. The RMSE scores are then averaged across all rolling windows for all feature selection methods to determine the method that has the best test score, Figure 5 and 6.
 
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig4.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig5.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig6.png" width="800" />
+</p>
 
+---
+
+## Visualization
+
+In the process of training and evaluating the machine learning models, visualizations played a pivotal role in enhancing understanding and assessing performance. During the feature selection stage, word clouds and bar plots are employed to visually convey the significance of each feature. Word clouds provide a high-level representation of feature importance, while bar plots offer more detailed insights, facilitating quick identification of key features. The training stage utilizes time series plots to depict model predictions and true values across various parameters, thus enables the visualization of change in performance, and aids in the prompt identification and resolution of issues. Figure 8 exemplifies these visualizations during the training process. In the model evaluation stage, similar time series plots are used to assess model performance on test data, employing optimal hyperparameters for each feature selection method and rolling window. These visualizations not only enhance the interpretability of the model but also provided valuable diagnostic tools for understanding feature importance, training dynamics, and overall model performance. The use of visualizations is integral to ensuring a comprehensive and informed analysis throughout the machine learning pipeline.
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig9.png" width="800" />
+</p>
+
+---
+
+## Results and Discussion
+
+Due to the memory constraints, executing state-of-the-art feature selection methods that have higher memory requirements on a local machine proved impractical. However, despite these limitations, the traditional SHAP method with its subset of features managed to achieve a remarkable performance (in terms of RMSE averaged across all rolling windows) by utilizing only about 10% of the original features, as depicted in Figure 10. Plots comparing the final predictions, for each method and set of features, against the true values are illustrated in Figure 9. Based on the average test scores (RMSE) of all back testing windows for each method, it's evident that the SHAP feature selection method generated better subset of features than the other methods in this experiment.
+
+For future improvements, various strategies can contribute to the refinement and enhancement of the model. Firstly, as shown in Figure 3, splits 1 to 6 were used to retrain the model with the best hyperparameter combinations to assess the performance on the test data, despite this being a rolling window approach. The expectation is that more data used for the retraining would provide better learning abilities. However, with more time for exploration and better computational resources, it is recommended that the performance of the current rolling window approach should be compared against that of the expanding window and rolling window with a fixed time period of data for retraining. There is also an opportunity to optimize the subset of features, fine-tuning the selection to achieve even better performance. Increasing the dataset size by clustering similar stocks and training separate models stands out as a potential avenue to bolster the model's generalization capability, providing a richer and more diverse set of instances for training. Hyperparameter tuning represents another avenue for improvement; by expanding the hyperparameter grid space, the search for optimal model configurations can be more exhaustive. Moreover, leveraging state-of-the-art models becomes viable with machines boasting higher processing power and memory, offering the potential for more sophisticated analyses. Lastly, incorporating additional feature engineering methods and experimenting with other machine learning algorithms provide an avenue to uncover and utilize more intricate patterns within the data, contributing to further enhancements in overall model performance.
+
+These considerations lay the groundwork for continuous improvement, addressing both existing limitations and the potential for more advanced modeling techniques in future iterations of the project.
+
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig3.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig9.png" width="800" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig10.png" width="800" />
+</p>
+
+---
 ## Pseudocode
 
 A high-level view for the pipeline processes.
