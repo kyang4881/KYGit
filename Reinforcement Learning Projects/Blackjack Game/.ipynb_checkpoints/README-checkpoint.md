@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/Blackjack%Game/docs/images.jpg" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack.jpg" width="1200" />
 </p>
 
 ---
