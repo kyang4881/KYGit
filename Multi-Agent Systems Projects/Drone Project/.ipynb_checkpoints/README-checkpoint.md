@@ -1,4 +1,4 @@
-# Garbage Detection and Classification
+# Mobile Base Station Placement
 
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/background.png" width="1200" />
