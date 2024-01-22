@@ -1,13 +1,69 @@
+## MAS Project
+
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/flow_diagram.png" width="1200" />
 </p>
 
 ---
 
-This project involves the development of a Python pipeline encompassing data ingestion, feature selection, model optimization, and prediction using the XGBoost algorithm. It emphasizes adaptability in selecting variable numbers of features, considering computational costs, eliminating irrelevant features, and mitigating overfitting. The pipeline's foundation lies in a thorough literature review that identifies and implements literature state-of-the-art feature selection methods, as well as traditional feature selection methods that are compatible with the XGBoost architecture. The dataset encompasses both standard datasets and a custom financial time series dataset created to simulate real-world conditions. The pipeline integrates rebalancing techniques and data transformation processes. The goal is to achieve robust model performance through back testing and hyperparameter tuning, paving the way for continuous improvement and future iterations of the project.
+## Introduction
+
+The Monetary Authority of Singapore (MAS) is guided by a set of values and a comprehensive code of conduct that underpin its mission to promote sustained non-inflationary economic growth and maintain a sound and progressive financial center. Upholding values such as integrity, commitment, enterprise, and teamwork, MAS fosters a culture that maintains zero tolerance towards fraud and misconduct. The code of conduct emphasizes the highest standards of personal and professional behavior, duty of confidentiality, avoidance of conflicts of interest, and responsible use of MAS' resources.
+
+Functioning as Singapore's central bank and integrated financial regulator, MAS plays a pivotal role in promoting sustainable economic growth through monetary policy formulation and oversight of financial institutions. Its functions include acting as the central bank, conducting integrated supervision of financial services, managing official foreign reserves, and developing Singapore as an international financial center. The MAS Act, enacted in 1970, granted MAS the authority to regulate the financial services sector, marking a significant evolution in its role as a regulator. Over the years, MAS has adapted to the demands of a complex financial environment, leading to the formation of the institution on January 1, 1971. Since then, MAS has played a crucial role in regulating various sectors, including insurance and securities, and assumed additional responsibilities such as currency issuance following its merger with the Board of Commissioners of Currency in 2002.
+
+## Problem Statement
 
 ---
 
+In the complex landscape of stock market analysis, the dynamics of price changes are shaped by a multitude of factors including historical data, fundamental indicators, and the intricate psychology of investors. However, the diversity of these features poses challenges in attaining heightened prediction accuracy. To address this, a strategic feature selection process may be imperative prior to deploying machine learning models for predictions. This process should not only focus on key features but also serves to mitigate issues such as irrelevant variables, computational costs, and overfitting, thereby enhancing the overall performance of the machine learning models. Care must be taken to strike the right balance when selecting features. Opting for too few features may leave the model with insufficient information for accurate predictions, while an excessive number of features can increase runtime and lead to a deterioration in generalization performance due to the curse of dimensionality. Hence, the focus should be on pinpointing the most impactful features to ensure a good balance between the accuracy of the predictions and time complexity of the models.
+
+The overarching goal revolves around choosing the best feature selection method to aid in constructing a stock portfolio that outperforms the SP500 index. To meet this objective, a versatile pipeline will be developed using Python, encompassing data ingestion, feature selection, and prediction using the XGboost to align with existing infrastructure. Various feature selection methods are to be tested and their performance benchmarked. This pipeline should offer adaptability in selecting a variable number of features, whether fixed or optimally determined. Furthermore, the inclusion of visualization and summarization components enhances the interpretability and practical utility of the entire stock market prediction process.
+
+---
+
+## Traditional Feature Selection Methods
+
+Feature selection is the process of choosing a subset of relevant features from a larger feature set within a dataset. The motivation behind this practice includes simplifying models for interpretability, reducing algorithm run-time, eliminating irrelevant features, mitigating the curse of dimensionality, and enhancing model generalization abilities. There are two main types of feature selection methods: unsupervised and supervised. Unsupervised methods, such as correlation-based approaches, do not rely on the target variable and focus on removing redundant variables. On the other hand, the supervised methods, which are the focus of this project, involve the use of the target variable for evaluation, this category includes:
+
+1. Filter Methods: These assess features based on intrinsic properties and statistical measures, independent of the specific machine learning algorithm chosen. The goal is to select the most relevant features before applying any learning algorithm.
+2. Wrapper Methods: These methods involve an iterative process where different subsets of features are evaluated in terms of their impact on model performance. This evaluation is done by training and testing the model with each subset, aiming to find the most informative feature set.
+3. Intrinsic (Embedded) Methods: These are algorithms that automatically perform feature selection during the training process. The selection is integrated into the learning algorithm itself, eliminating the need for a separate feature selection step.
+
+Each type of feature selection method has its strengths and weaknesses, and the choice of method depends on factors such as the dataset characteristics, the goals of the analysis, and computational considerations. Some examples of traditional feature selection methods that were explored and implemented into the pipeline are:
+
+* Permutation Importance: stands out for its speed and model-agnostic nature, making it suitable for baseline comparison, though it may struggle with intricate feature interactions.
+* SHAP Values: while comprehensive, are computationally intensive, making them valuable for detailed baseline assessments on smaller datasets.
+* Boruta: commonly applied in financial data analysis, is well-known and benefits from numerous benchmark results, enhancing its suitability for baseline comparisons.
+* XGBoost Importance: offers a built-in, fast solution, but its limitation lies in potential oversight of intricate feature relationships.
+* Feature Selection with Annealing (FSA): emerges as a highly efficient and model-agnostic method, particularly adept at handling nonlinearity and providing guarantees for feature recovery and convergence.
+* FeatBoost: while model-agnostic, prioritizes accuracy improvement by being stringent in sample weight assignment.
+* LASSO Regression Feature Importance: introduces a penalty factor to prevent overfitting and implicitly performs feature selection but struggles with correlated features and biases coefficients.
+* CART Feature Importance: being less sensitive to outliers and requiring minimal supervision, effectively models feature interactions but necessitates pruning to mitigate overfitting and exhibits sensitivity to certain data characteristics.
+
+---
+## Literature Review on State-of-the-Art Feature Selection Methods
+
+The literature review on state-of-the-art feature selection methods aimed to establish a comprehensive understanding of feature selection and subsequently identify recent, high performing approaches compatible with the XGBoost architecture. Over 70 research papers from reputable sources such as NIPS, ICML, JML, ScienceDirect, Arxiv, and Springer were examined. From this extensive review, methods feasible for integration with XGBoost were selected. A few noteworthy approaches with expected state-of-the-art performance that were implemented are summarized below.
+
+* Shapley Additive Global Importance (SAGE): SAGE focuses on quantifying the global importance of features in machine learning models and achieves state-of-the-art performance (Figure 11). Motivated by a recent emphasis on local interpretability, SAGE introduces model-based and universal predictive power notions. This method addresses challenges posed by feature interactions, aiming to develop a model-agnostic approach that efficiently accounts for future interactions. SAGE employs Shapley values and an efficient sampling-based algorithm to approximate feature importance. The advantages of SAGE include its ability to identify important and corrupted features swiftly (Figure 12), outperforming the widely used SHAP method, and exhibiting top-tier performance across various datasets.
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig11.png" width="800" />
+</p>
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig12.png" width="800" />
+</p>
+
+
+
+
+* Dynamic Feature Selection (DFS): DFS is an algorithm designed to select features with minimal budget while maximizing predictive accuracy. It performs approximation of the greedy policy trained using amortized optimization and focuses on the variational perspective of the Conditional Mutual Information (CMI) for the greedy policy, which is leveraged to train a network that directly predicts the optimal selection given the current features. It incorporates "reward shaping" in the training process, which outperforms static feature selection methods, achieving state-of-the-art performance (Figure 14). Its effectiveness lies in the strategic selection of features through repeated calls to the policy network and predictions made after each selection using the predictor network (Figure 13).
+
+* Stochastic Gates Feature Selection (STG): STG introduces an embedded feature selection approach tailored for nonlinear models like neural networks. It achieves high sparsity without compromising performance by leveraging the probabilistic relaxation of the ℓ₀ norm of features. Stochastic gates, drawn from the STG approximation of the Bernoulli distribution, are obtained through the application of the hard-sigmoid function to a mean-shifted Gaussian random variable (Figure 15). The resulting stochastic gate, attached to the input feature, is controlled by the trainable parameter μ𝑑, providing a nuanced solution to feature selection challenges in complex, nonlinear models. As a result, STG is an embedded feature selection method that achieves state-of-art performance (Figure 16).
+
+---
 <p align="left">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
 </p>
