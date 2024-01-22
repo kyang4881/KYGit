@@ -148,20 +148,21 @@ Low Rank Approximation (LoRA) is an optimization technique that reduces the numb
 
 ## Future Work
 
-Four approaches may be taken which are likely to further refine model performance.
+These are some approaches that may be taken to further refine model performance.
 
-### Further image augmentation
-
+1. Further image augmentation
+        
 The current dataset is limited to the overlay of cropped stock images at random points on the selection of background. The inclusion of additional backgrounds, rotation and resizing of the cropped images during the overlay process would further increase the amount of training data available. Image level transformations such as flips and rotation, as well as pixel level transformations like brightness, contrast and hue adjustments is likely to provide a model performance improvement.
 
-### Increased training time and resources
+2. Increased training time and resources
 
 It is to be noted however, that the proposed image augmentation will further inflate the datasets, resulting in significant increases in the training and testing time required for each model. Given sufficient time and computing resources, the models may be trained and tested using the augmented dataset consisting of the original sized images (1120x1120). This will allow for the standardization of the training, as well as the testing of the models thereby resulting in a more objective comparison in model performance.
 
-### Hyperparameter tuning
+3. Hyperparameter tuning
 
 More extensive hyperparameter tuning is likely to further improve model performance. Different approaches, such as grid searches, random searches or execution of hyperparameter sweeps.
 
+--- 
 
 ## Conclusion
 
