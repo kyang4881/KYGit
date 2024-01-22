@@ -4,14 +4,57 @@
 
 ---
 
-The Federal Reserve (the Fed) is the central bank of the United States. Its role is to conduct monetary policy to promote the health of the US economy and the stability of the US financial system. Within the Fed, the Federal Open Market Committee (FOMC) meets eight times a year to discuss the economic outlook and set the direction for monetary policy. These meetings are followed by public statements that summarise the committee’s view of the economy and monetary policy decisions.
-Fedspeak is a term used to describe the language used by the Fed to communicate on monetary policy decisions and manage investors’ expectations about future policy directions. The sentiment in the Fed’s communication can be classified as hawkish or dovish, where hawkish means the Fed is more likely to tighten monetary policy/raise interest rates to curb inflation and cool down the economy, while dovish means the Fed is more likely to loosen monetary policy/cut interest rates to support faltering growth. Depending on how hawkish or how dovish it is, the sentiment in the Fed’s language could significantly swing financial markets. As a result, central bank statements, meeting minutes and individual member speeches have become important data to be analysed by investment professionals.
+## Abstract
+
+The recent advancements in Natural Language Processing (NLP) can provide finance professionals with tools to analyse the sentiments of various news and statements. Among this financial news, statements made by the Federal Reserve during their meeting are some of the most studied by financial professionals. These statements, referred to also as FedSpeak, contains valuable information on the Federal Open Market Committee’s sentiment on the future of the US economy. Hence, knowing their sentiment could help predict the future action the committee will take which would influence the direction of the financial market. In this project, we fine-tuned several Large Language Models (Flan-T5, DeBERTa, FinBERT, GPT 3.5) to decipher the sentiment of FedSpeak statements. Our best performing model was Flan-T5 Large model, which achieved 77% accuracy, higher than what has been reported by other studies.
 
 ---
 
+## Introduction 
+
+The Federal Reserve plays a pivotal role in shaping economic policies that have a direct impact on financial markets. One of the keyways they influence these markets is through adjustments in interest rates, which in turn affect asset prices, stock markets, bond market on a global scale. A crucial aspect of communicating these policy decisions lies in the announcements made by the Federal Reserve which happen eight times a year, commonly referred to as FedSpeak. During these meetings, members of the Federal Open Market Committee (FOMC) share their perspectives on the state of the economy and monetary policy options. These insights often serve as valuable indicators for investors, aiding them in making informed investment decisions. However, the language and terminology used in these meetings can be quite technical and laden with jargon, posing challenges for many investors to interpret and understand the implications.
+
+The utilization of Natural Language Processing (NLP) has proven to be an invaluable tool in various applications, including sentiment analysis, news classification, and more. In line with this, Large Language Models in NLP could potentially be used to effectively classify the statements made during FedSpeak communications for Andromeda Capital. However, previous attempts at classification using ChatGPT ZeroShot Learning yielded unsatisfactory accuracy. 
+
+To improve these previous attempts, we believe that employing more advanced and specialized large language models trained specifically on text data can significantly enhance the accuracy of sentence classification in this context. By effectively classifying these statements, we can provide Andromeda Capital with a deeper understanding of the sentiments expressed by the Federal Reserve during these meetings. This, in turn, enables them to develop improved investment strategies, considering the nuanced insights gleaned from the Fed's communication. A trained model can be deployed in the current operations of the company which can decipher FedSpeak and give an overall sentiment score for each statement which then can be correlated with the interest rate policy changes happening after the announcement creating more market opportunities for better investments strategies.
+
+---
+
+## Related Work
+
+Recently, studies have been done to decipher FedSpeak using several Large Language Models. In particular, the work of Hansen & Kazinnik (2023) is a focal point of reference for this project. In their work, it was shown that the maximum accuracy attained using fine-tuned ChatGPT is 61%. The table below summarizes the key findings from the paper that we will use to evaluate our model performance.
+
 <p align="left">
-  <img src="https://github.com/kysrc/ky_mas/blob/main/feature_selection_timeseries/docs/images/py_ver.png" width="150" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/related_work.png" width="150" />
 </p>
+
+---
+
+## Approach
+
+The project aimed to overcome the text multi-class classification task. Text classification is defined as the ability for the trained model to correctly label the provided text among the set of trained classes. A set of models were selected to tackle this task, based on recency, performance, and architectural complexity. The models were trained and tested on a combination of datasets described in the next section under dataset selection.
+
+### Model Selection
+
+FLAN T5, DeBERTa, FinBERT and GPT 3.5 were the better models reported for this task and FLAN T5 was chosen as the final model based on classification accuracy. Other models such as BERT, RoBERTa, and ensemble with Random Forrest classifiers were also explored. However, these are not discussed since the performance were shown to be limited.
+
+#### FLAN T5
+
+The Flan T5 models, developed by Google Research, were selected due to 1) they were recently released (2022), showcasing cutting-edge performance on various NLP benchmarks [1], and 2) they have a distinctive instruction-based text-to-text architecture, allowing for adaptable fine-tuning across diverse NLP tasks. Through extensive instruction finetuning on a large corpus of text data, the Flan T5 models have acquired enhanced language knowledge and robust generalization capabilities to handle unseen data and tasks. Notably, these models surpass the original T5 models when fine-tuned for single task problems, while also exhibiting accelerated training speed and convergence [2], thereby offering superior performance and efficiency.
+
+The small, base, large, and XLarge variants with 80M, 250M, 780M, and 3B parameters respectively, were explored, through the HuggingFace API. Testing the XLarge model was made possible through the application of optimization techniques such as DeepSpeed with ZeRO and LoRA, the details are provided in section 9.1.1. However, due to limited computational and storage resources, the Flan T5 large model was eventually selected as the largest viable option, with the best cost to performance ratio, that can be executed on Colab efficiently, although the larger variants may potentially enhance performance further [3].
+
+Prior to the training process, the provided datasets were processed into the prompt format shown in Figure 1, for passing as inputs to the models. This prompt format was decided upon by referring to the Flan GitHub repository on template prompts used for specific tasks [4]. Among the various prompt formats explored, the prompt shown in Figure 1 gave the best test performance. However, due to the vast number of prompts available and computational constraints, the search space of the prompts was non exhaustive.
+The initial predictions on the validation set, conducted without any fine-tuning, resulted in poor performance as shown in Table 2. The accuracy achieved was only 11%, indicating that the predictions were worse than random guessing. The poor zero-shot performance may be attributed to the model’s inability to generalize effectively to an unseen task that is as difficult as a classification problem on Fed speeches, because FedSpeak often employs language that is deliberately ambiguous and vague. The Fed officials may choose their words carefully to avoid making explicit statements or commitments that could have immediate market or economic impacts. Consequently, the zero-shot model struggles to understand the context and often output the same predictions for most instances, resulting in worse-than-guessing performance. 
+
+Through fine-tuning on the FedSpeak dataset, the Flan T5 large model improves its understanding of the specific language patterns and contextual nuances present in Fed speeches, leading to a substantial improvement in performance. The fine-tuned model adapts its parameters to focus on the relevant features and patterns required for accurate classification. The resulting optimization allowed the model to achieve a 77% test accuracy, which is seven times higher than the accuracy of the zero-shot model. However, we have noticed a slight decrease in performance, as shown in Figure 1, when the augmented data was included, likely because the augmented data introduced some noise or variations that were not representative of the true patterns in the FedSpeak dataset. This noise could have led to confusion and hindered the model's ability to accurately classify the speeches. Additionally, the augmented data might have introduced biases or inconsistencies that affected the overall performance. 
+
+<p align="left">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/prompt.png" width="150" />
+</p>
+
+
+
 
 
 ## Dataset
