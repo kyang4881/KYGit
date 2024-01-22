@@ -7,11 +7,19 @@
 
 ---
 
-## Introduction 
+## Problem Statement 
 
-In today's world, the environmental challenges have become increasingly urgent, with 3.40 billion tonnes of waste expected to be generated annually by 2050 (Kaza et al, 2018), demanding innovative solutions to mitigate the detrimental impacts of human activities. One critical issue is the proper management of waste and the pressing need to minimise its adverse effects on the ecosystems. 
+A large sporting event can easily draw crowds of spectators that completely overwhelm local communication system. A recent solution is to contract telecommunication companies to provide temporary network connectivity by using a number of elevated mobile base stations (hosted on airborne unmanned aerial vehicles (UAVs), or drones). The question is how we fly these UAV nodes in order to provide optimal connectivity for the many ground-based mobile phone users.
 
-Recycling is one way to reduce waste. However, before waste can be recycled it needs to be sorted and processed. For example, segregating paper from plastics or removing hazardous waste ensures each type can be processed safely and appropriately. Apart from industrial waste production, consumers are also a first mile of the recycling process. 
+In this problem we will try to answer this question using game-theoretic approaches. We assume self-interested agents: mobile phone users who aim to optimize their connectivity (i.e., choose base station based on signal power; for simplicity, assume that the closest base station provides the strongest signal) and each base station maximizes the number of served users (i.e., count the number of connected devices). More specifically, we define agent utilities below:
+
+For mobile phone user 𝑖, his/her utility is defined as 𝑢𝑖=min𝑘=1,…,𝐾𝑑𝑖𝑘, where 𝐾 is the number of UAVs, and 𝑑𝑖𝑘 is the Euclidean distance between user 𝑖 and UAV 𝑘. For UAV 𝑘, it’s utility is defined as the number of users connected to it.
+
+
+
+```math
+$$u_i = \min_{k=1,...,K}d_ik$$
+```
 
 ---
 
