@@ -35,10 +35,6 @@ Thirty-one different background images containing no garbage were sourced from g
 
 The resulting dataset consisted of 39,965 files and 67.6 GB of memory, too large of a dataset to be used unaltered without taking a significant amount of time for model training. The images were resized to 224 by 224 pixels from their original 1120 by 1120 pixels, accepting a trade-off in possible performance gains from the increased image resolution for training speed. 
 
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/train_val_test.png" width="1200" />
-</p>
-
 ---
 
 ## Methodology 
@@ -48,8 +44,9 @@ The project aimed to overcome two main tasks: Image classification and object de
 The models were trained and tested with the generated images, with the results documented in the attached appendix (figures 8 to 11). To validate the models, a curated set of non-generated images consisting of garbage found in organic environments (such as one shown in figure 2 below) were used.
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/validation_img.png" width="600" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/train_val_test.png" width="1200" />
 </p>
+
 
 ---
 
@@ -123,6 +120,11 @@ For image classification, it appears that performance of the model improves with
  <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/results.png" width="1200" />
 </p>   
+
+ <p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/pred.png" width="1200" />
+</p>   
+
 ---
 
 ## Challenges
