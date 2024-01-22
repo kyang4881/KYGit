@@ -154,6 +154,7 @@ However, only the sliding window approach was tested due to the additional compu
 In an ideal scenario, the size parameters for the back testing windows should be fine-tuned. However, due to computational and memory constraints, only a set of fixed values could be tested. The number of rolling windows was limited to 5, and the size of the test set (holdout) was configured to be the same as that of the validation set. The validation set exists within each rolling window preceded by the training set. An illustrative example of a 5-fold train-validation split is shown in Figure 3.
 
 <p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig2.png" width="800" />
   <img src="https://github.com/kyang4881/KYGit/blob/master/Monetary%20Authority%20of%20Singapore%20Project/feature_selection_timeseries/docs/images/fig3.png" width="800" />
 </p>
 
