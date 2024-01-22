@@ -580,3 +580,40 @@ We observe that the UAVs have converged to a nash equilibrium
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/qlearning_uav.png" width="400" />
 </p>
+
+Best Response Learning Results
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/br_utility.png" width="1200" />
+</p>
+
+Reinforcement Learning Results
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/rl_utility.png" width="1200" />
+</p>
+
+
+Notice the following:
+
+* The best response learning model saves on training time because it does not need to learn the set of all possible moves to consider when making the next best move, it simply checks the most ideal next move based on the utility of the UAVs for the next move and not future moves.
+* The Q learning model needs to discount for future moves' rewards, thus require training with a set number of episodes. This leads to longer initial run time due to the training process which attempts to learn the set of optimal moves that maximize future utilities for the UAVs. The current Q learning model may also require retraining when the number of UAV changes to improve performance, thus increases computational time at the initial phase.
+* As the grid size (m) scales larger, it becomes more computational expensive to train the Q learning model. The Q learning model is also heavily dependent on the q table which contains the set of q values, that determine the action to take for a given state. This means it's vital to have enough training episodes for the optimal actions to be learned, otherwise random actions will be selected. While training takes up more time initially, later computation of the action in the Q learning model is more efficient than the BRL model because the Q values are stored in a lookup table and the action can be quickly obtained rather than having to compute the utilities to determine the best next action for each time step.
+* For a set of fixed starting positions of the UAVs, it appears that without sufficient training of the Q learning model, the BRL model outperforms it. However, increasing the number of training episodes can improve the performance of the Q learning model to surpass that of the BRL model.
+* The obtained equilibrium outcomes are still not socially optimal, thus as we see in socially optimal results below, the utilities of the users in a socially optimal case when m=100 with 2 UAVs is still significantly better than the results from both models. However, as expected, the users' total utility improves as the number of UAVs increases.
+
+---
+
+## Social Optimal
+
+It is possible to coordinate the competing UAV nodes into a socially optimal outcome by altering the objective function. The original objective function was based on the maximization of total utility for the UAVs, derived from counting the number of users connected to each uav based on their relevative minimum distance, thus resulted in the UAVs aggregating close to the center region and close to one another. The updated approach seek to maximize user utility as the objective instead, by minimizing the sum of the users' distance to the nearest uav. Therefore, user utility is presented as a negative value because maximizing this value result in the minimum total distance. It can be seen that changing this objective function lead to the UAVs moving in the direction that would lead to better user outcome
+
+Socially Optimal Reinforcement Learning Results
+
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Multi-Agent%20Systems%20Projects/Drone%20Project/docs/images/social_opt_rl_utility.png" width="1200" />
+</p>
+
+
+
+
