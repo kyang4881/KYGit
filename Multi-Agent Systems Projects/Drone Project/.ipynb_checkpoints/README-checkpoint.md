@@ -608,6 +608,35 @@ Notice the following:
 
 It is possible to coordinate the competing UAV nodes into a socially optimal outcome by altering the objective function. The original objective function was based on the maximization of total utility for the UAVs, derived from counting the number of users connected to each uav based on their relevative minimum distance, thus resulted in the UAVs aggregating close to the center region and close to one another. The updated approach seek to maximize user utility as the objective instead, by minimizing the sum of the users' distance to the nearest uav. Therefore, user utility is presented as a negative value because maximizing this value result in the minimum total distance. It can be seen that changing this objective function lead to the UAVs moving in the direction that would lead to better user outcome
 
+Update the objective function
+
+```python
+def connect_users_to_uavs(self, uav_positions_):
+    """
+    Calculate the utility based on the total distances of all users relative to the UAVs. Modified objective for social optimality
+
+    Args:
+        uav_positions_ (list of tuples): List of UAV positions.
+
+    Returns:
+        float: Total distance-based utility.
+    """
+    total_distance_utility = 0.0
+
+    for user_position in self.user_positions:
+        min_distance = float('inf')
+
+        for uav_position in uav_positions_:
+            distance = self.euclidean_distance(user_position, uav_position)
+            if distance < min_distance:
+                min_distance = distance
+
+        total_distance_utility += min_distance
+
+    return total_distance_utility
+
+```
+
 Socially Optimal Reinforcement Learning Results
 
 <p align="center">
