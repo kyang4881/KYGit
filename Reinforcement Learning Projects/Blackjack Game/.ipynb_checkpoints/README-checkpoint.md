@@ -13,12 +13,25 @@ In the game of Blackjack, a modified version of the classic casino game is playe
 </p>
 
 
-## Dataset
+## Overview
 
-The available dataset includes two files:
-1. A file containing the text of all FOMC statements released after meetings since 1997.
-2. A file containing 200 randomly-drawn sentences from all the statements. Each sentence has been pre-labelled by human analysts with a hawkishness/dovishness score as defined in the table below. There are also some sentences labelled as “Remove” which indicates sentences that are irrelevant to monetary policies and should be removed in the data cleaning stage.
+* Deck: Ace, 2-10, Jack and Queen
+* Objective: Maximize winnings or minimize losses
 
+Env:
+
+* Ace: {1, 11}, Jack or Queen = 10, else = face value
+* Win if total = 21 on the first 2 cards = blackjack
+* Tie if dealer also has blackjack
+* Win payout = +1, blackjack payout = +1.5, tie = 0
+* Player is dealt two cards, action = {"hit", "stand"}
+* Card total > 21 = busts (loses)
+* Dealer has 1 face up card and draw iff hard 16, soft 17 or lower
+
+Agents:
+
+* Q Learning
+* Monte Carlo
 
 <p align="center">
   <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/fedspeak_table.png" width="1200" />
@@ -26,9 +39,29 @@ The available dataset includes two files:
 
 ---
 
-## Notebook
+## Environment
 
-Import necessary libraries.
+The class BlackjackEnvironment simulates a game of Blackjack. The class initializes the game environment with a deck of cards, assigns values to each card in the deck, and offers methods for simulating the game. The deal_card method simulates drawing a card from the deck, and the card_mapper method maps card values to their corresponding numeric values. The initial_state method initializes the game state, generating the two player cards and one face up dealer card. The player can choose to "hit" (draw a card) or "stand" (end their turn) using the player_action method. The hand_total methods calculate the total value of a hand, considering possible values for Aces. The dealer_action method determines the dealer's action based on their hand, adhering to typical Blackjack rules. The accepted_value method helps identify acceptable values for the player and dealer, ensuring values do not exceed 21. The step method simulates a single step in the game, updating player and dealer hands, calculating rewards, and determining if the game is over. The play method simulates an entire game and returns the final reward.
+
+The following assumptions were implemented in the environment and state-transition.
+* Deck Composition: The deck is modified to exclude Kings, leaving only Ace, 2, 3, 4, 5, 6, 7, 8, 9, 10, Jack, and Queen.
+    * The provided code defines a Python class called BlackjackEnvironment, which simulates a simplified game of Blackjack. The class initializes the game environment with a deck of cards as defined in the assumption.
+
+* Card Values: Number cards are considered at face value, Jack and Queen cards are both valued at 10, and Aces can be counted as either 1 or 11.
+
+A card_mapper method maps card values to their corresponding numeric values
+Blackjack Definition: A player achieving a total of 21 on the first two cards is considered to have a "blackjack." In this case, the player wins unless the dealer also has a "blackjack," leading to a "tie."
+
+In the transition method, the player goes first and it is checked whether the player has 21, if the player has a total of 21 and the dealer doesn't, it's a blackjack and the turn ends. If the dealer also has 21, it's a tie game, otherwise the game continues until the player either stand or bust.
+Payouts: Payouts for regular wins are simplified at 1 to 1, and player "blackjacks" are paid out at 3 to 2 odds.
+
+Rewards are assigned in the transition method with +1.5 for blackjack, +1 for a normal win, 0 for a tie and -1 for a loss.
+Player Actions: The agent is given two possible actions: "hit" (take a card) or "stand" (end the turn). This simplifies the agent's decision-making process.
+
+The player's action is determined by the Agent class and consists of only the two listed actions.
+Dealer Rules: The dealer (representing the house) has a single faced-up card, and they must draw an additional card if their hand is currently "hard 16" or "soft 17" (which includes an Ace) or lower.
+
+This is implemented by the dealer_action method
 
 ```python
 import jsonlines
