@@ -793,3 +793,15 @@ trainer.save_model(best_model_path)
 
 1. Hansen, A. and Kazinnik, S., Can ChatGPT Decipher Fedspeak?, March 2023
 2. Pan, T., and Lee, H., AI in Finance: Deciphering Fedspeak with Natural Language Processing, March 2021
+3. Scaling Instruction-Finetuned Language Models. (2022, October 20). https://arxiv.org/abs/2210.11416
+4. The Flan Collection: Advancing open-source methods for instruction tuning. Section: Single task fine-tuning. (2023, February 1).
+https://ai.googleblog.com/2023/02/the-flan-collection-advancing-open.html
+5. Flan-T5 Overview. Hugging Face. https://huggingface.co/docs/transformers/model_doc/flan-t5
+6. Flan prompt templates by task. https://github.com/google-research/FLAN/blob/main/flan/v2/flan_templates_branched.py
+7. README.md · google/flan-t5-xxl at main. (2023, May 21). https://huggingface.co/google/flan-t5-xxl/blob/main/README.md. 
+8. He, P. et al. (2021) DeBERTa: Decoding-enhanced Bert with disentangled attention, arXiv.org. Available at: https://arxiv.org/abs/2006.03654 (Accessed: June 2023). 
+9. Chung, H.W. et al. (2022) Scaling instruction-finetuned language models, arXiv.org. Available at: https://arxiv.org/abs/2210.11416 (Accessed: May 2023). 
+10. Araci, D. (2019) Finbert: Financial sentiment analysis with pre-trained language models, arXiv.org. Available at: https://arxiv.org/abs/1908.10063 (Accessed: June 2023). 
+11. Board of governors of the Federal Reserve System (no date) Federal Reserve Board - H.15 - Selected Interest Rates (Daily) - June 23, 2023. Available at: https://www.federalreserve.gov/releases/h15/ (Accessed: June 2023).
+12. GPT-3 (2023) Wikipedia. Available at: https://en.wikipedia.org/wiki/GPT-3 (Accessed: June 2023).
+13. Desola, V. et al. (2019) FinBERT: pre-trained model on SEC filings for financial natural language tasks. Available at: https://www.researchgate.net/publication/334974348_FinBERT_pre-trained_model_on_SEC_filings_for_financial_natural_language_tasks (Accessed: May 2023).
