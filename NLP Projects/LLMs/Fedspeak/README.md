@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/main/docs/images/LLMs_background.jpg" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/LLMs_background.jpg" width="1200" />
 </p>
 
 ---
