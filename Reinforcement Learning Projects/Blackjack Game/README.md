@@ -628,7 +628,7 @@ rewards1, avg_reward1, tracker1 = test(env=env, agent=agent1, verbose=True, num_
 Visualize the performance
 
 <p align="left">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_performance.png" width="150" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Reinforcement%20Learning%20Projects/Blackjack%20Game/docs/images/blackjack_agent_performance.png" width="800" />
 </p>
 
 
