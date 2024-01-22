@@ -35,6 +35,12 @@ Thirty-one different background images containing no garbage were sourced from g
 
 The resulting dataset consisted of 39,965 files and 67.6 GB of memory, too large of a dataset to be used unaltered without taking a significant amount of time for model training. The images were resized to 224 by 224 pixels from their original 1120 by 1120 pixels, accepting a trade-off in possible performance gains from the increased image resolution for training speed. 
 
+<p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/train_val_test.png" width="1200" />
+</p>
+
+---
+
 ## Methodology 
 
 The project aimed to overcome two main tasks: Image classification and object detection. Image classification is defined as the ability of the ability for a trained model to correctly label a provided image among a set of trained classes, while object detection is defined as the ability for a train model to draw a bounding box around an object of interest within a provided image (thereby identifying the location) and then execute a proper classification of that object. A set of models were selected to tackle each of the two tasks, selected due to their recency, ease of implementation and performance whilst having a variety of architecture.
@@ -42,10 +48,12 @@ The project aimed to overcome two main tasks: Image classification and object de
 The models were trained and tested with the generated images, with the results documented in the attached appendix (figures 8 to 11). To validate the models, a curated set of non-generated images consisting of garbage found in organic environments (such as one shown in figure 2 below) were used.
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/validation_img.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/validation_img.png" width="600" />
 </p>
 
-## Model Selection
+---
+
+## Model Selection (Classification)
 
 Transfer learning using models Resnet 50, EfficientNetV2L and Vision Transformer (ViT) were selected for the task of image classification. 
 
@@ -74,109 +82,89 @@ Vision Transformer (henceforth referred to as ViT) was developed by Dosovitskiy 
   <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/vit.png" width="1200" />
 </p>
 
+---
 
+## Model Selection (Object detection)
 
+Transfer learning using model YOLOV3 was selected for the task of object identification. 
 
-#### Experimental Details
+### YOLOV3
 
-We built our models using specific configurations to conduct our experiments. The exact model configurations included details such as the architecture and type of model used, hyperparameters, learning rate, and training time. These configurations were chosen based on prior research and experimentation to ensure optimal performance, cost utilization, and reliable results.
+YOLOV3 (Redmon et al, 2016) tackles object identification in a method not unlike ViTs, by splitting a image into a series of sub-images in a grid like fashion. Conventionally, the sliding window object detection method is used for the task of object detection, which uses an approach similar to kernels in CNNs, the model learning from a window moved across the image with the image data and bounding box data. What makes YOLO unique in its approach to object detection is to first split an image into a grid and embedding visual and bounding box data within each cell of the grid. Feeding each sub-image through a CNN, the assessment of the location and appropriate label of the object of interest is assessed as a whole image. A trained model would then be able to predict several viable bounding boxes, with nonmax suppression, a method used to assess probabilities of the bounding boxes, used to determine the most appropriate bounding box for that image.
 
 <p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/exp_details.png" width="1200" />
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/yolo.png" width="1200" />
 </p>
 
 ---
 
-## Results
+#### YOLO Methodology
 
-Results of our models are shown in table below:
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/results.png" width="1200" />
-</p>
-
-From our results, FLAN-T5 Large model’s accuracy is the highest, followed by DeBERTa Large model. The results we obtained managed to beat the baseline (Figure below) reported by Hansen & Kazinnik (2023), with our best model gaining a 16% increase in accuracy. This shows significant improvement can be achieved by our fine-tuning methods, which can be considered by Andromeda capital.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/comparison.png" width="1200" />
-</p>
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/flan_family.png" width="1200" />
-</p>
-
----
-
-## Analysis
-
-FLAN-T5 large (Fine-tuned) gave the best results compared to other models. This could be because, FLAN-T5 Large benefits from its underlying T5 architecture, which is known for its strong performance in various NLP tasks. T5 (Text-To-Text Transfer Transformer) is a transformer-based model that has been extensively trained on a diverse range of language tasks, allowing it to grasp complex linguistic structures effectively. Fine tuning it further enhances its performance by training it on task specific data, helping the model specialize and adept to the specific nuances and characteristics of the FedSpeak statements.
-
-Moving down the rank is the DeBERTa and FinBERT model. Both models may not perform as well as FLAN-T5 because they were not trained as extensively compared to FLAN-T5 model’s underlying pre-training tasks. However, our exploration of these BERT models suggests that we should potentially look at finetuning our Large Language Models using a lot more financial corpus. This is shown by FinBERT’s ability to achieve better accuracy compared to many other models we’ve tried even though it was still mainly based on the original BERT architecture, which is less advanced compared to GPT and DeBERTa architecture for example. Hence, this led us to believe that more advanced models trained on larger financial corpuses may potentially result in performance gain.
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/timeseries.png" width="1200" />
-</p>
-
----
-
-Finally, based on our best model, we created a time series plot in the figure above (Figure 3) to compare the actual historical interest rate (in blue) against the hypothetical rates (in orange) that were computed with listed procedures and assumptions below:
-
-1)	Using our best model, predict the FedSpeak scores for the unlabelled FOMC speeches.
-
-2)	Generate the frequencies of each label by date in the following format: 
-
-<p align="center">
-  <img src="https://github.com/kyang4881/KYGit/blob/master/NLP%20Projects/LLMs/Fedspeak/docs/images/table_format.png" width="1200" />
-</p>
-
-3)	Choose the label with the max frequency and assign rates as shown below. Choose neutral if no max value.
-    a.	Dovish: -50 basis points
-    b.	Mostly Dovish: -25 basis points
-    c.	Neutral: 0 basis points
-    d.	Mostly Hawkish: +25 basis points
-    e.	Hawkish: +50 basis points
+After the data augmentation step, a separate input file was created for each image, containing the bounding box information in the format: class x coordinate, y coordinate, width, height. Subsequently, each image was labelled using the same name as the image file for the model's data processing. Then, the darknet weights and YOLO configuration, trained on the imagenet dataset, were utilized to train the model. Model training however, took a very long time due to the large size of the custom dataset and the specific requirements of the YOLO architecture. 
     
-4)	For the first instance of interest rate, use the actual historical rate. For the rest, sum up the hypothetical interest rates from the steps above sequentially with the previous rate, such that we take max (0, rate change + previous rate) to prevent the curve from dipping below 0%.
+Consequently, a pretrained YOLO model was used to test the custom images. To achieve this, the hyperparameters were tuned according to the dataset, which consisted of 5 classes, and the output layer of the YOLO architecture was modified accordingly.
+    
+Regarding the architecture, the image was initially resized to 448x448 pixels, and the pixel values were normalized within the range of -1 to 1. These values were then processed through the network, which produced the network output. The architecture primarily consisted of a CNN network that extracted high-level features through a series of convolution and pooling layers. These layers captured contextual information, enabling the network to gain a deeper understanding of the image. The detection layers were responsible for predicting the bounding boxes and class probabilities. The output of the network was a tensor representing grid cells, which contained information about the bounding boxes and class probabilities.
+    
+When comparing the performance between overlayed images and natural images, the model exhibits superior performance on natural images compared to overlayed images. This discrepancy can be attributed to the dataset on which the model was trained. The pretrained model was trained on the COCO dataset, which consisted of common object images. As a result, the model is more adept at recognizing objects in their original context, where the background is coherent with the object itself, rather than objects superimposed on a different background.
 
-5)	Due to the above assumptions, which were needed to generate the hypothetical time series of the interest rates, we were more interested in the overall trend alignment of the curves than the magnitude of the interest rates. As seen in the figure above, our FedSpeak scores can be roughly translated into a time series, the trend shows that our model is effective in capturing the dovishness/hawkishness of the Fed’s speeches. It appears that in the period between 2014-2016, according to our predictions, the Fed was Mostly Hawkish in their speeches, but they had kept the interest rate fixed. Nevertheless, this simple illustration shows that the FedSpeak scores are incredibly useful and can model the actual interest rate trend quite well.
+---
+    
+##  Evaluation 
 
---- 
+Evaluation of the previously mentioned models was be done primarily through the analysis of performance metrics. The main performance metrics are the accuracy, precision, recall and eventually the F1 score. For object detection, intersection over union (IOU) will be used as another evaluation metric. Intersection over union (IOU), the measure of the model’s ability to distinguish the objects from the background, will also be used as a performance metric. In addition, models were tested against a selection of images contributed by team members to roughly determine the model accuracies.
+
+---
+
+##  Results
+
+For image classification, it appears that performance of the model improves with the more recent, sophisticated models. For YOLOV3, while the accuracy, precision and recall performance metrics are not as high as the test classification models, the IOU was found to be 57%, a relatively acceptable level for a model not yet trained specially on the selected dataset.
+    
+ <p align="center">
+  <img src="https://github.com/kyang4881/KYGit/blob/master/Computer%20Vision/Garbage%20Classification/docs/images/results.png" width="1200" />
+</p>   
+---
+
+## Challenges
+
+It is to be noted that the number of tests datapoints were not consistent between model evaluations. Through the refinement from Trashbox’s stock images, the resulting dataset consisted of images 1120 by 1120 pixels in size, approximately 40, 000 images over the 4 sub-categories, spanning 67.6 GB. With the limitation of time and computing resources, images were resized down to 224 by 224 pixels in size to allow for ease of model training. Despite this however, model training took a significant amount of time, with training of an object detection model with additional google colaboratory GPU resources on 20% of the training dataset took upwards of 7 hours. Each model was trained and tested on a variety of subset sizes in an attempt to feed in as much training and test data as possible in a reasonable amount of time. While this will introduce a level of inconsistency into model comparisons, representative sampling of both the training and testing datasets make it less likely to have large deviations in model performance than what has been tested.
+
+---
 
 ## Memory Optimization
 
-To grapple with the large memory size of the data, two memory optimization methods had to be implemented, the usage of the DeepSpeed library and the application of low rank approximation (LoRA).
+To grapple with the large memory size of the image data, two memory optimization methods had to be implemented, the usage of the DeepSpeed library and the application of low rank approximation (LoRA).
 
 DeepSpeed is an open-source deep learning optimization library for PyTorch. It aims to enhance the efficiency of deep learning training by reducing computational power and memory usage while enabling better parallelism on existing hardware. The library is specifically designed for training large, distributed models with a focus on low latency and high throughput. DeepSpeed incorporates the Zero Redundancy Optimizer (ZeRO), which enables training models with 1 trillion or more parameters. Key features of DeepSpeed include mixed precision training, support for single-GPU, multi-GPU, and multi-node training, as well as customizable model parallelism.
 
-Given the limitations imposed by computational resources, recurrent instances of GPU memory overflow were encountered during the training of the models. Despite attempts to mitigate these issues by reducing sample size, the fine-tuning of expansive models like FLAN-T5 Large, available on HuggingFace, demanded substantial computing power. However, by harnessing the power of DeepSpeed, not only was a successful execution of the larger prodigious FLAN T5 model achieved, but also significant advancements in our endeavours for model optimization. Specifically, longer token length, finer-grained learning rates and more expansive training sample sizes were able to be incorporated, thus capitalizing on the enhanced capabilities provided by DeepSpeed's state-of-the-art deep learning optimization library for Pytorch.
-
+Given the limitations imposed by computational resources, recurrent instances of GPU memory overflow were encountered during the training of the models. Despite attempts to mitigate these issues by reducing sample size and image resolution, the fine-tuning of expansive models like google/vit-large-patch16-224-in21k, available on HuggingFace, demanded substantial computing power and consistently led to runtime crashes. However, by harnessing the power of DeepSpeed, not only was a successful execution of the prodigious ViT model achieved, but significant advancements in the model optimization endeavours. Specifically, larger batch sizes, finer-grained learning rates and more expansive training sample sizes were able to be incorporated, thus capitalizing on the enhanced capabilities provided by DeepSpeed's state-of-the-art deep learning optimization library for PyTorch.
 Low Rank Approximation (LoRA) is an optimization technique that reduces the number of trainable parameters by learning pairs of rank-decomposition matrices while freezing the original weights. By leveraging LoRA, the storage footprint and memory usage of the model were able to be reduced, and larger models with better performance on the downstream classification task were able to be trained.
 
 ---
 
 ## Future Work
 
-Three approaches may be taken which are likely to further refine model performance.
-* More relevant data collection and augmentation
-* Increased training time and resources
-* Hyperparameter tuning.
-More extensive hyperparameter tuning is likely to further improve model performance. Different approaches, such as grid searches, random searches, or execution of hyperparameter sweeps.
+Four approaches may be taken which are likely to further refine model performance.
 
----
+### Further image augmentation
+
+The current dataset is limited to the overlay of cropped stock images at random points on the selection of background. The inclusion of additional backgrounds, rotation and resizing of the cropped images during the overlay process would further increase the amount of training data available. Image level transformations such as flips and rotation, as well as pixel level transformations like brightness, contrast and hue adjustments is likely to provide a model performance improvement.
+
+### Increased training time and resources
+
+It is to be noted however, that the proposed image augmentation will further inflate the datasets, resulting in significant increases in the training and testing time required for each model. Given sufficient time and computing resources, the models may be trained and tested using the augmented dataset consisting of the original sized images (1120x1120). This will allow for the standardization of the training, as well as the testing of the models thereby resulting in a more objective comparison in model performance.
+
+### Hyperparameter tuning
+
+More extensive hyperparameter tuning is likely to further improve model performance. Different approaches, such as grid searches, random searches or execution of hyperparameter sweeps.
+
 
 ## Conclusion
 
-In conclusion, this project aimed to leverage Natural Language Processing (NLP) techniques to classify statements made during FedSpeak communications for Andromeda Capital. The goal was to provide a deeper understanding of the sentiments expressed by the Federal Reserve during these meetings, enabling improved investment strategies.
-
-Multiple models were evaluated, including FLAN T5, DeBERTa, FinBERT, and GPT 3.5, with FLAN T5 Large emerging as the best-performing model. The Flan T5 large model was fine-tuned on a dataset of FedSpeak statements and achieved a test accuracy of 77%, significantly outperforming other models.
-
-The main challenge faced in this project was the limited availability of training data. Data augmentation techniques, such as generating similar sentences using ChatGPT, were employed to augment the dataset. However, some of the augmented data may have introduced noise that affected the overall model performance. Further experiments on a variety of other ChatGPT prompts in the future may help overcome this issue.
-
-Future work for this project includes collecting more relevant data, increasing training time and resources, and conducting hyperparameter tuning to further improve model performance. These approaches have the potential to enhance the accuracy and robustness of the classification model.
-
-Overall, by effectively classifying the statements made during FedSpeak communications, Andromeda Capital can gain valuable insights into the sentiments expressed by the Federal Reserve, leading to improved investment strategies and marker opportunities.
+The ability to classify images and identify objects was tested through transfer learning of models Resnet50, EfficientNetV2L, ViT and YOLOV3. Preliminary testing shows a general improvement of performance with more recent and sophisticated models. Given additional time and resources, a properly tuned model will be able to assist members of the public in the sorting of recyclables.
 
 ---
+
 
 ## Notebook
 
@@ -793,17 +781,12 @@ trainer.save_model(best_model_path)
 
 ## Sources
 
-1. Hansen, A. and Kazinnik, S., Can ChatGPT Decipher Fedspeak?, March 2023
-2. Pan, T., and Lee, H., AI in Finance: Deciphering Fedspeak with Natural Language Processing, March 2021
-3. Scaling Instruction-Finetuned Language Models. (2022, October 20). https://arxiv.org/abs/2210.11416
-4. The Flan Collection: Advancing open-source methods for instruction tuning. Section: Single task fine-tuning. (2023, February 1).
-https://ai.googleblog.com/2023/02/the-flan-collection-advancing-open.html
-5. Flan-T5 Overview. Hugging Face. https://huggingface.co/docs/transformers/model_doc/flan-t5
-6. Flan prompt templates by task. https://github.com/google-research/FLAN/blob/main/flan/v2/flan_templates_branched.py
-7. README.md · google/flan-t5-xxl at main. (2023, May 21). https://huggingface.co/google/flan-t5-xxl/blob/main/README.md. 
-8. He, P. et al. (2021) DeBERTa: Decoding-enhanced Bert with disentangled attention, arXiv.org. Available at: https://arxiv.org/abs/2006.03654 (Accessed: June 2023). 
-9. Chung, H.W. et al. (2022) Scaling instruction-finetuned language models, arXiv.org. Available at: https://arxiv.org/abs/2210.11416 (Accessed: May 2023). 
-10. Araci, D. (2019) Finbert: Financial sentiment analysis with pre-trained language models, arXiv.org. Available at: https://arxiv.org/abs/1908.10063 (Accessed: June 2023). 
-11. Board of governors of the Federal Reserve System (no date) Federal Reserve Board - H.15 - Selected Interest Rates (Daily) - June 23, 2023. Available at: https://www.federalreserve.gov/releases/h15/ (Accessed: June 2023).
-12. GPT-3 (2023) Wikipedia. Available at: https://en.wikipedia.org/wiki/GPT-3 (Accessed: June 2023).
-13. Desola, V. et al. (2019) FinBERT: pre-trained model on SEC filings for financial natural language tasks. Available at: https://www.researchgate.net/publication/334974348_FinBERT_pre-trained_model_on_SEC_filings_for_financial_natural_language_tasks (Accessed: May 2023).
+1. Channel News Asia. 2020. IN FOCUS: 'It is not easy, but it can be done' - The challenges of raising Singapore's recycling rate. https://www.channelnewsasia.com/singapore/in-focus-singapore-recycling-sustainability-blue-bins-waste-1339091 
+2. Kaza, S., Yao, L. C., Bhada-Tata, P., & Van Woerden, F. (2018). What a Waste 2.0: A Global Snapshot of Solid Waste Management to 2050. Washington, DC: World Bank. https://doi.org/10.1596/978-1-4648-1329-0
+3. N. V. Kumsetty, A. Bhat Nekkare, S. K. S. and A. Kumar M. 2018. TrashBox: Trash Detection and Classification using Quantum Transfer Learning. 31st Conference of Open Innovations. Association (FRUCT), 2022, pp. 125-130, doi: 10.23919/FRUCT54823.2022.9770922. https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9770922&isnumber=9770880
+4. He, K., Zhang, X., Ren, S., Sun, J. 2015. Deep Residual Learning for Image Recognition. arXiv.org. https://arxiv.org/abs/1512.03385 
+5. Boesch, G. (n.d). Vision Transformer (ViT) in Image Recognition – 2023 Guide. https://viso.ai/deep-learning/vision-transformer-vit/
+6. Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., & Houlsby, N. (2021, June 3). An image is worth 16x16 words: Transformers for image recognition at scale. arXiv.org. https://arxiv.org/abs/2010.11929
+7. Tan, M., Le, Q., 2021. EfficientNetV2: Smaller Models and Faster Training. arXiv.org: https://arxiv.org/abs/2104.00298
+8. Redmon, K. Divvala, S., Girshick, R., Farhadi, A. 2016, You Only Look Once: Unified, Real-Time Object Detection arXiv.org. https://arxiv.org/abs/1506.02640v5
+
