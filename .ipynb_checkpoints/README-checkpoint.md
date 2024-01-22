@@ -12,6 +12,6 @@ Check out the Machine Learning projects that I worked on recently:
 
 * [Reinforcement Learning: Blackjack Game](https://github.com/kyang4881/KYGit/tree/master/Reinforcement%20Learning%20Projects/Blackjack%20Game)
 
-* [AI Internship: Feature Selection](https://github.com/kyang4881/KYGit/tree/master/Monetary%20Authority%20of%20Singapore%20Project)
+* [MAS AI Internship: Feature Selection Methodology](https://github.com/kyang4881/KYGit/tree/master/Monetary%20Authority%20of%20Singapore%20Project)
 
 ---
